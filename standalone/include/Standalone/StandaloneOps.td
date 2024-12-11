@@ -40,18 +40,24 @@ def Standalone_FooOp : Standalone_Op<"foo", [Pure,
     }];
 }
 
-// def Standalone_AddOp : Standalone_Op<"add", [Pure,SameOperandsAndResultType]>{
-//     let summary = "Add two integers";
-//     let description = [{
-//         The `standalone.add` operation adds two integers and returns the result.
-//     }];
+def Standalone_MulOp : Standalone_Op<"mul", [Pure, SameOperandsAndResultType]> {
+  let summary = "Multiply two integers";
+  let description = [{
+    The `standalone.mul` operation multiplies two integers and returns the result.
 
-//     let arguments = (ins I32:$lhs, I32:$rhs);
-//     let results = (outs I32:$res);
+    Example:
 
-//     let assemblyFormat = [{
-//         $lhs attr-dict `,` $rhs attr-dict `:` type($lhs)
-//     }];
-// }
+    ```mlir
+    %result = standalone.mul %a, %b : i32
+    ```
+  }];
+
+  let arguments = (ins I32:$lhs, I32:$rhs); // Two input operands
+  let results = (outs I32:$res);           // One output result
+
+  let assemblyFormat = [{
+    $lhs `,` $rhs attr-dict `:` type($lhs)
+  }];
+}
 
 #endif // STANDALONE_OPS
