@@ -40,4 +40,18 @@ def Standalone_FooOp : Standalone_Op<"foo", [Pure,
     }];
 }
 
+// def Standalone_AddOp : Standalone_Op<"add", [Pure,SameOperandsAndResultType]>{
+//     let summary = "Add two integers";
+//     let description = [{
+//         The `standalone.add` operation adds two integers and returns the result.
+//     }];
+
+//     let arguments = (ins I32:$lhs, I32:$rhs);
+//     let results = (outs I32:$res);
+
+//     let assemblyFormat = [{
+//         $lhs attr-dict `,` $rhs attr-dict `:` type($lhs)
+//     }];
+// }
+
 #endif // STANDALONE_OPS
