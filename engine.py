@@ -51,11 +51,16 @@ class Model():
         self.nodes = o_model.graph.node
 
     def infer(self, input):
-        for i, n in enumerate(self.nodes):
+        for i, nd in enumerate(self.nodes):
             if i == 0:
-                self.cache[n.input[0]] = input
-            inputs = [self.cache[inp] for inp in n.input]
-            n_obj = Node(n.op_type, inputs)
-            self.cache[n.output[0]] = n_obj.execute()
-            out = n.output[0]
+                self.cache[nd.input[0]] = input
+            inputs = [self.cache[inp] for inp in nd.input]
+            n_obj = Node(nd.op_type, inputs)
+            self.cache[nd.output[0]] = n_obj.execute()
+            out = nd.output[0]
         return self.cache[out]
+    
+
+
+    # PASSAR AST PARA MINHA LINGUAGEM 
+    #
