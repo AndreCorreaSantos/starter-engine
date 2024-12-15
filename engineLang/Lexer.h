@@ -2,7 +2,7 @@
 #include <memory>
 #include <string>
 #include <cassert>
-
+#include <math.h> 
 namespace engine {
 
 
@@ -10,6 +10,7 @@ enum Token : int {
     tok_parenthesis_open = '(',
     tok_parenthesis_close = ')',
     tok_colon = ':',
+    tok_comma = ',',
 
     tok_identifier = -5,
     tok_number = -4,
@@ -39,6 +40,12 @@ public:
     Token getCurToken() { return curTok; }
 
     Token getNextToken() {return curTok = getTok();};
+    /// Move to the next token in the stream, asserting on the current token
+    /// matching the expectation.
+    void consume(Token tok) {
+        assert(tok == curTok && "consume Token mismatch expectation");
+        getNextToken();
+    }
 
     /// Return the current identifier (prereq: getCurToken() == tok_identifier)
     std::string getId() {
@@ -51,6 +58,18 @@ public:
         assert(curTok == tok_number);
         return numVal;
     }
+
+    // DEBUGGING FUNCS
+
+    /// Return the location for the beginning of the current token.
+    Location getLastLocation() { return lastLocation; }
+
+    // Return the current line in the file.
+    int getLine() { return curLineNum; }
+
+    // Return the current column in the file.
+    int getCol() { return curCol; }
+
 
 
 private:
@@ -100,15 +119,15 @@ private:
         }
 
         // Number: [0-9.]+
-        if (isdigit(lastChar) || lastChar == '.') {
-        std::string numStr;
-        do {
-            numStr += lastChar;
-            lastChar = Token(getNextChar());
-        } while (isdigit(lastChar) || lastChar == '.');
+        if (isdigit(lastChar) || lastChar == '.' || lastChar == '-' || lastChar == '+') {
+            std::string numStr;
+            do {
+                numStr += lastChar;
+                lastChar = Token(getNextChar());
+            } while (isdigit(lastChar) || lastChar == '.' || lastChar == 'e' || lastChar == 'E' || lastChar == '-' || lastChar == '+');
 
-        numVal = strtod(numStr.c_str(), nullptr);
-        return tok_number;
+            numVal = strtod(numStr.c_str(), nullptr);
+            return tok_number;
         }
 
         if (lastChar == '#') {
