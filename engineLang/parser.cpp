@@ -52,11 +52,9 @@ std::vector<float> parse_data(Lexer& lexer) {
         data.push_back(lexer.getValue());
         lexer.consume(tok_number);
         Location loc = lexer.getLastLocation();
-        if (loc.col % 1000 == 0)
-        {
-            std::cout << "Line: " << loc.line << " Column: " << loc.col << std::endl;
+        if (loc.col > 10){
+            return data;
         }
-       
     }
     return data;
 }
