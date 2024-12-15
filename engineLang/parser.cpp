@@ -36,6 +36,9 @@ int main(int argc, char* argv[]){
     std::cout << "Token: " << lexer.getCurToken() << std::endl;
     std::cout << lexer.getId() << std::endl;
 
+    // lexer.getNextToken();
+    // std::cout << "Token: " << lexer.getCurToken() << std::endl;
+
     
 
     return 0;

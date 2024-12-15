@@ -93,7 +93,7 @@ private:
         // Identifier: [a-zA-Z][a-zA-Z0-9_]*
         if (isalpha(lastChar)) {
         identifierStr = (char)lastChar;
-        while (isalnum((lastChar = Token(getNextChar()))) || lastChar == '_')
+        while (isalnum((lastChar = Token(getNextChar()))) || lastChar == '_' || lastChar == '.')
             identifierStr += (char)lastChar;
 
         return tok_identifier;
