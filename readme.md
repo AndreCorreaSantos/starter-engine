@@ -5,7 +5,7 @@
 
 SAVE INTO TXT FILE:
 
---------INITIALZERS--------- (both weights and biases are here)
+--------INITIALIZERS--------- (both weights and biases are here)
 
 name
 data
@@ -43,3 +43,12 @@ onnx= {initializer},newline,{node};
 initializer = string,tuple,newline,{float};
 node = ;
 ```
+
+PARSER NEEDS TO:
+1)  CREATE SEVERAL INITIALIZER DEC
+2)  CREATE SEVERAL NODES DEC
+
+
+Execution would be:
+    - Loop over initializers and set them in cache with their names.
+    - Loop over nodes and execute them.
