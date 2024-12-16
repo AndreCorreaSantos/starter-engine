@@ -10,19 +10,20 @@ using namespace engine;
 class Initializer{
 public:
     std::string name;
-    std::string op_type;
     std::vector<int> shape;
     std::vector<float> data;
 };
 
-std::string parse_name(Lexer& lexer) {
+std::string parse_name(Lexer& lexer, bool consume = true) {
     std::string name;
     name = lexer.getId();
-    // lexer.getNextToken();
+    if(consume){
+        lexer.getNextToken();
+    }
     return name;
 }
 
-std::vector<int> parse_shape(Lexer& lexer) {
+std::vector<int> parse_shape(Lexer& lexer, bool consume = true) {
     std::vector<int> shape;
     // Ensure the opening parenthesis is consumed
     lexer.consume(tok_parenthesis_open);
@@ -40,8 +41,13 @@ std::vector<int> parse_shape(Lexer& lexer) {
             throw std::runtime_error("Unexpected token in shape, expected integer");
         }
     }
-    // Ensure the closing parenthesis is consumed
-    lexer.consume(tok_parenthesis_close);
+    if(lexer.getCurToken() != tok_parenthesis_close){
+        throw std::runtime_error("Expected closing parenthesis");
+    }
+
+    if(consume){
+        lexer.consume(tok_parenthesis_close);
+    }
 
     return shape;
 }
@@ -72,16 +78,13 @@ std::vector<float> parse_data(Lexer& lexer) {
 
 Initializer parse_initializer(Lexer& lexer){
     std::string name;
-    std::string op_type;
     std::vector<int> shape;
     std::vector<float> data;
     name = parse_name(lexer);
-    lexer.getNextToken();
-    shape = parse_shape(lexer);
-    op_type = parse_name(lexer);
+    shape = parse_shape(lexer,false);
     data = parse_data(lexer);
     
-    return Initializer{name, op_type, shape, data};
+    return Initializer{name, shape, data};
 }   
 
 int main(int argc, char* argv[]){
@@ -93,17 +96,15 @@ int main(int argc, char* argv[]){
 
     Lexer lexer(argv[1]);
     lexer.getNextToken();
-    Initializer initializer = parse_initializer(lexer);
-    std::cout << initializer.name << std::endl;
-    std::cout << initializer.op_type << std::endl;
-    //first element
-    std::cout << initializer.data.front() << std::endl;
-    //last element
-    std::cout << initializer.data.back() << std::endl;
-    std::cout << initializer.data.size() << std::endl;
-
-    std::cout << lexer.getId() << std::endl;
     
+
+
+    Initializer initializer1 = parse_initializer(lexer);
+    Initializer initializer2 = parse_initializer(lexer);
+    std::cout << initializer2.name << std::endl;
+    std::cout<< initializer2.data.front() << std::endl;
+    std::cout << initializer2.data.back() << std::endl;
+    std::cout << initializer2.data.size() << std::endl;
 
     return 0;
 }
