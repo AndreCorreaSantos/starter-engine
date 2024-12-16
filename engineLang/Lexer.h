@@ -59,6 +59,14 @@ public:
         return numVal;
     }
 
+    std::string getLineBuffer() { return curLineBuffer; }
+
+    void getNextLine() {
+        curLineBuffer = readNextLine();
+        curLineNum++;
+        curCol = 0;
+    }
+
     // DEBUGGING FUNCS
 
     /// Return the location for the beginning of the current token.
