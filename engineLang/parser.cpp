@@ -14,6 +14,14 @@ public:
     std::vector<float> data;
 };
 
+class Node{
+public:
+    std::string op_type;
+    std::vector<std::string> output;
+    std::vector<std::string> input;
+
+};
+
 std::string parse_name(Lexer& lexer, bool consume = true) {
     std::string name;
     name = lexer.getId();
@@ -53,7 +61,7 @@ std::vector<int> parse_shape(Lexer& lexer, bool consume = true) {
 }
 
 
-std::vector<float> splitString(const std::string& input, char delimiter) {
+std::vector<float> splitData(const std::string& input, char delimiter) {
     std::vector<float> result;
     size_t start = 0;
     size_t end;
@@ -70,7 +78,7 @@ std::vector<float> splitString(const std::string& input, char delimiter) {
 
 
 std::vector<float> parse_data(Lexer& lexer) {
-    std::vector<float> data = splitString(lexer.getLineBuffer(), ' ');
+    std::vector<float> data = splitData(lexer.getLineBuffer(), ' ');
     lexer.getNextLine();
     lexer.getNextToken();
     return data;
@@ -87,6 +95,41 @@ Initializer parse_initializer(Lexer& lexer){
     return Initializer{name, shape, data};
 }   
 
+std::vector<std::string> splitStrings(const std::string& input, char delimiter) {
+    std::vector<std::string> result;
+    size_t start = 0;
+    size_t end;
+
+    while ((end = input.find(delimiter, start)) != std::string::npos) {
+        result.push_back(input.substr(start, end - start));
+        start = end + 1;
+    }
+    // Add the last token
+    result.push_back(input.substr(start));
+    
+    return result;
+}
+
+std::vector<std::string> parse_strings(Lexer& lexer,bool consume=true){
+    std::vector<std::string> strs = splitStrings(lexer.getLineBuffer(), ' ');
+    lexer.getNextLine();
+    if (consume){
+        lexer.getNextToken();
+    }
+    return strs;
+}
+
+
+Node parse_node(Lexer& lexer) {
+    std::string op_type;
+    std::vector<std::string> output;
+    std::vector<std::string> input;
+    op_type = parse_name(lexer,false);
+    output = parse_strings(lexer,false);
+    input = parse_strings(lexer);
+    return Node{op_type,output,input};
+}
+
 int main(int argc, char* argv[]){
 
     if(argc != 2){
@@ -96,15 +139,27 @@ int main(int argc, char* argv[]){
 
     Lexer lexer(argv[1]);
     lexer.getNextToken();
-    
+
+    std::vector<Initializer> inits;
+    std::vector<Node> nodes;
+
+    while(lexer.getCurToken() != tok_delimiter){
+        inits.push_back(parse_initializer(lexer));
+    }
+    lexer.consume(tok_delimiter);    
+    while (lexer.getCurToken() != tok_eof)
+    {
+        nodes.push_back(parse_node(lexer));
+    }
+
+    std::cout << inits.size() << std::endl;
+    std::cout << nodes.size() << std::endl;
 
 
-    Initializer initializer1 = parse_initializer(lexer);
-    Initializer initializer2 = parse_initializer(lexer);
-    std::cout << initializer2.name << std::endl;
-    std::cout<< initializer2.data.front() << std::endl;
-    std::cout << initializer2.data.back() << std::endl;
-    std::cout << initializer2.data.size() << std::endl;
+
+
+
+
 
     return 0;
 }

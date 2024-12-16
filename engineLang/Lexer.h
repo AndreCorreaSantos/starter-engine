@@ -11,6 +11,7 @@ enum Token : int {
     tok_parenthesis_close = ')',
     tok_colon = ':',
     tok_comma = ',',
+    tok_delimiter = '|',
 
     tok_identifier = -5,
     tok_number = -4,
