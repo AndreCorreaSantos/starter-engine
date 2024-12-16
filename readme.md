@@ -40,7 +40,11 @@ def Node(inputs,output, op_type):
 
 ``` ebnf
 onnx= {initializer},newline,{node};
-initializer = string,tuple,newline,{float};
+initializer = name,shape, op_type,newline,data;
+name = string;
+shape = "(",[int, {",", int}, [","]],")";
+op_type = string;
+data = {float};
 node = ;
 ```
 
@@ -52,3 +56,7 @@ PARSER NEEDS TO:
 Execution would be:
     - Loop over initializers and set them in cache with their names.
     - Loop over nodes and execute them.
+
+
+
+### CURRENT ISSUE: NUMBERS STOPPED BEING PARSED CORRECTLY AFTER INTRODUCING SCIENTIFIC NOTATION 

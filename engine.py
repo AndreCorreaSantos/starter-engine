@@ -11,6 +11,21 @@ def convert_raw_data(initializer):
         return np.frombuffer(initializer.raw_data, dtype=np.int64).reshape(initializer.dims)
     else:
         raise ValueError(f"Unsupported data type: {data_type}")
+    
+def write_data(path, model):
+    with open(path, "w+") as f:
+        for i in model.graph.initializer:
+            data = convert_raw_data(i)
+            f.write(f'{i.name} {data.shape}\n')
+            flat_data = data.flatten()[None, :]
+            np.savetxt(f, flat_data, fmt='%s', delimiter=' ', newline='')
+            f.write('\n')
+        f.write("| \n")
+        for i in model.graph.node:
+            f.write(f"{i.op_type}\n")
+            f.write(f"{" ".join(i.output)}\n")
+            f.write(f"{" ".join(i.input)}\n")
+
 
 class Node():
     def __init__(self, op_type, inputs):
