@@ -42,21 +42,110 @@ include(AddLLVM)
 include(AddMLIR)
 include(HandleLLVMOptions)
 
-# Include directories for LLVM and MLIR headers
-include_directories(${LLVM_INCLUDE_DIRS})
+# Collect all include paths for TableGen
+set(TABLEGEN_INCLUDE_DIRS
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${MLIR_INCLUDE_DIRS}
+  ${LLVM_INCLUDE_DIRS}
+)
+
+# Prepare include flags for TableGen
+set(TABLEGEN_INCLUDES)
+foreach(dir ${TABLEGEN_INCLUDE_DIRS})
+  list(APPEND TABLEGEN_INCLUDES -I${dir})
+endforeach()
+
+# TableGen setup for Engine Dialect
+set(ENGINE_TD_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(ENGINE_GEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/include)
+
+# Ensure the generated include directory exists
+file(MAKE_DIRECTORY ${ENGINE_GEN_DIR})
+
+# Generate headers and sources for Engine Dialect
+# Use explicit include paths for mlir-tblgen
+add_custom_command(
+  OUTPUT ${ENGINE_GEN_DIR}/EngineDialect.h.inc
+  COMMAND ${MLIR_TABLEGEN_EXE}
+    ${ENGINE_TD_DIR}/EngineDialect.td
+    -gen-dialect-decls
+    -dialect=engine
+    -name=Engine
+    ${TABLEGEN_INCLUDES}
+    -o ${ENGINE_GEN_DIR}/EngineDialect.h.inc
+  DEPENDS 
+    ${ENGINE_TD_DIR}/EngineDialect.td
+    ${MLIR_TABLEGEN_EXE}
+)
+
+add_custom_command(
+  OUTPUT ${ENGINE_GEN_DIR}/EngineDialect.cpp.inc
+  COMMAND ${MLIR_TABLEGEN_EXE}
+    ${ENGINE_TD_DIR}/EngineDialect.td
+    -gen-dialect-defs
+    -dialect=engine
+    -name=Engine
+    ${TABLEGEN_INCLUDES}
+    -o ${ENGINE_GEN_DIR}/EngineDialect.cpp.inc
+  DEPENDS 
+    ${ENGINE_TD_DIR}/EngineDialect.td
+    ${MLIR_TABLEGEN_EXE}
+)
+
+add_custom_command(
+  OUTPUT ${ENGINE_GEN_DIR}/EngineOps.h.inc
+  COMMAND ${MLIR_TABLEGEN_EXE}
+    ${ENGINE_TD_DIR}/EngineOps.td
+    -gen-op-decls
+    ${TABLEGEN_INCLUDES}
+    -o ${ENGINE_GEN_DIR}/EngineOps.h.inc
+  DEPENDS 
+    ${ENGINE_TD_DIR}/EngineOps.td
+    ${ENGINE_TD_DIR}/EngineDialect.td
+    ${MLIR_TABLEGEN_EXE}
+)
+
+add_custom_command(
+  OUTPUT ${ENGINE_GEN_DIR}/EngineOps.cpp.inc
+  COMMAND ${MLIR_TABLEGEN_EXE}
+    ${ENGINE_TD_DIR}/EngineOps.td
+    -gen-op-defs
+    ${TABLEGEN_INCLUDES}
+    -o ${ENGINE_GEN_DIR}/EngineOps.cpp.inc
+  DEPENDS 
+    ${ENGINE_TD_DIR}/EngineOps.td
+    ${ENGINE_TD_DIR}/EngineDialect.td
+    ${MLIR_TABLEGEN_EXE}
+)
+
+# Create a target for generated files
+add_custom_target(EngineDialectGen 
+  DEPENDS 
+    ${ENGINE_GEN_DIR}/EngineDialect.h.inc
+    ${ENGINE_GEN_DIR}/EngineDialect.cpp.inc
+    ${ENGINE_GEN_DIR}/EngineOps.h.inc
+    ${ENGINE_GEN_DIR}/EngineOps.cpp.inc
+)
+
+# Include directories
 include_directories(${MLIR_INCLUDE_DIRS})
-include_directories(${PROJECT_SOURCE_DIR}/include)  # Your include directory for custom headers
-include_directories(${PROJECT_BINARY_DIR}/include)   # Generated include directory
-
-
-
+include_directories(${LLVM_INCLUDE_DIRS})
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_BINARY_DIR}/include)
+include_directories(${ENGINE_GEN_DIR})
 
 # Link directories for LLVM libraries
 link_directories(${LLVM_BUILD_LIBRARY_DIR})
 add_definitions(${LLVM_DEFINITIONS})
 
+# Add library
+add_library(EngineDialect
+  lib/EngineDialect.cpp
+  lib/EngineOps.cpp
+)
+
+# Ensure generated files are created before compiling the library
+add_dependencies(EngineDialect EngineDialectGen)
+
 # Add subdirectories for your project components
-add_subdirectory(include)      # Contains header files, if any
-add_subdirectory(lib)          # Contains your dialect implementation (e.g., EngineDialect.cpp)
-# add_subdirectory(test)         # Contains tests for your dialect, if any
-add_subdirectory(engine-opt)   # Replace with your executable target (e.g., standalone-opt)
+add_subdirectory(engine-opt)

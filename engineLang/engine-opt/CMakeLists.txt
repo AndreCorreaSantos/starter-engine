@@ -1,59 +1,30 @@
-cmake_minimum_required(VERSION 3.13.4)
+# CMake configuration for engine-opt tool
+add_executable(engine-opt main.cpp)
 
-# Set policies for CMake behavior
-if(POLICY CMP0068)
-  cmake_policy(SET CMP0068 NEW)
-  set(CMAKE_BUILD_WITH_INSTALL_NAME_DIR ON)
-endif()
+# Link MLIR and your custom EngineDialect library
+target_link_libraries(engine-opt
+  PRIVATE
+    MLIRSupport        # MLIR support utilities
+    MLIRIR             # Core MLIR IR library
+    MLIRParser         # MLIR file parser
+    EngineDialect      # Link your custom EngineDialect library
+)
 
-if(POLICY CMP0075)
-  cmake_policy(SET CMP0075 NEW)
-endif()
+# Include directories
+target_include_directories(engine-opt PRIVATE
+  ${PROJECT_SOURCE_DIR}/include   # Your project headers
+  ${PROJECT_BINARY_DIR}/include   # TableGen-generated headers
+  ${MLIR_INCLUDE_DIRS}            # MLIR includes
+)
 
-if(POLICY CMP0077)
-  cmake_policy(SET CMP0077 NEW)
-endif()
+# Output the executable to the bin directory
+set_target_properties(engine-opt PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
 
-# Define the project name and languages
-project(engine-dialect LANGUAGES CXX C)
+# Ensure TableGen-generated files are built before engine-opt
+add_dependencies(engine-opt EngineDialectGen)
 
-# Set the C++ standard
-set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard to conform to")
-
-# Find MLIR package
-find_package(MLIR REQUIRED CONFIG)
-
-# Output information about found packages
-message(STATUS "Using MLIRConfig.cmake in: ${MLIR_DIR}")
-message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
-
-# Set output directories for runtime and libraries
-set(LLVM_RUNTIME_OUTPUT_INTDIR ${CMAKE_BINARY_DIR}/bin)
-set(LLVM_LIBRARY_OUTPUT_INTDIR ${CMAKE_BINARY_DIR}/lib)
-set(MLIR_BINARY_DIR ${CMAKE_BINARY_DIR})
-
-# Add MLIR and LLVM module paths
-list(APPEND CMAKE_MODULE_PATH "${MLIR_CMAKE_DIR}")
-list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
-
-# Include necessary MLIR modules
-include(TableGen)
-include(AddLLVM)
-include(AddMLIR)
-include(HandleLLVMOptions)
-
-# Include directories for LLVM and MLIR headers
-include_directories(${LLVM_INCLUDE_DIRS})
-include_directories(${MLIR_INCLUDE_DIRS})
-include_directories(${PROJECT_SOURCE_DIR}/include)  # Your include directory for custom headers
-include_directories(${PROJECT_BINARY_DIR}/include)   # Generated include directory
-
-# Link directories for LLVM libraries
-link_directories(${LLVM_BUILD_LIBRARY_DIR})
-add_definitions(${LLVM_DEFINITIONS})
-
-# Add subdirectories for your project components
-add_subdirectory(include)      # Contains header files, if any
-add_subdirectory(lib)          # Contains your dialect implementation (e.g., EngineDialect.cpp)
-# add_subdirectory(test)         # Contains tests for your dialect, if any
-add_subdirectory(engine-opt)   # Replace with your executable target (e.g., standalone-opt)
+# Update compile flags for LLVM
+llvm_update_compile_flags(engine-opt)
+mlir_check_link_libraries(engine-opt)
