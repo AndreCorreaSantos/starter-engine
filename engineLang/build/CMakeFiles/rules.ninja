@@ -6,15 +6,23 @@
 # It is included in the main 'build.ninja'.
 
 # =============================================================================
-# Project: engine-dialect
+# Project: engine
 # Configurations: 
 # =============================================================================
 # =============================================================================
 
 #############################################
+# Rule for running custom commands.
+
+rule CUSTOM_COMMAND
+  command = $COMMAND
+  description = $DESC
+
+
+#############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__EngineDialect_unscanned_
+rule CXX_COMPILER__obj.2eMLIREngine_unscanned_
   depfile = $DEP_FILE
   deps = gcc
   command = /usr/bin/c++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -24,18 +32,10 @@ rule CXX_COMPILER__EngineDialect_unscanned_
 #############################################
 # Rule for linking CXX static library.
 
-rule CXX_STATIC_LIBRARY_LINKER__EngineDialect_
+rule CXX_STATIC_LIBRARY_LINKER__MLIREngine_
   command = $PRE_LINK && /home/andre/.local/lib/python3.10/site-packages/cmake/data/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar Dqc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib -D $TARGET_FILE && $POST_BUILD
   description = Linking CXX static library $TARGET_FILE
   restat = $RESTAT
-
-
-#############################################
-# Rule for running custom commands.
-
-rule CUSTOM_COMMAND
-  command = $COMMAND
-  description = $DESC
 
 
 #############################################

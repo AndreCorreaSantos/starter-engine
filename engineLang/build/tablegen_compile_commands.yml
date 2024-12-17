@@ -1,0 +1,42 @@
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineDialect.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
+--- !FileInfo:
+  filepath: "/home/andre/starter-engine/engineLang/include/Engine/EngineOps.td"
+  includes: "/home/andre/starter-engine/engineLang/include/Engine;/home/andre/llvm-project/llvm/include;/home/andre/llvm-project/build/include;/home/andre/llvm-project/mlir/include;/home/andre/llvm-project/build/tools/mlir/include;/home/andre/starter-engine/engineLang/include;/home/andre/starter-engine/engineLang/build/include"
