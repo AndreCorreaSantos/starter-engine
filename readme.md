@@ -55,8 +55,9 @@ PARSER NEEDS TO:
 
 Execution would be:
     - Loop over initializers and set them in cache with their names.
-    - Loop over nodes and execute them.
+    - Loop over nodes and execute them, setting their output in cache.
 
 
 
-### CURRENT ISSUE: NUMBERS STOPPED BEING PARSED CORRECTLY AFTER INTRODUCING SCIENTIFIC NOTATION 
+### Need to create operations for my language and specify their lowering into the llvm dialect
+
