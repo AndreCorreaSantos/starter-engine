@@ -1,5 +1,10 @@
 # ninja log v5
-1	4	1734460489288080529	include/EngineDialect.h.inc	4f5a8b909306b234
-1	4	1734460489288080529	/home/andre/starter-engine/engineLang/build/include/EngineDialect.h.inc	4f5a8b909306b234
-1	4	1734460489288080529	include/EngineDialect.cpp.inc	12f96a048601ec53
-1	4	1734460489288080529	/home/andre/starter-engine/engineLang/build/include/EngineDialect.cpp.inc	12f96a048601ec53
+1	4	1734463781293573915	include/EngineDialect.cpp.inc	12f96a048601ec53
+1	4	1734463781293573915	/home/andre/starter-engine/engineLang/build/include/EngineDialect.cpp.inc	12f96a048601ec53
+1	4	1734463781293573915	include/EngineDialect.h.inc	4f5a8b909306b234
+1	4	1734463781293573915	/home/andre/starter-engine/engineLang/build/include/EngineDialect.h.inc	4f5a8b909306b234
+2	8	1734463781298573863	include/EngineOps.h.inc	ac0a993f8bdebe13
+2	8	1734463781298573863	/home/andre/starter-engine/engineLang/build/include/EngineOps.h.inc	ac0a993f8bdebe13
+1	9	1734463781298573863	include/EngineOps.cpp.inc	ca77643d13f7e773
+1	9	1734463781298573863	/home/andre/starter-engine/engineLang/build/include/EngineOps.cpp.inc	ca77643d13f7e773
+9	18	1734463781307573770	CMakeFiles/EngineDialect.dir/lib/EngineOps.cpp.o	9c61129cf140bba3
