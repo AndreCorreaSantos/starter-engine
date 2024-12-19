@@ -50,4 +50,13 @@ def WorldOp : Engine_Op<"world", [Pure]> {
     }];
 }
 
+def AddOp : Engine_Op<"add"> {
+  let summary = "adds two tensors";
+  let description = [{
+    The "add" operation adds two tensors element-wise.
+  }];
+  let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef]>:$lhs, AnyTypeOf<[F64Tensor, F64MemRef]>:$rhs);
+  let results = (outs F64Tensor);
+}
+
 #endif // HELLO_OPS

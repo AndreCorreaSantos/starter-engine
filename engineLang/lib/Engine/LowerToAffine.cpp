@@ -141,6 +141,15 @@ class PrintOpLowering : public mlir::OpConversionPattern<engine::PrintOp> {
   }
 };
 
+class AddOpLowering : public mlir::OpConversionPattern<engine::AddOp> {
+  using OpConversionPattern<engine::AddOp>::OpConversionPattern;
+
+mlir::LogicalResult
+AddOpLowering::matchAndRewrite(engine::AddOp op, OpAdaptor adaptor,
+                                mlir::ConversionPatternRewriter &rewriter) const final {
+}
+};
+
 namespace {
 class EngineToAffineLowerPass
     : public mlir::PassWrapper<EngineToAffineLowerPass,
@@ -172,7 +181,7 @@ void EngineToAffineLowerPass::runOnOperation() {
   target.addLegalOp<engine::WorldOp>();
 
   mlir::RewritePatternSet patterns(&getContext());
-  patterns.add<ConstantOpLowering, PrintOpLowering>(&getContext());
+  patterns.add<ConstantOpLowering, PrintOpLowering, AddOpLowering>(&getContext());
 
   if (mlir::failed(mlir::applyPartialConversion(getOperation(), target,
                                                 std::move(patterns)))) {
