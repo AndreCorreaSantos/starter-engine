@@ -59,4 +59,13 @@ def AddOp : Engine_Op<"add"> {
   let results = (outs F64Tensor);
 }
 
+def MulOp : Engine_Op<"mul">{
+  let summary = "multiplies two tensors";
+  let description = [{
+    The "mul" operation multiplies two tensors.
+  }];
+  let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef]>:$lhs, AnyTypeOf<[F64Tensor, F64MemRef]>:$rhs);
+  let results = (outs F64Tensor);
+}
+
 #endif // HELLO_OPS

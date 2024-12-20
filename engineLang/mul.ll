@@ -99,7 +99,7 @@ define void @main() {
   %64 = add i64 %63, %54
   %65 = getelementptr double, ptr %62, i64 %64
   %66 = load double, ptr %65, align 8
-  %67 = fadd double %61, %66
+  %67 = fmul double %61, %66
   %68 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 1
   %69 = mul i64 %50, 3
   %70 = add i64 %69, %54

@@ -59,5 +59,5 @@ Execution would be:
 
 
 
-### Need to create operations for my language and specify their lowering into the llvm dialect
+### RIGHT NOW, UNDERSTAND OPERATION LOWERING TO LLVM IN ENGINELANG. --> LOWER ADD OPERATION TO AFFINE
 

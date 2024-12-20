@@ -208,6 +208,7 @@ struct BinaryOpLowering : public mlir::ConversionPattern {
 };
 
 using AddOpLowering = BinaryOpLowering<engine::AddOp, mlir::arith::AddFOp>;
+using MulOpLowering = BinaryOpLowering<engine::MulOp, mlir::arith::MulFOp>;
 
 } 
 
@@ -245,6 +246,7 @@ void EngineToAffineLowerPass::runOnOperation() {
   patterns.add<ConstantOpLowering>(&getContext());
   patterns.add<PrintOpLowering>(&getContext());
   patterns.add<AddOpLowering>(&getContext());
+  patterns.add<MulOpLowering>(&getContext());
 
   if (mlir::failed(mlir::applyPartialConversion(getOperation(), target,
                                                 std::move(patterns)))) {
