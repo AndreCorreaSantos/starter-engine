@@ -13,7 +13,7 @@ def ConstantOp : Engine_Op<"constant", [Pure]> {
     ```mlir
       %0 = "engine.constant"()
       { value = dense<[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]> : tensor<2x3xf64> }
-      : () -> tensor<2x3xf64>
+      : () -> tensor<2x3xf64> 
     ```
   }];
 

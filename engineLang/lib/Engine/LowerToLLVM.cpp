@@ -42,85 +42,7 @@
 #include <iostream>
 
 namespace engine {
-
-class AddOpLowering : public mlir::ConversionPattern {
-public:
-  explicit AddOpLowering(mlir::MLIRContext *context)
-      : mlir::ConversionPattern(AddOp::getOperationName(), 1, context) {}
-
-  mlir::LogicalResult
-  matchAndRewrite(mlir::Operation *op, mlir::ArrayRef<mlir::Value> operands,
-                  mlir::ConversionPatternRewriter &rewriter) const override {
-// Verify input operands and results
-    assert(operands.size() == 2 && "AddOp should have two input operands");
-    assert(op->getNumResults() == 1 && "AddOp should have one result");
-    
-    // Get the location of the original operation
-    auto loc = op->getLoc();
-    
-    // Access the converted input values
-    mlir::Value lhs = operands[0];
-    mlir::Value rhs = operands[1];
-    
-    // Determine the shape of the input tensor
-    auto lhsType = mlir::cast<mlir::MemRefType>(lhs.getType());
-    auto shape = lhsType.getShape();
-    
-    // Create the result memref with the same type as the inputs
-    auto resultType = mlir::cast<mlir::MemRefType>(op->getResult(0).getType());
-    
-    // Create loops to iterate over the tensor dimensions
-    mlir::SmallVector<mlir::Value, 4> loopIvs;
-    
-    // Generate nested loops
-    auto outerLoop = rewriter.create<mlir::scf::ForOp>(
-      loc, 
-      rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0),
-      rewriter.create<mlir::arith::ConstantIndexOp>(loc, shape[0]),
-      rewriter.create<mlir::arith::ConstantIndexOp>(loc, 1)
-    );
-    
-    // Populate the loops
-    rewriter.setInsertionPointToStart(outerLoop.getBody());
-    loopIvs.push_back(outerLoop.getInductionVar());
-    
-    // Create nested loops for higher-dimensional tensors
-    mlir::Value currentLoopIv = outerLoop.getInductionVar();
-    for (unsigned dim = 1; dim < shape.size(); ++dim) {
-      auto innerLoop = rewriter.create<mlir::scf::ForOp>(
-        loc, 
-        rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0),
-        rewriter.create<mlir::arith::ConstantIndexOp>(loc, shape[dim]),
-        rewriter.create<mlir::arith::ConstantIndexOp>(loc, 1)
-      );
-      
-      rewriter.setInsertionPointToStart(innerLoop.getBody());
-      loopIvs.push_back(innerLoop.getInductionVar());
-      
-      // Update the current loop induction variable
-      currentLoopIv = innerLoop.getInductionVar();
-    }
-    
-    // If this is the innermost loop, perform the addition
-    if (loopIvs.size() == shape.size()) {
-      // Load elements from input tensors
-      auto lhsElement = rewriter.create<mlir::memref::LoadOp>(loc, lhs, loopIvs);
-      auto rhsElement = rewriter.create<mlir::memref::LoadOp>(loc, rhs, loopIvs);
-      
-      // Perform addition (using floating-point addition)
-      auto addResult = rewriter.create<mlir::arith::AddFOp>(loc, lhsElement, rhsElement);
-      
-      // Store the result in the output tensor
-      rewriter.create<mlir::memref::StoreOp>(loc, addResult, op->getResult(0), loopIvs);
-    }
-    
-    // Remove the original operation
-    rewriter.eraseOp(op);
-    
-    return mlir::success();
-  }
-};
-
+ 
 class PrintOpLowering : public mlir::ConversionPattern {
 public:
   explicit PrintOpLowering(mlir::MLIRContext *context)
@@ -346,7 +268,7 @@ void EngineToLLVMLoweringPass::runOnOperation() {
                                                         patterns);
   populateFuncToLLVMConversionPatterns(typeConverter, patterns);
 
-  patterns.add<engine::PrintOpLowering, engine::WorldOpLowering, engine::AddOp>(&getContext());
+  patterns.add<engine::PrintOpLowering, engine::WorldOpLowering>(&getContext());
 
   auto module = getOperation();
   if (failed(applyFullConversion(module, target, std::move(patterns)))) {

@@ -26,6 +26,13 @@
 #include "mlir/Pass/Pass.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "llvm/ADT/Sequence.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/STLExtras.h"
+#include "mlir/IR/Builders.h"
+#include "mlir/IR/Location.h"
+#include "mlir/IR/Value.h"
+#include "mlir/IR/PatternMatch.h"
 
 static mlir::MemRefType convertTensorToMemRef(mlir::TensorType type) {
   assert(type.hasRank() && "expected only ranked shapes");
@@ -141,14 +148,68 @@ class PrintOpLowering : public mlir::OpConversionPattern<engine::PrintOp> {
   }
 };
 
-class AddOpLowering : public mlir::OpConversionPattern<engine::AddOp> {
-  using OpConversionPattern<engine::AddOp>::OpConversionPattern;
 
-mlir::LogicalResult
-AddOpLowering::matchAndRewrite(engine::AddOp op, OpAdaptor adaptor,
-                                mlir::ConversionPatternRewriter &rewriter) const final {
+
+
+/// This defines the function type used to process an iteration of a lowered
+/// loop. It takes as input an OpBuilder, an range of memRefOperands
+/// corresponding to the operands of the input operation, and the range of loop
+/// induction variables for the iteration. It returns a value to store at the
+/// current index of the iteration.
+using LoopIterationFn = llvm::function_ref<mlir::Value(
+    mlir::OpBuilder &rewriter, mlir::ValueRange memRefOperands, mlir::ValueRange loopIvs)>;
+
+static void lowerOpToLoops(mlir::Operation *op, mlir::ValueRange operands,
+                           mlir::PatternRewriter &rewriter,
+                           LoopIterationFn processIteration) {
+  auto tensorType = llvm::cast<mlir::RankedTensorType>(*op->result_type_begin());
+  mlir::Location loc = op->getLoc();
+
+  auto memRefType = convertTensorToMemRef(tensorType); // Ensure this is defined
+  mlir::Value alloc = insertAllocAndDealloc(memRefType, loc, rewriter); // Ensure this is defined
+
+  llvm::SmallVector<int64_t, 4> lowerBounds(tensorType.getRank(), /*Value=*/0);
+  llvm::SmallVector<int64_t, 4> steps(tensorType.getRank(), /*Value=*/1);
+
+  mlir::affine::buildAffineLoopNest(
+      rewriter, loc, lowerBounds, tensorType.getShape(), steps,
+      [&](mlir::OpBuilder &nestedBuilder, mlir::Location nestedLoc, mlir::ValueRange ivs) {
+        mlir::Value valueToStore = processIteration(nestedBuilder, operands, ivs);
+        nestedBuilder.create<mlir::affine::AffineStoreOp>(nestedLoc, valueToStore, alloc, ivs);
+      });
+
+  rewriter.replaceOp(op, alloc);
 }
+
+namespace {
+
+template <typename BinaryOp, typename LoweredBinaryOp>
+struct BinaryOpLowering : public mlir::ConversionPattern {
+  BinaryOpLowering(mlir::MLIRContext *ctx)
+      : mlir::ConversionPattern(BinaryOp::getOperationName(), 1, ctx) {}
+
+  mlir::LogicalResult
+  matchAndRewrite(mlir::Operation *op, llvm::ArrayRef<mlir::Value> operands,
+                  mlir::ConversionPatternRewriter &rewriter) const final {
+    mlir::Location loc = op->getLoc();
+    lowerOpToLoops(op, operands, rewriter,
+                   [loc](mlir::OpBuilder &builder, mlir::ValueRange memRefOperands,
+                         mlir::ValueRange loopIvs) {
+                     typename BinaryOp::Adaptor binaryAdaptor(memRefOperands);
+                     mlir::Value loadedLhs = builder.create<mlir::affine::AffineLoadOp>(
+                         loc, binaryAdaptor.getLhs(), loopIvs);
+                     mlir::Value loadedRhs = builder.create<mlir::affine::AffineLoadOp>(
+                         loc, binaryAdaptor.getRhs(), loopIvs);
+
+                     return builder.create<LoweredBinaryOp>(loc, loadedLhs, loadedRhs).getResult();
+                   });
+    return mlir::success();
+  }
 };
+
+using AddOpLowering = BinaryOpLowering<engine::AddOp, mlir::arith::AddFOp>;
+
+} 
 
 namespace {
 class EngineToAffineLowerPass
@@ -181,7 +242,9 @@ void EngineToAffineLowerPass::runOnOperation() {
   target.addLegalOp<engine::WorldOp>();
 
   mlir::RewritePatternSet patterns(&getContext());
-  patterns.add<ConstantOpLowering, PrintOpLowering, AddOpLowering>(&getContext());
+  patterns.add<ConstantOpLowering>(&getContext());
+  patterns.add<PrintOpLowering>(&getContext());
+  patterns.add<AddOpLowering>(&getContext());
 
   if (mlir::failed(mlir::applyPartialConversion(getOperation(), target,
                                                 std::move(patterns)))) {
