@@ -6,9 +6,5 @@ cmake -G Ninja .. \
 
 cmake --build . --target engine-opt
 
-./build/bin/engine-opt ./test/Engine/add.mlir > add.ll
+./run.sh
 
-# # test run
-
-# ./build/bin/engine-opt ./test/Engine/print.mlir > print.ll
-# $BUILD_DIR/bin/lli print.ll

@@ -34,6 +34,9 @@
 #include "mlir/IR/Value.h"
 #include "mlir/IR/PatternMatch.h"
 
+#include "mlir/Dialect/Bufferization/IR/Bufferization.h"
+#include "mlir/Dialect/MemRef/IR/MemRef.h"
+
 static mlir::MemRefType convertTensorToMemRef(mlir::TensorType type) {
   assert(type.hasRank() && "expected only ranked shapes");
   return mlir::MemRefType::get(type.getShape(), type.getElementType());
@@ -212,6 +215,103 @@ using MulOpLowering = BinaryOpLowering<engine::MulOp, mlir::arith::MulFOp>;
 
 } 
 
+
+// CACHE LOWERING
+class StoreOpLowering : public mlir::OpConversionPattern<engine::StoreOp> {
+public:
+  using OpConversionPattern<engine::StoreOp>::OpConversionPattern;
+  
+  mlir::LogicalResult
+  matchAndRewrite(engine::StoreOp op, OpAdaptor adaptor,
+                  mlir::ConversionPatternRewriter &rewriter) const final {
+    mlir::Location loc = op->getLoc();
+    mlir::Value input = adaptor.getValue();
+    llvm::StringRef symbolName = adaptor.getName();
+    mlir::Type inputType = input.getType();
+
+    llvm::errs() << "Creating global with name: " << symbolName << "\n";
+
+
+    
+    if (auto tensorType = mlir::dyn_cast<mlir::TensorType>(inputType)) {
+      mlir::MemRefType memrefType = mlir::MemRefType::get(
+        tensorType.getShape(),
+        tensorType.getElementType());
+      input = rewriter.create<mlir::bufferization::ToMemrefOp>(
+        loc, memrefType, input);
+    }
+    
+    mlir::MemRefType memrefType = mlir::cast<mlir::MemRefType>(input.getType());
+    
+    mlir::ModuleOp moduleOp = op->getParentOfType<mlir::ModuleOp>();
+
+
+    mlir::memref::GlobalOp global = 
+      moduleOp.lookupSymbol<mlir::memref::GlobalOp>(symbolName);
+      
+    if (!global) {
+      mlir::OpBuilder::InsertionGuard guard(rewriter);
+      rewriter.setInsertionPoint(moduleOp.getBody(), 
+                                moduleOp.getBody()->begin());
+      global = rewriter.create<mlir::memref::GlobalOp>(
+        loc, 
+        symbolName,
+        rewriter.getStringAttr("public"),
+        memrefType,
+        nullptr, 
+        false,
+        nullptr);  // alignment is optional
+    }
+    
+    mlir::Value globalRef = rewriter.create<mlir::memref::GetGlobalOp>(
+      loc, memrefType, symbolName);
+    rewriter.create<mlir::memref::CopyOp>(loc, input, globalRef);
+    
+    
+    rewriter.eraseOp(op);
+    return mlir::success();
+  }
+};
+
+
+// class LoadOpLowering : public mlir::OpConversionPattern<engine::LoadOp> {
+// public:
+//     using OpConversionPattern<engine::LoadOp>::OpConversionPattern;
+
+//     mlir::LogicalResult
+//     matchAndRewrite(engine::LoadOp op, OpAdaptor adaptor,
+//                    mlir::ConversionPatternRewriter &rewriter) const final {
+//         mlir::Location loc = op->getLoc();
+
+//         // Construct the global name that StoreOp would have used
+//         std::string symbolName = adaptor.getName().str();
+
+//         // Find the global in the module
+//         mlir::ModuleOp moduleOp = op->getParentOfType<mlir::ModuleOp>();
+//         mlir::memref::GlobalOp global = moduleOp.lookupSymbol<mlir::memref::GlobalOp>(symbolName);
+
+//         if (!global) {
+//             return rewriter.notifyMatchFailure(op,
+//                 "No tensor found in cache with name: " + adaptor.getName().str());
+//         }
+
+//         // Get the stored memref type
+//         mlir::MemRefType memrefType = global.getType().cast<mlir::MemRefType>();
+
+//         // Get reference to the global
+//         mlir::Value globalRef = rewriter.create<mlir::memref::GetGlobalOp>(loc, memrefType, symbolName);
+
+//         // Convert memref back to tensor for the result
+//         mlir::TensorType resultType = op.getResult().getType().cast<mlir::TensorType>();
+//         mlir::Value result = rewriter.create<mlir::bufferization::ToTensorOp>(loc, resultType, globalRef);
+
+//         rewriter.replaceOp(op, result);
+//         return mlir::success();
+//     }
+// };
+
+
+
 namespace {
 class EngineToAffineLowerPass
     : public mlir::PassWrapper<EngineToAffineLowerPass,
@@ -221,7 +321,7 @@ public:
 
   void getDependentDialects(mlir::DialectRegistry &registry) const override {
     registry.insert<mlir::affine::AffineDialect, mlir::func::FuncDialect,
-                    mlir::memref::MemRefDialect>();
+                    mlir::memref::MemRefDialect,mlir::arith::ArithDialect,mlir::bufferization::BufferizationDialect>();
   }
 
   void runOnOperation() final;
@@ -247,6 +347,8 @@ void EngineToAffineLowerPass::runOnOperation() {
   patterns.add<PrintOpLowering>(&getContext());
   patterns.add<AddOpLowering>(&getContext());
   patterns.add<MulOpLowering>(&getContext());
+  patterns.add<StoreOpLowering>(&getContext());
+  // patterns.add<LoadOpLowering>(&getContext());
 
   if (mlir::failed(mlir::applyPartialConversion(getOperation(), target,
                                                 std::move(patterns)))) {
