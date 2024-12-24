@@ -5,8 +5,7 @@ target triple = "x86_64-unknown-linux-gnu"
 
 @nl = internal constant [2 x i8] c"\0A\00"
 @frmt_spec = internal constant [4 x i8] c"%f \00"
-@my_tensor = global [2 x [2 x double]] zeroinitializer
-
+@my_tensor = private global [2 x [2 x double]] zeroinitializer
 
 declare void @free(ptr)
 

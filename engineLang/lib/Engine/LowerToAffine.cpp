@@ -216,58 +216,62 @@ using MulOpLowering = BinaryOpLowering<engine::MulOp, mlir::arith::MulFOp>;
 } 
 
 
-// CACHE LOWERING
 class StoreOpLowering : public mlir::OpConversionPattern<engine::StoreOp> {
 public:
   using OpConversionPattern<engine::StoreOp>::OpConversionPattern;
-  
+
   mlir::LogicalResult
   matchAndRewrite(engine::StoreOp op, OpAdaptor adaptor,
                   mlir::ConversionPatternRewriter &rewriter) const final {
     mlir::Location loc = op->getLoc();
-    mlir::Value input = adaptor.getValue();
-    llvm::StringRef symbolName = adaptor.getName();
+    mlir::Value input = adaptor.getValue(); // The tensor value
+    llvm::StringRef symbolName = adaptor.getName(); // The name for the global
     mlir::Type inputType = input.getType();
 
-    llvm::errs() << "Creating global with name: " << symbolName << "\n";
-
-
-    
+    // Ensure input is a MemRef
     if (auto tensorType = mlir::dyn_cast<mlir::TensorType>(inputType)) {
       mlir::MemRefType memrefType = mlir::MemRefType::get(
-        tensorType.getShape(),
-        tensorType.getElementType());
+          tensorType.getShape(), tensorType.getElementType());
       input = rewriter.create<mlir::bufferization::ToMemrefOp>(
-        loc, memrefType, input);
+          loc, memrefType, input);
     }
-    
+
+    // Get the MemRef type of the input
     mlir::MemRefType memrefType = mlir::cast<mlir::MemRefType>(input.getType());
-    
+
+    // Get the parent module
     mlir::ModuleOp moduleOp = op->getParentOfType<mlir::ModuleOp>();
 
+    // Check if a global with the same name already exists
+    if (!moduleOp.lookupSymbol<mlir::memref::GlobalOp>(symbolName)) {
+      // Create a zero-initialized DenseElementsAttr
+      mlir::DenseElementsAttr initialValue = mlir::DenseElementsAttr::get(
+          mlir::RankedTensorType::get(
+              memrefType.getShape(), memrefType.getElementType()),
+          rewriter.getZeroAttr(memrefType.getElementType()));
 
-    mlir::memref::GlobalOp global = 
-      moduleOp.lookupSymbol<mlir::memref::GlobalOp>(symbolName);
-      
-    if (!global) {
+      // Create a global if it does not exist
       mlir::OpBuilder::InsertionGuard guard(rewriter);
-      rewriter.setInsertionPoint(moduleOp.getBody(), 
-                                moduleOp.getBody()->begin());
-      global = rewriter.create<mlir::memref::GlobalOp>(
-        loc, 
-        symbolName,
-        rewriter.getStringAttr("public"),
-        memrefType,
-        nullptr, 
-        false,
-        nullptr);  // alignment is optional
+      rewriter.setInsertionPointToStart(moduleOp.getBody());
+      rewriter.create<mlir::memref::GlobalOp>(
+          loc,                                // Location
+          symbolName,                         // Symbol name
+          rewriter.getStringAttr("private"),  // Visibility ("private" or "public")
+          memrefType,                         // MemRef type
+          initialValue,                       // Initial value (zero initializer)
+          false,                              // Is constant (false for mutable)
+          nullptr                             // Alignment (nullptr for default)
+      );
     }
-    
-    mlir::Value globalRef = rewriter.create<mlir::memref::GetGlobalOp>(
-      loc, memrefType, symbolName);
+
+    // Create a GetGlobalOp to get a reference to the global
+    mlir::Value globalRef =
+        rewriter.create<mlir::memref::GetGlobalOp>(loc, memrefType, symbolName);
+
+    // Copy the tensor data into the global
     rewriter.create<mlir::memref::CopyOp>(loc, input, globalRef);
-    
-    
+
+    // Erase the original operation
     rewriter.eraseOp(op);
     return mlir::success();
   }
