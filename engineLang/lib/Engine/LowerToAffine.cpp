@@ -278,41 +278,41 @@ public:
 };
 
 
-// class LoadOpLowering : public mlir::OpConversionPattern<engine::LoadOp> {
-// public:
-//     using OpConversionPattern<engine::LoadOp>::OpConversionPattern;
+class LoadOpLowering : public mlir::OpConversionPattern<engine::LoadOp> {
+public:
+  using OpConversionPattern<engine::LoadOp>::OpConversionPattern;
 
-//     mlir::LogicalResult
-//     matchAndRewrite(engine::LoadOp op, OpAdaptor adaptor,
-//                    mlir::ConversionPatternRewriter &rewriter) const final {
-//         mlir::Location loc = op->getLoc();
+  mlir::LogicalResult
+  matchAndRewrite(engine::LoadOp op, OpAdaptor adaptor,
+                  mlir::ConversionPatternRewriter &rewriter) const final {
+    mlir::Location loc = op.getLoc();
+    llvm::StringRef symbolName = adaptor.getName();
 
-//         // Construct the global name that StoreOp would have used
-//         std::string symbolName = adaptor.getName().str();
+    // Our op now says its result is already a memref type.
+    auto resultType = op.getResult().getType().cast<mlir::MemRefType>();
 
-//         // Find the global in the module
-//         mlir::ModuleOp moduleOp = op->getParentOfType<mlir::ModuleOp>();
-//         mlir::memref::GlobalOp global = moduleOp.lookupSymbol<mlir::memref::GlobalOp>(symbolName);
+    // Verify the global exists
+    mlir::ModuleOp moduleOp = op->getParentOfType<mlir::ModuleOp>();
+    auto globalOp = moduleOp.lookupSymbol<mlir::memref::GlobalOp>(symbolName);
+    if (!globalOp) {
+      llvm::errs() << "Error: Global variable '" << symbolName
+                   << "' does not exist.\n";
+      return rewriter.notifyMatchFailure(op, "global variable does not exist");
+    }
 
-//         if (!global) {
-//             return rewriter.notifyMatchFailure(op,
-//                 "No tensor found in cache with name: " + adaptor.getName().str());
-//         }
+    // Create memref.get_global
+    mlir::Value globalRef = rewriter.create<mlir::memref::GetGlobalOp>(
+        loc, resultType, symbolName);
 
-//         // Get the stored memref type
-//         mlir::MemRefType memrefType = global.getType().cast<mlir::MemRefType>();
+    // Directly replace the LoadOp with the memref (no to_tensor!)
+    rewriter.replaceOp(op, globalRef);
 
-//         // Get reference to the global
-//         mlir::Value globalRef = rewriter.create<mlir::memref::GetGlobalOp>(loc, memrefType, symbolName);
+    return mlir::success();
+  }
+};
 
-//         // Convert memref back to tensor for the result
-//         mlir::TensorType resultType = op.getResult().getType().cast<mlir::TensorType>();
-//         mlir::Value result = rewriter.create<mlir::bufferization::ToTensorOp>(loc, resultType, globalRef);
 
-//         rewriter.replaceOp(op, result);
-//         return mlir::success();
-//     }
-// };
+
 
 
 
@@ -338,21 +338,22 @@ void EngineToAffineLowerPass::runOnOperation() {
   target.addIllegalDialect<engine::EngineDialect>();
   target.addLegalDialect<mlir::affine::AffineDialect, mlir::BuiltinDialect,
                          mlir::func::FuncDialect, mlir::arith::ArithDialect,
-                         mlir::memref::MemRefDialect>();
+                         mlir::memref::MemRefDialect,mlir::bufferization::BufferizationDialect>();
+  target.addLegalOp<mlir::bufferization::ToTensorOp>();
+  target.addLegalOp<mlir::bufferization::ToMemrefOp>();
   target.addDynamicallyLegalOp<engine::PrintOp>([](engine::PrintOp op) {
     return llvm::none_of(op->getOperandTypes(), [](mlir::Type type) {
       return mlir::isa<mlir::TensorType>(type);
     });
   });
   target.addLegalOp<engine::WorldOp>();
-
   mlir::RewritePatternSet patterns(&getContext());
   patterns.add<ConstantOpLowering>(&getContext());
   patterns.add<PrintOpLowering>(&getContext());
   patterns.add<AddOpLowering>(&getContext());
   patterns.add<MulOpLowering>(&getContext());
   patterns.add<StoreOpLowering>(&getContext());
-  // patterns.add<LoadOpLowering>(&getContext());
+  patterns.add<LoadOpLowering>(&getContext());
 
   if (mlir::failed(mlir::applyPartialConversion(getOperation(), target,
                                                 std::move(patterns)))) {

@@ -34,48 +34,47 @@ define void @main() {
   %15 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 1
   %16 = getelementptr double, ptr %15, i64 3
   store double 4.000000e+00, ptr %16, align 8
-  br label %17
+  %17 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 3, 0
+  %18 = mul i64 1, %17
+  %19 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 3, 1
+  %20 = mul i64 %18, %19
+  %21 = mul i64 %20, ptrtoint (ptr getelementptr (double, ptr null, i32 1) to i64)
+  %22 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 1
+  %23 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 2
+  %24 = getelementptr double, ptr %22, i64 %23
+  call void @llvm.memcpy.p0.p0.i64(ptr @my_tensor, ptr %24, i64 %21, i1 false)
+  br label %25
 
-17:                                               ; preds = %32, %0
-  %18 = phi i64 [ 0, %0 ], [ %34, %32 ]
-  %19 = icmp slt i64 %18, 2
-  br i1 %19, label %20, label %35
+25:                                               ; preds = %39, %0
+  %26 = phi i64 [ 0, %0 ], [ %41, %39 ]
+  %27 = icmp slt i64 %26, 2
+  br i1 %27, label %28, label %42
 
-20:                                               ; preds = %17
-  br label %21
+28:                                               ; preds = %25
+  br label %29
 
-21:                                               ; preds = %24, %20
-  %22 = phi i64 [ 0, %20 ], [ %31, %24 ]
-  %23 = icmp slt i64 %22, 2
-  br i1 %23, label %24, label %32
+29:                                               ; preds = %32, %28
+  %30 = phi i64 [ 0, %28 ], [ %38, %32 ]
+  %31 = icmp slt i64 %30, 2
+  br i1 %31, label %32, label %39
 
-24:                                               ; preds = %21
-  %25 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 1
-  %26 = mul i64 %18, 2
-  %27 = add i64 %26, %22
-  %28 = getelementptr double, ptr %25, i64 %27
-  %29 = load double, ptr %28, align 8
-  %30 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %29)
-  %31 = add i64 %22, 1
-  br label %21
+32:                                               ; preds = %29
+  %33 = mul i64 %26, 2
+  %34 = add i64 %33, %30
+  %35 = getelementptr double, ptr @my_tensor, i64 %34
+  %36 = load double, ptr %35, align 8
+  %37 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %36)
+  %38 = add i64 %30, 1
+  br label %29
 
-32:                                               ; preds = %21
-  %33 = call i32 (ptr, ...) @printf(ptr @nl)
-  %34 = add i64 %18, 1
-  br label %17
+39:                                               ; preds = %29
+  %40 = call i32 (ptr, ...) @printf(ptr @nl)
+  %41 = add i64 %26, 1
+  br label %25
 
-35:                                               ; preds = %17
-  %36 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 3, 0
-  %37 = mul i64 1, %36
-  %38 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 3, 1
-  %39 = mul i64 %37, %38
-  %40 = mul i64 %39, ptrtoint (ptr getelementptr (double, ptr null, i32 1) to i64)
-  %41 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 1
-  %42 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 2
-  %43 = getelementptr double, ptr %41, i64 %42
-  call void @llvm.memcpy.p0.p0.i64(ptr @my_tensor, ptr %43, i64 %40, i1 false)
-  %44 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 0
-  call void @free(ptr %44)
+42:                                               ; preds = %25
+  %43 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 0
+  call void @free(ptr %43)
   ret void
 }
 
@@ -83,7 +82,6 @@ define void @main() {
 declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #0
 
 attributes #0 = { nocallback nofree nounwind willreturn }
-
 
 !llvm.module.flags = !{!0}
 
