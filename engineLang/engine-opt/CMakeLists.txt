@@ -13,6 +13,8 @@ set(LIBS
         MLIRLLVMToLLVMIRTranslation
         MLIRMemRefDialect
         MLIRLLVMDialect
+        MLIRTensorDialect
+        MLIRLinalgDialect
         MLIRParser
         MLIRPass
         MLIRSideEffectInterfaces

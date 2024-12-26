@@ -36,6 +36,9 @@
 
 #include "mlir/Dialect/Bufferization/IR/Bufferization.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
+#include "mlir/Dialect/Linalg/IR/Linalg.h"
+#include "mlir/Dialect/Tensor/IR/Tensor.h"
+
 
 static mlir::MemRefType convertTensorToMemRef(mlir::TensorType type) {
   assert(type.hasRank() && "expected only ranked shapes");
@@ -212,7 +215,6 @@ struct BinaryOpLowering : public mlir::ConversionPattern {
 
 using AddOpLowering = BinaryOpLowering<engine::AddOp, mlir::arith::AddFOp>;
 using MulOpLowering = BinaryOpLowering<engine::MulOp, mlir::arith::MulFOp>;
-
 } 
 
 
@@ -324,8 +326,12 @@ public:
   MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(EngineToAffineLowerPass)
 
   void getDependentDialects(mlir::DialectRegistry &registry) const override {
-    registry.insert<mlir::affine::AffineDialect, mlir::func::FuncDialect,
-                    mlir::memref::MemRefDialect,mlir::arith::ArithDialect,mlir::bufferization::BufferizationDialect>();
+    registry.insert<mlir::linalg::LinalgDialect>();
+    registry.insert<mlir::affine::AffineDialect>();
+    registry.insert<mlir::func::FuncDialect>();
+    registry.insert<mlir::bufferization::BufferizationDialect>();
+    registry.insert<mlir::memref::MemRefDialect>();
+    registry.insert<mlir::arith::ArithDialect>();
   }
 
   void runOnOperation() final;
@@ -336,18 +342,36 @@ void EngineToAffineLowerPass::runOnOperation() {
   mlir::ConversionTarget target(getContext());
 
   target.addIllegalDialect<engine::EngineDialect>();
-  target.addLegalDialect<mlir::affine::AffineDialect, mlir::BuiltinDialect,
-                         mlir::func::FuncDialect, mlir::arith::ArithDialect,
-                         mlir::memref::MemRefDialect,mlir::bufferization::BufferizationDialect>();
-  target.addLegalOp<mlir::bufferization::ToTensorOp>();
-  target.addLegalOp<mlir::bufferization::ToMemrefOp>();
+  
+  target.addLegalDialect<
+                          mlir::affine::AffineDialect, 
+                          mlir::BuiltinDialect,
+                          mlir::func::FuncDialect, 
+                          mlir::arith::ArithDialect,
+                          mlir::memref::MemRefDialect,
+                          mlir::bufferization::BufferizationDialect, 
+                          mlir::tensor::TensorDialect,
+                          mlir::linalg::LinalgDialect
+                        >();
+
+  target.addLegalDialect<mlir::affine::AffineDialect>();
+  target.addLegalDialect<mlir::arith::ArithDialect>();
+  target.addLegalDialect<mlir::memref::MemRefDialect>();
+  target.addLegalDialect<mlir::linalg::LinalgDialect>();
+  target.addLegalDialect<mlir::tensor::TensorDialect>();
+  target.addLegalDialect<mlir::bufferization::BufferizationDialect>();
+  target.addLegalDialect<mlir::func::FuncDialect>();
+  target.addLegalDialect<mlir::BuiltinDialect>();
+
   target.addDynamicallyLegalOp<engine::PrintOp>([](engine::PrintOp op) {
     return llvm::none_of(op->getOperandTypes(), [](mlir::Type type) {
       return mlir::isa<mlir::TensorType>(type);
     });
   });
   target.addLegalOp<engine::WorldOp>();
+
   mlir::RewritePatternSet patterns(&getContext());
+
   patterns.add<ConstantOpLowering>(&getContext());
   patterns.add<PrintOpLowering>(&getContext());
   patterns.add<AddOpLowering>(&getContext());

@@ -36,6 +36,11 @@
 #include "Engine/EngineDialect.h"
 #include "Engine/EnginePasses.h"
 
+#include "mlir/Conversion/LinalgToLoops/LinalgToLoops.h" /// WRONG LINALG TO LOOPS PASS CHECK THIS PORTION
+#include "mlir/Conversion/SCFToControlFlow/SCFToControlFlow.h"
+#include "mlir/Conversion/MemRefToLLVM/MemRefToLLVM.h"
+#include "mlir/Conversion/AffineToStandard/AffineToStandard.h"
+
 namespace cl = llvm::cl;
 static cl::opt<std::string> inputFilename(cl::Positional,
                                           cl::desc("<input engine file>"),
@@ -112,7 +117,20 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (mlir::failed(mlir::applyPassManagerCLOptions(passManager)))
     return 4;
 
+
+  // Convert tensor operations to linalg
+  passManager.addPass(mlir::createConvertTensorToLinalgPass());  // REVISE PASSES
+  
+  // Lower to affine (your existing pass)
   passManager.addPass(engine::createLowerToAffinePass());
+
+  // Linalg to LLVM lowering sequence
+  passManager.addPass(mlir::createConvertLinalgToLoopsPass());
+  passManager.addPass(mlir::createConvertSCFToControlFlowPass());
+  passManager.addPass(mlir::createMemRefToLLVMPass());
+  passManager.addPass(mlir::createLowerAffinePass());
+  
+  // Your existing LLVM lowering pass
   passManager.addPass(engine::createLowerToLLVMPass());
 
   if (mlir::failed(passManager.run(*module))) {
@@ -154,21 +172,35 @@ int runJit(mlir::ModuleOp module) {
 }
 
 int main(int argc, char **argv) {
+  // Register command-line options.
   mlir::registerMLIRContextCLOptions();
   mlir::registerPassManagerCLOptions();
+  mlir::registerAsmPrinterCLOptions(); // Enables --allow-unregistered-dialect
 
-  cl::ParseCommandLineOptions(argc, argv, "Engine compiler\n");
+  // Create an MLIR context and register necessary dialects.
   mlir::MLIRContext context;
-  context.getOrLoadDialect<engine::EngineDialect>();
-  context.getOrLoadDialect<mlir::func::FuncDialect>();
+  mlir::DialectRegistry registry;
+  registry.insert<engine::EngineDialect>();
+  registry.insert<mlir::func::FuncDialect>();
+  registry.insert<mlir::arith::ArithDialect>();
+  registry.insert<mlir::memref::MemRefDialect>();
+  registry.insert<mlir::affine::AffineDialect>();
+  registry.insert<mlir::linalg::LinalgDialect>();
+  registry.insert<mlir::scf::SCFDialect>();
+  registry.insert<mlir::tensor::TensorDialect>();
+  context.appendDialectRegistry(registry);
 
+  // Parse command-line arguments.
+  llvm::cl::ParseCommandLineOptions(argc, argv, "Engine compiler\n");
+
+  // Load and process MLIR file.
   mlir::OwningOpRef<mlir::ModuleOp> module;
   if (int error = loadAndProcessMLIR(context, module)) {
     return error;
   }
 
+  // Dump the LLVM IR (assuming `dumpLLVMIR` is implemented elsewhere).
   dumpLLVMIR(*module);
-  //  runJit(*module);
 
   return 0;
 }
