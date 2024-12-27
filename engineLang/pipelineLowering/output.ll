@@ -3,7 +3,7 @@ source_filename = "LLVMDialectModule"
 
 declare ptr @malloc(i64)
 
-define { ptr, ptr, i64, [1 x i64], [1 x i64] } @sqrt() {
+define { ptr, ptr, i64, [1 x i64], [1 x i64] } @add() {
   %1 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (float, ptr null, i64 3) to i64))
   %2 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } undef, ptr %1, 0
   %3 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %2, ptr %1, 1
@@ -66,7 +66,7 @@ define { ptr, ptr, i64, [1 x i64], [1 x i64] } @sqrt() {
 }
 
 define void @main() {
-  %1 = call { ptr, ptr, i64, [1 x i64], [1 x i64] } @sqrt()
+  %1 = call { ptr, ptr, i64, [1 x i64], [1 x i64] } @add()
   ret void
 }
 

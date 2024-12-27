@@ -2,7 +2,7 @@
 
 module {
  // test
-  func.func @sqrt() -> memref<3xf32> {
+  func.func @add() -> memref<3xf32> {
     // defining two tensors
     %t1 = memref.alloc() : memref<3xf32>
     %t2 = memref.alloc() : memref<3xf32>
@@ -33,8 +33,8 @@ module {
   }
 
   func.func @main() {
-    %result = call @sqrt() : () -> memref<3xf32>
-    "engine.print"(%result) : (memref<3xf32>) -> ()
+    %result = call @add() : () -> memref<3xf32>
+    // "engine.print"(%result) : (memref<3xf32>) -> ()
     return
   }
   

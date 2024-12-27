@@ -130,20 +130,26 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
     return 4;
 
 
+
+  // // passManager.addPass(mlir::bufferization::createOneShotBufferizePass()); // Tensor to MemRef
+
+  // // passManager.addPass(mlir::createLowerAffinePass());                    // Lower Affine constructs
+
+
+  // // passManager.addPass(mlir::createReconcileUnrealizedCastsPass());       // Resolve unrealized casts
+  // // passManager.addPass(mlir::createConvertMathToLLVMPass());              // Lower Math ops to LLVM
+  // // passManager.addPass(mlir::createArithToLLVMConversionPass());          // Lower Arith ops to LLVM
+  // // passManager.addPass(mlir::createFinalizeMemRefToLLVMConversionPass()); // Finalize MemRef lowering
   passManager.addPass(engine::createLowerToAffinePass());
   passManager.addPass(engine::createLowerToLLVMPass());
-  passManager.addPass(mlir::bufferization::createOneShotBufferizePass()); // Tensor to MemRef
-  passManager.addPass(mlir::createConvertLinalgToLoopsPass());           // Lower Linalg to Loops
+  passManager.addPass(mlir::createConvertLinalgToLoopsPass());          // Lower Linalg to Loops
   passManager.addPass(mlir::createLowerAffinePass());                    // Lower Affine constructs
-  
   passManager.addPass(mlir::createConvertSCFToCFPass());                 // Lower SCF to CF
-  passManager.addPass(mlir::createReconcileUnrealizedCastsPass());       // Resolve unrealized casts
-  passManager.addPass(mlir::createConvertMathToLLVMPass());              // Lower Math ops to LLVM
-  passManager.addPass(mlir::createArithToLLVMConversionPass());          // Lower Arith ops to LLVM
-  passManager.addPass(mlir::createFinalizeMemRefToLLVMConversionPass()); // Finalize MemRef lowering
-
+  passManager.addPass(mlir::createReconcileUnrealizedCastsPass());
   passManager.addPass(mlir::createConvertToLLVMPass());                  // Convert to LLVM Dialect
+  
 
+  
 
 
   if (mlir::failed(passManager.run(*module))) {

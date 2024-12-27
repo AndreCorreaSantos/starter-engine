@@ -257,6 +257,7 @@ public:
 void EngineToLLVMLoweringPass::runOnOperation() {
   mlir::LLVMConversionTarget target(getContext());
   target.addLegalOp<mlir::ModuleOp>();
+  target.addLegalDialect<mlir::linalg::LinalgDialect>();
 
   mlir::LLVMTypeConverter typeConverter(&getContext());
   mlir::RewritePatternSet patterns(&getContext());

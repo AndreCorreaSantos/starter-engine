@@ -21,6 +21,7 @@
 
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
+#include "mlir/Dialect/Linalg/IR/Linalg.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Pass/Pass.h"
@@ -338,7 +339,7 @@ void EngineToAffineLowerPass::runOnOperation() {
   target.addIllegalDialect<engine::EngineDialect>();
   target.addLegalDialect<mlir::affine::AffineDialect, mlir::BuiltinDialect,
                          mlir::func::FuncDialect, mlir::arith::ArithDialect,
-                         mlir::memref::MemRefDialect,mlir::bufferization::BufferizationDialect>();
+                         mlir::memref::MemRefDialect,mlir::bufferization::BufferizationDialect,mlir::linalg::LinalgDialect>();
   target.addLegalOp<mlir::bufferization::ToTensorOp>();
   target.addLegalOp<mlir::bufferization::ToMemrefOp>();
   target.addDynamicallyLegalOp<engine::PrintOp>([](engine::PrintOp op) {
