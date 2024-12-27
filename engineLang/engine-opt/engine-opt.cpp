@@ -47,6 +47,7 @@
 #include "mlir/Conversion/ComplexToLLVM/ComplexToLLVM.h"
 #include "mlir/Conversion/ArithToLLVM/ArithToLLVM.h"
 #include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
+#include "mlir/Conversion/AffineToStandard/AffineToStandard.h"
 
 
 #include "mlir/Dialect/Linalg/Transforms/BufferizableOpInterfaceImpl.h"
@@ -128,14 +129,19 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (mlir::failed(mlir::applyPassManagerCLOptions(passManager)))
     return 4;
 
+
+
+
   passManager.addPass(mlir::bufferization::createOneShotBufferizePass());
-  passManager.addPass(mlir::createConvertLinalgToLoopsPass());
-  passManager.addPass(mlir::createConvertSCFToCFPass());
-  passManager.addPass(mlir::createConvertMathToLLVMPass());
-  passManager.addPass(mlir::createFinalizeMemRefToLLVMConversionPass());
-  passManager.addPass(mlir::createReconcileUnrealizedCastsPass());
-  passManager.addPass(mlir::createConvertToLLVMPass());
   passManager.addPass(engine::createLowerToAffinePass());
+  passManager.addPass(mlir::createConvertLinalgToStandardPass());
+  passManager.addPass(mlir::createLowerAffinePass());
+  passManager.addPass(mlir::createConvertSCFToCFPass());
+  passManager.addPass(mlir::createReconcileUnrealizedCastsPass());
+  passManager.addPass(mlir::createConvertMathToLLVMPass());
+  passManager.addPass(mlir::createArithToLLVMConversionPass());
+  passManager.addPass(mlir::createFinalizeMemRefToLLVMConversionPass());
+  passManager.addPass(mlir::createConvertToLLVMPass());
   passManager.addPass(engine::createLowerToLLVMPass());
 
 

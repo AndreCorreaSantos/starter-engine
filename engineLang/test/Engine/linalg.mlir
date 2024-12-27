@@ -34,7 +34,7 @@ module {
 
   func.func @main() {
     %result = call @add() : () -> memref<3xf64>
-    "engine.print"(%result) : (memref<3xf64>) -> ()
+    // "engine.print"(%result) : (memref<3xf64>) -> ()
     return
   }
   
