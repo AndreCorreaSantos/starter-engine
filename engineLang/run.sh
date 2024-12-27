@@ -1,3 +1,3 @@
-./build/bin/engine-opt ./test/Engine/linalg.mlir > linalg.ll
+./build/bin/engine-opt ./test/Engine/linalg2.mlir > linalg2.ll
 
-lli -opaque-pointers linalg.ll
+lli -opaque-pointers linalg2.ll
