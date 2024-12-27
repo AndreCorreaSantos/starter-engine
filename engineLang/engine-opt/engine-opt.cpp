@@ -43,6 +43,10 @@
 #include "mlir/Dialect/Linalg/Passes.h"
 #include "mlir/Conversion/MathToLLVM/MathToLLVM.h"
 #include "mlir/Conversion/UBToLLVM/UBToLLVM.h"
+#include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVM.h"
+#include "mlir/Conversion/ComplexToLLVM/ComplexToLLVM.h"
+#include "mlir/Conversion/ArithToLLVM/ArithToLLVM.h"
+#include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
 
 namespace cl = llvm::cl;
 static cl::opt<std::string> inputFilename(cl::Positional,
@@ -120,8 +124,7 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (mlir::failed(mlir::applyPassManagerCLOptions(passManager)))
     return 4;
 
-  // passManager.addPass(mlir::bufferization::createOneShotBufferizePass());
-
+  passManager.addPass(mlir::bufferization::createOneShotBufferizePass());
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
   passManager.addPass(mlir::createConvertSCFToCFPass());
   passManager.addPass(mlir::createConvertMathToLLVMPass());
@@ -188,7 +191,14 @@ int main(int argc, char **argv) {
   registry.insert<mlir::linalg::LinalgDialect>();
   registry.insert<mlir::scf::SCFDialect>();
   registry.insert<mlir::tensor::TensorDialect>();
+
   mlir::ub::registerConvertUBToLLVMInterface(registry);
+  mlir::registerConvertMemRefToLLVMInterface(registry);
+  mlir::registerConvertMathToLLVMInterface(registry);
+  mlir::registerConvertFuncToLLVMInterface(registry);
+  mlir::registerConvertComplexToLLVMInterface(registry);
+  mlir::arith::registerConvertArithToLLVMInterface(registry);
+  mlir::cf::registerConvertControlFlowToLLVMInterface(registry);
   context.appendDialectRegistry(registry);
 
   // Parse command-line arguments.
