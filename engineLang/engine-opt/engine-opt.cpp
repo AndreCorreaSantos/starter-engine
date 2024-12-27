@@ -48,6 +48,10 @@
 #include "mlir/Conversion/ArithToLLVM/ArithToLLVM.h"
 #include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
 
+
+#include "mlir/Dialect/Linalg/Transforms/BufferizableOpInterfaceImpl.h"
+
+
 namespace cl = llvm::cl;
 static cl::opt<std::string> inputFilename(cl::Positional,
                                           cl::desc("<input engine file>"),
@@ -199,6 +203,15 @@ int main(int argc, char **argv) {
   mlir::registerConvertComplexToLLVMInterface(registry);
   mlir::arith::registerConvertArithToLLVMInterface(registry);
   mlir::cf::registerConvertControlFlowToLLVMInterface(registry);
+
+
+  // Register BufferizableOpInterface external models
+  mlir::arith::registerBufferizableOpInterfaceExternalModels(registry);
+  mlir::cf::registerBufferizableOpInterfaceExternalModels(registry);
+  mlir::scf::registerBufferizableOpInterfaceExternalModels(registry);
+  mlir::tensor::registerBufferizableOpInterfaceExternalModels(registry);
+  mlir::linalg::registerBufferizableOpInterfaceExternalModels(registry);
+  mlir::bufferization::func_ext::registerBufferizableOpInterfaceExternalModels(registry);
   context.appendDialectRegistry(registry);
 
   // Parse command-line arguments.
