@@ -42,6 +42,7 @@
 #include "mlir/Conversion/SCFToControlFlow/SCFToControlFlow.h"
 #include "mlir/Dialect/Linalg/Passes.h"
 #include "mlir/Conversion/MathToLLVM/MathToLLVM.h"
+#include "mlir/Conversion/UBToLLVM/UBToLLVM.h"
 
 namespace cl = llvm::cl;
 static cl::opt<std::string> inputFilename(cl::Positional,
@@ -120,14 +121,17 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
     return 4;
 
   // passManager.addPass(mlir::bufferization::createOneShotBufferizePass());
+
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
   passManager.addPass(mlir::createConvertSCFToCFPass());
   passManager.addPass(mlir::createConvertMathToLLVMPass());
   passManager.addPass(mlir::createFinalizeMemRefToLLVMConversionPass());
+  passManager.addPass(mlir::createReconcileUnrealizedCastsPass());
+  passManager.addPass(mlir::createConvertToLLVMPass());
   passManager.addPass(engine::createLowerToAffinePass());
   passManager.addPass(engine::createLowerToLLVMPass());
-  
-  // passManager.addPass(mlir::createConvertToLLVMPass());
+
+
 
   if (mlir::failed(passManager.run(*module))) {
     return 4;
@@ -184,6 +188,7 @@ int main(int argc, char **argv) {
   registry.insert<mlir::linalg::LinalgDialect>();
   registry.insert<mlir::scf::SCFDialect>();
   registry.insert<mlir::tensor::TensorDialect>();
+  mlir::ub::registerConvertUBToLLVMInterface(registry);
   context.appendDialectRegistry(registry);
 
   // Parse command-line arguments.
