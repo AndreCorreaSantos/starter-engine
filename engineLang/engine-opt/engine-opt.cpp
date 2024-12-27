@@ -122,9 +122,10 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   // passManager.addPass(mlir::bufferization::createOneShotBufferizePass());
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
   passManager.addPass(mlir::createConvertSCFToCFPass());
+  passManager.addPass(mlir::createConvertMathToLLVMPass());
   passManager.addPass(engine::createLowerToAffinePass());
   passManager.addPass(engine::createLowerToLLVMPass());
-  passManager.addPass(mlir::createConvertMathToLLVMPass());
+  
   // passManager.addPass(mlir::createConvertToLLVMPass());
 
   if (mlir::failed(passManager.run(*module))) {

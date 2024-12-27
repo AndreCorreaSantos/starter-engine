@@ -1,6 +1,3 @@
-#!/bin/bash
+./build/bin/engine-opt ./test/Engine/linalg.mlir > linalg.ll
 
-./build/bin/engine-opt ./test/Engine/print.mlir > out.mlir
-
-
-lli -opaque-pointers out.mlir
+lli -opaque-pointers linalg.ll
