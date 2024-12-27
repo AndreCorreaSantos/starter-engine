@@ -7,5 +7,4 @@ cmake -G Ninja .. \
 
 cmake --build . --target engine-opt
 
-./run.sh
 

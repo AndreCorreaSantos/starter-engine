@@ -36,10 +36,11 @@
 #include "Engine/EngineDialect.h"
 #include "Engine/EnginePasses.h"
 
-#include "mlir/Conversion/LinalgToLoops/LinalgToLoops.h" /// WRONG LINALG TO LOOPS PASS CHECK THIS PORTION
 #include "mlir/Conversion/SCFToControlFlow/SCFToControlFlow.h"
 #include "mlir/Conversion/MemRefToLLVM/MemRefToLLVM.h"
 #include "mlir/Conversion/AffineToStandard/AffineToStandard.h"
+#include "mlir/Conversion/SCFToControlFlow/SCFToControlFlow.h"
+#include "mlir/Dialect/Linalg/Passes.h"
 
 namespace cl = llvm::cl;
 static cl::opt<std::string> inputFilename(cl::Positional,
@@ -117,20 +118,10 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (mlir::failed(mlir::applyPassManagerCLOptions(passManager)))
     return 4;
 
-
-  // Convert tensor operations to linalg
-  passManager.addPass(mlir::createConvertTensorToLinalgPass());  // REVISE PASSES
-  
-  // Lower to affine (your existing pass)
-  passManager.addPass(engine::createLowerToAffinePass());
-
-  // Linalg to LLVM lowering sequence
+  // passManager.addPass(mlir::bufferization::createOneShotBufferizePass());
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
-  passManager.addPass(mlir::createConvertSCFToControlFlowPass());
-  passManager.addPass(mlir::createMemRefToLLVMPass());
-  passManager.addPass(mlir::createLowerAffinePass());
-  
-  // Your existing LLVM lowering pass
+  passManager.addPass(mlir::createConvertSCFToCFPass());
+  passManager.addPass(engine::createLowerToAffinePass());
   passManager.addPass(engine::createLowerToLLVMPass());
 
   if (mlir::failed(passManager.run(*module))) {

@@ -2,7 +2,7 @@
 
 module {
  // test
-  func.func @sqrt() -> memref<xf32> {
+  func.func @sqrt() -> memref<3xf32> {
     %0 = memref.alloc() : memref<3xf32>
     %1 = arith.constant 1.0 : f32
     %2 = arith.constant 2.0 : f32
@@ -20,6 +20,11 @@ module {
     linalg.sqrt ins(%0 : memref<3xf32>) outs(%output : memref<3xf32>)
 
     return %output : memref<3xf32>
+  }
+
+  func.func @main() {
+    %result = call @sqrt() : () -> memref<3xf32>
+    return
   }
   
 }
