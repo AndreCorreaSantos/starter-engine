@@ -41,6 +41,7 @@
 #include "mlir/Conversion/AffineToStandard/AffineToStandard.h"
 #include "mlir/Conversion/SCFToControlFlow/SCFToControlFlow.h"
 #include "mlir/Dialect/Linalg/Passes.h"
+#include "mlir/Conversion/MathToLLVM/MathToLLVM.h"
 
 namespace cl = llvm::cl;
 static cl::opt<std::string> inputFilename(cl::Positional,
@@ -123,6 +124,8 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   passManager.addPass(mlir::createConvertSCFToCFPass());
   passManager.addPass(engine::createLowerToAffinePass());
   passManager.addPass(engine::createLowerToLLVMPass());
+  passManager.addPass(mlir::createConvertMathToLLVMPass());
+  // passManager.addPass(mlir::createConvertToLLVMPass());
 
   if (mlir::failed(passManager.run(*module))) {
     return 4;

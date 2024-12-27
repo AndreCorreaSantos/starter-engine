@@ -3,7 +3,10 @@
 module {
  // test
   func.func @sqrt() -> memref<3xf32> {
-    %0 = memref.alloc() : memref<3xf32>
+    // defining two tensors
+    %t1 = memref.alloc() : memref<3xf32>
+    %t2 = memref.alloc() : memref<3xf32>
+
     %1 = arith.constant 1.0 : f32
     %2 = arith.constant 2.0 : f32
     %3 = arith.constant 3.0 : f32
@@ -12,12 +15,19 @@ module {
     %c1 = arith.constant 1 : index
     %c2 = arith.constant 2 : index
 
-    memref.store %1, %0[%c0] : memref<3xf32>  
-    memref.store %2, %0[%c1] : memref<3xf32>  
-    memref.store %3, %0[%c2] : memref<3xf32> 
+    // setting tensor 1
+    memref.store %1, %t1[%c0] : memref<3xf32>  
+    memref.store %2, %t1[%c1] : memref<3xf32>  
+    memref.store %3, %t1[%c2] : memref<3xf32> 
+
+    // setting tensor 2
+    memref.store %1, %t2[%c0] : memref<3xf32>  
+    memref.store %2, %t2[%c1] : memref<3xf32>  
+    memref.store %3, %t2[%c2] : memref<3xf32> 
+
 
     %output = memref.alloc() : memref<3xf32>
-    linalg.sqrt ins(%0 : memref<3xf32>) outs(%output : memref<3xf32>)
+    linalg.add ins(%t1,%t2 : memref<3xf32>, memref<3xf32>) outs(%output : memref<3xf32>)
 
     return %output : memref<3xf32>
   }
