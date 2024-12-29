@@ -123,30 +123,18 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (int error = loadMLIR(context, module)) {
     return error;
   }
-
-  // Register passes to be applied in this compile process
   mlir::PassManager passManager(&context);
   if (mlir::failed(mlir::applyPassManagerCLOptions(passManager)))
     return 4;
 
 
 
-  // // passManager.addPass(mlir::bufferization::createOneShotBufferizePass()); // Tensor to MemRef
-
-  // // passManager.addPass(mlir::createLowerAffinePass());                    // Lower Affine constructs
-
-
-  // // passManager.addPass(mlir::createReconcileUnrealizedCastsPass());       // Resolve unrealized casts
-  // // passManager.addPass(mlir::createConvertMathToLLVMPass());              // Lower Math ops to LLVM
-  // // passManager.addPass(mlir::createArithToLLVMConversionPass());          // Lower Arith ops to LLVM
-  // // passManager.addPass(mlir::createFinalizeMemRefToLLVMConversionPass()); // Finalize MemRef lowering
   passManager.addPass(engine::createLowerToAffinePass());
+  passManager.addPass(mlir::createConvertLinalgToLoopsPass()); 
+  passManager.addPass(mlir::createConvertSCFToCFPass());      
+  
   passManager.addPass(engine::createLowerToLLVMPass());
-  passManager.addPass(mlir::createConvertLinalgToLoopsPass());          // Lower Linalg to Loops
-  passManager.addPass(mlir::createLowerAffinePass());                    // Lower Affine constructs
-  passManager.addPass(mlir::createConvertSCFToCFPass());                 // Lower SCF to CF
-  passManager.addPass(mlir::createReconcileUnrealizedCastsPass());
-  passManager.addPass(mlir::createConvertToLLVMPass());                  // Convert to LLVM Dialect
+  passManager.addPass(mlir::createConvertToLLVMPass());              
   
 
   
