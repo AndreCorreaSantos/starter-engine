@@ -21,6 +21,7 @@
 
 #include "mlir/Conversion/AffineToStandard/AffineToStandard.h"
 #include "mlir/Conversion/ArithToLLVM/ArithToLLVM.h"
+#include "mlir/Conversion/LinalgToStandard/LinalgToStandard.h"
 #include "mlir/Conversion/ControlFlowToLLVM/ControlFlowToLLVM.h"
 #include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVM.h"
 #include "mlir/Conversion/FuncToLLVM/ConvertFuncToLLVMPass.h"
@@ -257,11 +258,12 @@ public:
 void EngineToLLVMLoweringPass::runOnOperation() {
   mlir::LLVMConversionTarget target(getContext());
   target.addLegalOp<mlir::ModuleOp>();
-  target.addLegalDialect<mlir::linalg::LinalgDialect>();
+  // target.addLegalDialect<mlir::linalg::LinalgDialect>();
 
   mlir::LLVMTypeConverter typeConverter(&getContext());
   mlir::RewritePatternSet patterns(&getContext());
 
+  mlir::linalg::populateLinalgToStandardConversionPatterns(patterns);
   populateAffineToStdConversionPatterns(patterns);
   populateSCFToControlFlowConversionPatterns(patterns);
   mlir::arith::populateArithToLLVMConversionPatterns(typeConverter, patterns);

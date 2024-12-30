@@ -32,3 +32,30 @@ How do I ensure that `mlir::Linalg` to loops ignores `engine::` operations?
 
 ### 3) Solution: Fix LLVM and affine pass wrappers  
 - Refactor them to also convert Linalg operations to loops at some point, as they already include SCF to CF conversions (LLVM pass wrapper).
+- maybe do mlir::lower to affine in the LLVM pass wrapper?
+- what are illegal dialects and operations in the llvm pass wrapper?:
+    - Legal operations are not converted in the pass for which they have been marked as legal. Only illegal operations are converted.
+
+### Types of conversions:
+ - Partial Conversions:
+    - Convert only the operations that have been marked explicitly as illegal for the target dialect.
+ - Full Conversions:
+    - Convert all operations in the source to the target dialect. Insures no operations are unknown to the target dialect at this point.
+ - Analysis Conversions:
+    - Perform partial conversion and "writes down" the operations which cannot be converted to the target dialect. No rewrites or transformations  are applied to the source code, only analysis is performed.
+
+### Hypothesized passes:
+
+1. "LowerToAffine" - performs partial conversion, Making only the engine:: dialect (custom built dialect for the project) operations illegal and lowers it to affine dialect.
+2. "LowerToLLVM" llvm - performs full conversion of all dialects directly to llvm. -> problem: there is only populateLinalgToSTDConversionPatterns, no populateLinalgToLoopsConversion patterns and apparently linalgtostd cannot run in JIT? (What is this jit compiler?)
+
+
+#### Conversion target:  definition of what is considered to be legal during the conversion process.
+ - Legal: will not be converted to the target, i.e. is already supported by it.
+ - Illegal: must be converted to the target, rewritten or removed, as it is not supported by the target dialect.
+ - Dynamic: This action signals that only some instances of a given operation are legal. e.g. saying that arith.addi is only legal when operating on 32-bit integers.
+
+
+
+
+### What is dialect registration?
