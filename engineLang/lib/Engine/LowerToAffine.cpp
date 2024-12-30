@@ -324,7 +324,7 @@ class EngineToAffineLowerPass
 public:
   MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(EngineToAffineLowerPass)
 
-  void getDependentDialects(mlir::DialectRegistry &registry) const override {
+  void getDependentDialects(mlir::DialectRegistry &registry) const override { // shouldnt need this, check it later.
     registry.insert<mlir::affine::AffineDialect, mlir::func::FuncDialect,
                     mlir::memref::MemRefDialect,mlir::arith::ArithDialect,mlir::bufferization::BufferizationDialect>();
   }

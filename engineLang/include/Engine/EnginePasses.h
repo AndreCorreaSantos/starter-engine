@@ -24,6 +24,7 @@
 
 namespace engine {
 std::unique_ptr<mlir::Pass> createLowerToAffinePass();
+std::unique_ptr<mlir::Pass> createLowerLinalgPass();
 std::unique_ptr<mlir::Pass> createLowerToLLVMPass();
 } // namespace engine
 

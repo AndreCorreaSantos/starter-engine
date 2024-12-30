@@ -263,7 +263,7 @@ void EngineToLLVMLoweringPass::runOnOperation() {
   mlir::LLVMTypeConverter typeConverter(&getContext());
   mlir::RewritePatternSet patterns(&getContext());
 
-  mlir::linalg::populateLinalgToStandardConversionPatterns(patterns);
+  // mlir::linalg::populateLinalgToStandardConversionPatterns(patterns); THIS CRASHES JIT, IDK WHY
   populateAffineToStdConversionPatterns(patterns);
   populateSCFToControlFlowConversionPatterns(patterns);
   mlir::arith::populateArithToLLVMConversionPatterns(typeConverter, patterns);

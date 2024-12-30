@@ -130,9 +130,7 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
 
 
   passManager.addPass(engine::createLowerToAffinePass());
-  // passManager.addPass(mlir::createConvertLinalgToLoopsPass()); 
-  // passManager.addPass(mlir::createConvertSCFToCFPass());      
-  
+  passManager.addPass(engine::createLowerLinalgPass());
   passManager.addPass(engine::createLowerToLLVMPass());
   // passManager.addPass(mlir::createConvertToLLVMPass());              
   
@@ -186,7 +184,7 @@ int main(int argc, char **argv) {
 
   // Create an MLIR context and register necessary dialects.
   mlir::MLIRContext context;
-  mlir::DialectRegistry registry;
+  mlir::DialectRegistry registry; // CHECK THIS LATER, should not need it, each pass should override this with its own registry via getDependentDialects.
   registry.insert<engine::EngineDialect>();
   registry.insert<mlir::func::FuncDialect>();
   registry.insert<mlir::arith::ArithDialect>();

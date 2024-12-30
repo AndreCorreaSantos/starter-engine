@@ -3,11 +3,6 @@ source_filename = "LLVMDialectModule"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
 
-@nl = internal constant [2 x i8] c"\0A\00"
-@frmt_spec = internal constant [4 x i8] c"%f \00"
-
-declare i32 @printf(ptr, ...)
-
 declare ptr @malloc(i64)
 
 define { ptr, ptr, i64, [1 x i64], [1 x i64] } @add() {
@@ -47,71 +42,33 @@ define { ptr, ptr, i64, [1 x i64], [1 x i64] } @add() {
   %28 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %27, i64 0, 2
   %29 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %28, i64 3, 3, 0
   %30 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %29, i64 1, 4, 0
-  %31 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 0
-  %32 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
-  %33 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 2
-  %34 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 3, 0
-  %35 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 4, 0
-  %36 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %12, 0
-  %37 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %12, 1
-  %38 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %12, 2
-  %39 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %12, 3, 0
-  %40 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %12, 4, 0
-  %41 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %30, 0
+  br label %31
+
+31:                                               ; preds = %34, %0
+  %32 = phi i64 [ 0, %0 ], [ %44, %34 ]
+  %33 = icmp slt i64 %32, 3
+  br i1 %33, label %34, label %45
+
+34:                                               ; preds = %31
+  %35 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %36 = getelementptr double, ptr %35, i64 %32
+  %37 = load double, ptr %36, align 8
+  %38 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %12, 1
+  %39 = getelementptr double, ptr %38, i64 %32
+  %40 = load double, ptr %39, align 8
+  %41 = fadd double %37, %40
   %42 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %30, 1
-  %43 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %30, 2
-  %44 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %30, 3, 0
-  %45 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %30, 4, 0
-  call void @linalg_add_view3xf64_view3xf64_view3xf64(ptr %31, ptr %32, i64 %33, i64 %34, i64 %35, ptr %36, ptr %37, i64 %38, i64 %39, i64 %40, ptr %41, ptr %42, i64 %43, i64 %44, i64 %45)
+  %43 = getelementptr double, ptr %42, i64 %32
+  store double %41, ptr %43, align 8
+  %44 = add i64 %32, 1
+  br label %31
+
+45:                                               ; preds = %31
   ret { ptr, ptr, i64, [1 x i64], [1 x i64] } %30
 }
 
-define private void @linalg_add_view3xf64_view3xf64_view3xf64(ptr %0, ptr %1, i64 %2, i64 %3, i64 %4, ptr %5, ptr %6, i64 %7, i64 %8, i64 %9, ptr %10, ptr %11, i64 %12, i64 %13, i64 %14) {
-  %16 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } undef, ptr %0, 0
-  %17 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %16, ptr %1, 1
-  %18 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %17, i64 %2, 2
-  %19 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %18, i64 %3, 3, 0
-  %20 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %19, i64 %4, 4, 0
-  %21 = alloca { ptr, ptr, i64, [1 x i64], [1 x i64] }, i64 1, align 8
-  store { ptr, ptr, i64, [1 x i64], [1 x i64] } %20, ptr %21, align 8
-  %22 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } undef, ptr %5, 0
-  %23 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %22, ptr %6, 1
-  %24 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %23, i64 %7, 2
-  %25 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %24, i64 %8, 3, 0
-  %26 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %25, i64 %9, 4, 0
-  %27 = alloca { ptr, ptr, i64, [1 x i64], [1 x i64] }, i64 1, align 8
-  store { ptr, ptr, i64, [1 x i64], [1 x i64] } %26, ptr %27, align 8
-  %28 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } undef, ptr %10, 0
-  %29 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %28, ptr %11, 1
-  %30 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %29, i64 %12, 2
-  %31 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %30, i64 %13, 3, 0
-  %32 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %31, i64 %14, 4, 0
-  %33 = alloca { ptr, ptr, i64, [1 x i64], [1 x i64] }, i64 1, align 8
-  store { ptr, ptr, i64, [1 x i64], [1 x i64] } %32, ptr %33, align 8
-  call void @_mlir_ciface_linalg_add_view3xf64_view3xf64_view3xf64(ptr %21, ptr %27, ptr %33)
-  ret void
-}
-
-declare void @_mlir_ciface_linalg_add_view3xf64_view3xf64_view3xf64(ptr, ptr, ptr)
-
 define void @main() {
   %1 = call { ptr, ptr, i64, [1 x i64], [1 x i64] } @add()
-  br label %2
-
-2:                                                ; preds = %5, %0
-  %3 = phi i64 [ 0, %0 ], [ %10, %5 ]
-  %4 = icmp slt i64 %3, 3
-  br i1 %4, label %5, label %11
-
-5:                                                ; preds = %2
-  %6 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %1, 1
-  %7 = getelementptr double, ptr %6, i64 %3
-  %8 = load double, ptr %7, align 8
-  %9 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %8)
-  %10 = add i64 %3, 1
-  br label %2
-
-11:                                               ; preds = %2
   ret void
 }
 

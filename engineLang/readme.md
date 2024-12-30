@@ -56,6 +56,10 @@ How do I ensure that `mlir::Linalg` to loops ignores `engine::` operations?
  - Dynamic: This action signals that only some instances of a given operation are legal. e.g. saying that arith.addi is only legal when operating on 32-bit integers.
 
 
+#### Logic seems correct but problems:
+ - Linalg to std conversion patterns inside the lowerToLLVM works, does not erase "engine" operations but crashes jit compiler, cannot be run by lli.
+ - Linalg to loops on the engine opt file erases all "engine" operations.
 
-
-### What is dialect registration?
+### Solution:
+ - write a pass wrapper for linalg pass and legalize all the "engine" dialect so as to keep it safe? - try this first.
+ - or maybe instead of using lli, lower it to object files and run it some other way? 
