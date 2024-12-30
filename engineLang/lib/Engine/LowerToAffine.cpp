@@ -337,9 +337,9 @@ void EngineToAffineLowerPass::runOnOperation() { // Only engine:: opertions need
   mlir::ConversionTarget target(getContext());
 
   target.addIllegalDialect<engine::EngineDialect>();
-  // target.addLegalDialect<mlir::affine::AffineDialect, mlir::BuiltinDialect, // SHOULD NOT BE NEEDED HERE, THIS IS ALREADY A PARTIAL CONVERSION
-  //                        mlir::func::FuncDialect, mlir::arith::ArithDialect,
-  //                        mlir::memref::MemRefDialect,mlir::bufferization::BufferizationDialect,mlir::linalg::LinalgDialect>();
+  target.addLegalDialect<mlir::affine::AffineDialect, mlir::BuiltinDialect,
+                         mlir::func::FuncDialect, mlir::arith::ArithDialect,
+                         mlir::memref::MemRefDialect,mlir::bufferization::BufferizationDialect,mlir::linalg::LinalgDialect>();
   // target.addLegalOp<mlir::bufferization::ToTensorOp>();
   // target.addLegalOp<mlir::bufferization::ToMemrefOp>();
   target.addDynamicallyLegalOp<engine::PrintOp>([](engine::PrintOp op) {

@@ -1,3 +1,3 @@
-./build/bin/engine-opt --mlir-print-ir-after-all ./test/Engine/main.mlir > main.ll
+./build/bin/engine-opt --mlir-print-ir-after-all ./test/Engine/linalg.mlir > linalg.ll
 
-lli -opaque-pointers main.ll
+lli -opaque-pointers linalg.ll
