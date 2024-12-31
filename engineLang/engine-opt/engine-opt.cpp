@@ -128,11 +128,8 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
     return 4;
 
   passManager.addPass(engine::createLowerToAffinePass());
-  passManager.addPass(engine::createLowerToLLVMPass());
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
-  passManager.addPass(mlir::createConvertSCFToCFPass());
-  passManager.addPass(mlir::createConvertToLLVMPass());
-
+  passManager.addPass(engine::createLowerToLLVMPass());
 
   // passManager.addPass(engine::createLowerLinalgPass());
 

@@ -4,7 +4,7 @@
 include "EngineDialect.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 
-def ConstantOp : Engine_Op<"constant", [Pure]> {
+def ConstantOp : Engine_Op<"constant"> {
   let summary = "constant";
   let description = [{
     Constant operation turns a literal into an SSA value. The data is attached
@@ -29,7 +29,7 @@ def ConstantOp : Engine_Op<"constant", [Pure]> {
   let results = (outs F64Tensor);
 }
 
-def PrintOp : Engine_Op<"print", [Pure]> {
+def PrintOp : Engine_Op<"print"> {
     let summary = "print operation";
     let description = [{
         The "print" builtin operation prints a given input tensor, and produces
