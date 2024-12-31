@@ -258,12 +258,11 @@ public:
 void EngineToLLVMLoweringPass::runOnOperation() {
   mlir::LLVMConversionTarget target(getContext());
   target.addLegalOp<mlir::ModuleOp>();
-  // target.addLegalDialect<mlir::linalg::LinalgDialect>();
+  target.addLegalDialect<mlir::linalg::LinalgDialect>();
 
   mlir::LLVMTypeConverter typeConverter(&getContext());
   mlir::RewritePatternSet patterns(&getContext());
 
-  // mlir::linalg::populateLinalgToStandardConversionPatterns(patterns); THIS CRASHES JIT, IDK WHY
   populateAffineToStdConversionPatterns(patterns);
   populateSCFToControlFlowConversionPatterns(patterns);
   mlir::arith::populateArithToLLVMConversionPatterns(typeConverter, patterns);
@@ -281,6 +280,8 @@ void EngineToLLVMLoweringPass::runOnOperation() {
     signalPassFailure();
   }
 }
+
+
 
 std::unique_ptr<mlir::Pass> engine::createLowerToLLVMPass() {
   return std::make_unique<EngineToLLVMLoweringPass>();

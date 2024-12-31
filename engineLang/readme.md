@@ -63,3 +63,12 @@ How do I ensure that `mlir::Linalg` to loops ignores `engine::` operations?
 ### Solution:
  - write a pass wrapper for linalg pass and legalize all the "engine" dialect so as to keep it safe? - try this first.
  - or maybe instead of using lli, lower it to object files and run it some other way? 
+
+
+
+#### 4)
+   Lower Linalg to loops is the only way to go, but it eliminates my non lowered dialect's operations. 
+   ### Solution:
+      - feels like a hack, but I might have to first lower my dialect's operations to llvm and then afterwards lower everything to llvm again.
+
+      : MARK LINALG OPERATIONS AS LEGAL, LOWER MY DIALECT'S OPS TO LLVM, THEN LOWER LINALG TO LLVM AFTERWARDS.
