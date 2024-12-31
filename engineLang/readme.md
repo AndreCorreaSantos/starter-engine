@@ -72,3 +72,9 @@ How do I ensure that `mlir::Linalg` to loops ignores `engine::` operations?
       - feels like a hack, but I might have to first lower my dialect's operations to llvm and then afterwards lower everything to llvm again.
 
       : MARK LINALG OPERATIONS AS LEGAL, LOWER MY DIALECT'S OPS TO LLVM, THEN LOWER LINALG TO LLVM AFTERWARDS.
+
+
+      - lowering to linalg to loops and then using the patterns from lowerToLLVM causes it to not recognize some arith operations.
+      - lowering linalg-to-loops, scf-to-cf, convert-to-llvm in the engine-opt causes it to generate unrealized-conversion casts which cannot be reconciled.
+
+      
