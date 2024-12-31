@@ -77,4 +77,9 @@ How do I ensure that `mlir::Linalg` to loops ignores `engine::` operations?
       - lowering to linalg to loops and then using the patterns from lowerToLLVM causes it to not recognize some arith operations.
       - lowering linalg-to-loops, scf-to-cf, convert-to-llvm in the engine-opt causes it to generate unrealized-conversion casts which cannot be reconciled.
 
+
+#### 5)
+   !!!! MARKING MY ENGINE OPERATIONS AS HAVING SIDE EFFECTS SOLVED IT, LINALG CAN BE LOWERED !!!!
+   next goal: MAKE tensors loaded via engine.constant able to be inserted into linalg.add and linalg.dot operations.
+
       

@@ -3,7 +3,7 @@
 module {
 
  // test
-  func.func @add() -> memref<3xf64> {
+  func.func @add() -> memref<f64> {
     // defining two tensors
     %t1 = memref.alloc() : memref<3xf64>
     %t2 = memref.alloc() : memref<3xf64>
@@ -27,15 +27,15 @@ module {
     memref.store %3, %t2[%c2] : memref<3xf64> 
 
 
-    %output = memref.alloc() : memref<3xf64>
-    linalg.add ins(%t1,%t2 : memref<3xf64>, memref<3xf64>) outs(%output : memref<3xf64>)
+    %output = memref.alloc() : memref<f64>
+    linalg.dot ins(%t1,%t2 : memref<3xf64>, memref<3xf64>) outs(%output : memref<f64>)
 
-    return %output : memref<3xf64>
+    return %output : memref<f64>
   }
 
   func.func @main() {
-    %result = call @add() : () -> memref<3xf64>
-    "engine.print"(%result) : (memref<3xf64>) -> ()
+    %result = call @add() : () -> memref<f64>
+    "engine.print"(%result) : (memref<f64>) -> ()
     return
   }
   

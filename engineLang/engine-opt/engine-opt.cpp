@@ -54,7 +54,7 @@
 #include "mlir/Conversion/BufferizationToMemRef/BufferizationToMemRef.h"
 
 
-// #include "mlir/Dialect/Linalg/Transforms/BufferizableOpInterfaceImpl.h"
+#include "mlir/Dialect/Linalg/Transforms/BufferizableOpInterfaceImpl.h"
 
 
 namespace cl = llvm::cl;
@@ -130,20 +130,15 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   mlir::PassManager passManager(&context);
   if (mlir::failed(mlir::applyPassManagerCLOptions(passManager)))
     return 4;
-  // tensor
-  passManager.addPass(mlir::createConvertTensorToLinalgPass());
-  passManager.addPass(mlir::bufferization::createEmptyTensorToAllocTensorPass());
-
-  //linalg
+  
+  // passManager.addPass(mlir::createConvertTensorToLinalgPass());
+  // passManager.addPass(mlir::bufferization::createEmptyTensorToAllocTensorPass());
+  // passManager.addPass(mlir::bufferization::createOneShotBufferizePass());
+  // passManager.addPass(mlir::createBufferizationToMemRefPass());
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
-
-  // bufferization (tensor lowering)
-  passManager.addPass(mlir::createBufferizationToMemRefPass());
-
   passManager.addPass(engine::createLowerToAffinePass());
   passManager.addPass(engine::createLowerToLLVMPass());
 
-  // passManager.addPass(engine::createLowerLinalgPass());
 
   if (mlir::failed(passManager.run(*module))) {
     return 4;
@@ -211,12 +206,12 @@ int main(int argc, char **argv) {
 
 
   // // Register BufferizableOpInterface external models
-  // mlir::arith::registerBufferizableOpInterfaceExternalModels(registry);
-  // mlir::cf::registerBufferizableOpInterfaceExternalModels(registry);
-  // mlir::scf::registerBufferizableOpInterfaceExternalModels(registry);
-  // mlir::tensor::registerBufferizableOpInterfaceExternalModels(registry);
-  // mlir::linalg::registerBufferizableOpInterfaceExternalModels(registry);
-  // mlir::bufferization::func_ext::registerBufferizableOpInterfaceExternalModels(registry);
+  mlir::arith::registerBufferizableOpInterfaceExternalModels(registry);
+  mlir::cf::registerBufferizableOpInterfaceExternalModels(registry);
+  mlir::scf::registerBufferizableOpInterfaceExternalModels(registry);
+  mlir::tensor::registerBufferizableOpInterfaceExternalModels(registry);
+  mlir::linalg::registerBufferizableOpInterfaceExternalModels(registry);
+  mlir::bufferization::func_ext::registerBufferizableOpInterfaceExternalModels(registry);
   context.appendDialectRegistry(registry);
 
   // Parse command-line arguments.
