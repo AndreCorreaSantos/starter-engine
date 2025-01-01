@@ -71,4 +71,3 @@ public:
 std::unique_ptr<mlir::Pass> engine::createLowerLinalgPass() {
   return std::make_unique<LowerLinalgPass>();
 }
-
