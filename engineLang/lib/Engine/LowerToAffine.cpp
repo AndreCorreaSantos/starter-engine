@@ -187,7 +187,7 @@ static void lowerOpToLoops(mlir::Operation *op, mlir::ValueRange operands,
 
 namespace {
 
-template <typename BinaryOp, typename LoweredBinaryOp>
+template <typename BinaryOp, typename LoweredBinaryOp> // CHECK IF THIS CONVERTS THE TENSORS TO MEMREF
 struct BinaryOpLowering : public mlir::ConversionPattern {
   BinaryOpLowering(mlir::MLIRContext *ctx)
       : mlir::ConversionPattern(BinaryOp::getOperationName(), 1, ctx) {}
@@ -213,8 +213,12 @@ struct BinaryOpLowering : public mlir::ConversionPattern {
 
 using AddOpLowering = BinaryOpLowering<engine::AddOp, mlir::arith::AddFOp>;
 using MulOpLowering = BinaryOpLowering<engine::MulOp, mlir::arith::MulFOp>;
-
 } 
+
+class DotOpLowering : public mlir::OpRewritePattern<engine::DotOp> {
+  using OpRewritePattern<engine::DotOp>::OpRewritePattern;
+
+}
 
 
 // class StoreOpLowering : public mlir::OpConversionPattern<engine::StoreOp> {
@@ -353,6 +357,7 @@ void EngineToAffineLowerPass::runOnOperation() { // Only engine:: opertions need
   patterns.add<PrintOpLowering>(&getContext());
   patterns.add<AddOpLowering>(&getContext());
   patterns.add<MulOpLowering>(&getContext());
+  patterns.add<DotOpLowering>(&getContext());
   // patterns.add<StoreOpLowering>(&getContext());
   // patterns.add<LoadOpLowering>(&getContext());
 

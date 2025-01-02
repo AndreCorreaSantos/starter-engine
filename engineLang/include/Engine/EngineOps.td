@@ -67,6 +67,17 @@ def MulOp : Engine_Op<"mul">{
   let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef]>:$lhs, AnyTypeOf<[F64Tensor, F64MemRef]>:$rhs);
   let results = (outs F64Tensor);
 }
+
+def DotOp : Engine_Op<"dot">{
+  let summary = "returns the dot product of two tensors";
+  let description = [{
+    the dot operation calculates the dot product between two tensors, it is a wrapper on the linalg dialect.
+  }];
+  let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef]>:$lhs, AnyTypeOf<[F64Tensor, F64MemRef]>:$rhs);
+  let results = (outs F64Tensor);
+}
+
+
 def StoreOp : Engine_Op<"store"> {
   let summary = "stores a tensor under a name in the cache";
   let description = [{
