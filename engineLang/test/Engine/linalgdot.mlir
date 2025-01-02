@@ -28,6 +28,8 @@ module {
 
 
     %output = memref.alloc() : memref<f64>
+
+    
     linalg.dot ins(%t1,%t2 : memref<3xf64>, memref<3xf64>) outs(%output : memref<f64>)
 
     return %output : memref<f64>

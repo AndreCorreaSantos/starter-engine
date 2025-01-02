@@ -129,3 +129,12 @@ tasks:
  - generate output memref allocation
  - generate linalg call with operands
  - change declared operand types into memrefs instead of tensor
+
+
+ PROBLEM: WHEN ENGINE.CONST GETS LOWERED TO AFFINE, IT'S TENSOR TYPE CHANGES INTO A MEMREF.
+
+ EITHER:
+ - UPDATE ALL LATER REFERENCES TO THE VALUE TO THE NEW TYPE, EVEN FUNCTION RETURNS.
+ - OR MAKE IT RECEIVE TENSORS AND OUTPUT MEMREFS ALWAYS. -> IT'S OUTPUT GETS LOWERED INTO A MEMREF, BUT IT DOESNT ACCEPT AN OUTPUT TYPE OF MEMREF, ONLY TENSOR.
+
+ for now make it return memref? -> this way it will easily be able to be inserted into linalg ops

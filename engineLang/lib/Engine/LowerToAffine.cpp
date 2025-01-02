@@ -33,6 +33,7 @@
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/Location.h"
 #include "mlir/IR/Value.h"
+#include "mlir/IR/Types.h"
 #include "mlir/IR/PatternMatch.h"
 
 #include "mlir/Dialect/Bufferization/IR/Bufferization.h"
@@ -216,10 +217,65 @@ using MulOpLowering = BinaryOpLowering<engine::MulOp, mlir::arith::MulFOp>;
 } 
 
 class DotOpLowering : public mlir::OpRewritePattern<engine::DotOp> {
+public:
   using OpRewritePattern<engine::DotOp>::OpRewritePattern;
 
-}
+  mlir::LogicalResult
+  matchAndRewrite(engine::DotOp op, mlir::PatternRewriter &rewriter) const override {
+    // Get location
+    auto loc = op.getLoc();
 
+    // Get input operands
+    mlir::Value lhs = op.getOperand(0);
+    mlir::Value rhs = op.getOperand(1);
+
+    // Convert tensor operands to memref type if needed
+    auto lhsMemRef = lhs;
+    auto rhsMemRef = rhs;
+    
+    // convert lhs type to memref
+    if (lhs.getType().isa<mlir::TensorType>()) {
+      lhsMemRef = rewriter.create<mlir::bufferization::ToMemrefOp>(
+          loc, 
+          mlir::MemRefType::get(
+              lhs.getType().cast<mlir::TensorType>().getShape(),
+              lhs.getType().cast<mlir::TensorType>().getElementType()),
+          lhs);
+    }
+    // convert rhs to memref
+    if (rhs.getType().isa<mlir::TensorType>()) {
+      rhsMemRef = rewriter.create<mlir::bufferization::ToMemrefOp>(
+          loc,
+          mlir::MemRefType::get(
+              rhs.getType().cast<mlir::TensorType>().getShape(),
+              rhs.getType().cast<mlir::TensorType>().getElementType()),
+          rhs);
+    }
+
+    // Create output memref type and allocation
+    auto resultType = op.getResult().getType().cast<mlir::TensorType>();
+    auto resultMemRefType = mlir::MemRefType::get(
+        resultType.getShape(),
+        resultType.getElementType());
+    auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, resultMemRefType);
+
+    // Create the linalg.dot operation
+    auto dotOp = rewriter.create<mlir::linalg::DotOp>(
+        loc,
+        mlir::TypeRange{},
+        mlir::ValueRange{lhsMemRef, rhsMemRef},
+        mlir::ValueRange{alloc}
+    );
+
+    // Convert the result back to tensor type
+    auto result = rewriter.create<mlir::bufferization::ToTensorOp>(loc, resultType, alloc);
+
+    // Replace the original operation with our new result
+    rewriter.replaceOp(op, result);
+
+    return mlir::success();
+  }
+};
 
 // class StoreOpLowering : public mlir::OpConversionPattern<engine::StoreOp> {
 // public:
