@@ -172,8 +172,8 @@ static void lowerOpToLoops(mlir::Operation *op, mlir::ValueRange operands,
   auto tensorType = llvm::cast<mlir::RankedTensorType>(*op->result_type_begin());
   mlir::Location loc = op->getLoc();
 
-  auto memRefType = convertTensorToMemRef(tensorType); // Ensure this is defined
-  mlir::Value alloc = insertAllocAndDealloc(memRefType, loc, rewriter); // Ensure this is defined
+  auto memRefType = convertTensorToMemRef(tensorType); 
+  mlir::Value alloc = insertAllocAndDealloc(memRefType, loc, rewriter); 
 
   llvm::SmallVector<int64_t, 4> lowerBounds(tensorType.getRank(), /*Value=*/0);
   llvm::SmallVector<int64_t, 4> steps(tensorType.getRank(), /*Value=*/1);
@@ -242,20 +242,35 @@ public:
     auto resultType = mlir::dyn_cast<mlir::MemRefType>(op.getResult().getType());
     if (!resultType) {
       return rewriter.notifyMatchFailure(op, "expected memref result type");
+    } 
+
+  //debug printing shapes
+    auto lhsShape = lhsType.getShape();
+    llvm::errs() << "LHS_Shape: [";
+    for (auto dim : lhsShape) {
+      llvm::errs() << dim << " ";
     }
+    llvm::errs() << "]\n";
+
+    auto rhsShape = rhsType.getShape();
+    llvm::errs() << "RHS_Shape: [";
+    for (auto dim : rhsShape) {
+      llvm::errs() << dim << " ";
+    }
+    llvm::errs() << "]\n";
 
     // Allocate output memref
-    auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
+    auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
 
     // Create the linalg.dot operation
     rewriter.create<mlir::linalg::DotOp>(
         loc,
-        mlir::TypeRange{},                     // No return values; outputs written to memref
-        mlir::ValueRange{lhs, rhs},            // Inputs
-        mlir::ValueRange{alloc});              // Output memref
+        mlir::ValueRange{lhs, rhs},
+        mlir::ValueRange{alloc}
+    );
 
     // Replace the original operation with the allocated output memref
-    rewriter.replaceOp(op, alloc.getResult());
+    rewriter.replaceOp(op, alloc);
 
     return mlir::success();
   }
