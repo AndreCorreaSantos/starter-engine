@@ -78,6 +78,16 @@ def DotOp : Engine_Op<"dot">{
 }
 
 
+def MatmulOp : Engine_Op<"matmul">{
+  let summary = "returns the matrix multiplication of two tensors";
+  let description = [{
+    the matmul operation calculates the matrix multiplication between two tensors, it is a wrapper on the linalg dialect.
+  }];
+  let arguments = (ins AnyTypeOf<[F64MemRef]>:$lhs, AnyTypeOf<[F64MemRef]>:$rhs);
+  let results = (outs F64MemRef);
+}
+
+
 def StoreOp : Engine_Op<"store"> {
   let summary = "stores a tensor under a name in the cache";
   let description = [{

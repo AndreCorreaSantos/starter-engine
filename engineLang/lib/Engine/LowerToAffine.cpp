@@ -218,6 +218,7 @@ using AddOpLowering = BinaryOpLowering<engine::AddOp, mlir::arith::AddFOp>;
 using MulOpLowering = BinaryOpLowering<engine::MulOp, mlir::arith::MulFOp>;
 } 
 
+
 class DotOpLowering : public mlir::OpRewritePattern<engine::DotOp> {
 public:
   using OpRewritePattern<engine::DotOp>::OpRewritePattern;
@@ -264,6 +265,64 @@ public:
 
     // Create the linalg.dot operation
     rewriter.create<mlir::linalg::DotOp>(
+        loc,
+        mlir::ValueRange{lhs, rhs},
+        mlir::ValueRange{alloc}
+    );
+
+    // Replace the original operation with the allocated output memref
+    rewriter.replaceOp(op, alloc);
+
+    return mlir::success();
+  }
+};
+
+class MatmulOpLowering : public mlir::OpRewritePattern<engine::MatmulOp> {
+public:
+  using OpRewritePattern<engine::MatmulOp>::OpRewritePattern;
+
+  mlir::LogicalResult
+  matchAndRewrite(engine::MatmulOp op, mlir::PatternRewriter &rewriter) const override {
+    // Get location
+    auto loc = op.getLoc();
+
+    // Get input operands
+    mlir::Value lhs = op.getOperand(0);
+    mlir::Value rhs = op.getOperand(1);
+
+    // Validate input types
+    auto lhsType = mlir::dyn_cast<mlir::MemRefType>(lhs.getType());
+    auto rhsType = mlir::dyn_cast<mlir::MemRefType>(rhs.getType());
+    if (!lhsType || !rhsType) {
+      return rewriter.notifyMatchFailure(op, "expected memref types for lhs and rhs");
+    }
+
+    // Validate output type
+    auto resultType = mlir::dyn_cast<mlir::MemRefType>(op.getResult().getType());
+    if (!resultType) {
+      return rewriter.notifyMatchFailure(op, "expected memref result type");
+    } 
+
+  //debug printing shapes
+    auto lhsShape = lhsType.getShape();
+    llvm::errs() << "LHS_Shape: [";
+    for (auto dim : lhsShape) {
+      llvm::errs() << dim << " ";
+    }
+    llvm::errs() << "]\n";
+
+    auto rhsShape = rhsType.getShape();
+    llvm::errs() << "RHS_Shape: [";
+    for (auto dim : rhsShape) {
+      llvm::errs() << dim << " ";
+    }
+    llvm::errs() << "]\n";
+
+    // Allocate output memref
+    auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
+
+    // Create the linalg.Matmul operation
+    rewriter.create<mlir::linalg::MatmulOp>(
         loc,
         mlir::ValueRange{lhs, rhs},
         mlir::ValueRange{alloc}
@@ -413,6 +472,7 @@ void EngineToAffineLowerPass::runOnOperation() { // Only engine:: opertions need
   patterns.add<AddOpLowering>(&getContext());
   patterns.add<MulOpLowering>(&getContext());
   patterns.add<DotOpLowering>(&getContext());
+  patterns.add<MatmulOpLowering>(&getContext());
   // patterns.add<StoreOpLowering>(&getContext());
   // patterns.add<LoadOpLowering>(&getContext());
 
