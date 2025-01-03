@@ -359,14 +359,19 @@ public:
     
     // Create constant indices for dimensions
     auto valueShape = inputType.getShape();
-    mlir::SmallVector<mlir::Value, 8> constantIndices;
+
+    mlir::SmallVector<mlir::Value, 8> constantIndices; // creates 
     for (auto i : llvm::seq<int64_t>(0, *std::max_element(valueShape.begin(), valueShape.end()))) {
       constantIndices.push_back(rewriter.create<mlir::arith::ConstantIndexOp>(loc, i));
     }
+    // creates:
+    // %c0 = arith.constant 0 : index
+    // %c1 = arith.constant 1 : index
+    // %c2 = arith.constant 2 : index ...
 
     // Create constant 1.0 for addition
-    auto oneAttr = rewriter.getFloatAttr(inputType.getElementType(), 1.0);
-    auto oneValue = rewriter.create<mlir::arith::ConstantOp>(loc, oneAttr);
+    auto zeroAttr = rewriter.getZeroAttr(inputType.getElementType());
+    auto zeroValue = rewriter.create<mlir::arith::ConstantOp>(loc, zeroAttr);
 
     // Iterate and store
     mlir::SmallVector<mlir::Value, 2> indices;
@@ -374,10 +379,19 @@ public:
       if (dimension == valueShape.size()) {
         // Load input value
         auto loadedValue = rewriter.create<mlir::affine::AffineLoadOp>(loc, input, llvm::ArrayRef(indices));
-        // Add 1.0
-        auto addOp = rewriter.create<mlir::arith::AddFOp>(loc, loadedValue, oneValue);
-        // Store result
-        rewriter.create<mlir::affine::AffineStoreOp>(loc, addOp, alloc, llvm::ArrayRef(indices));
+      
+        auto cmp = rewriter.create<mlir::arith::CmpFOp>(
+            loc,
+            mlir::arith::CmpFPredicate::OGT,
+            loadedValue,    // x
+            zeroValue       // 0.0
+        );
+
+        // relu(x) = select (x>0), x, 0
+        auto reluValue = rewriter.create<mlir::arith::SelectOp>(loc, cmp, loadedValue, zeroValue);
+
+        // Then store reluValue
+        rewriter.create<mlir::affine::AffineStoreOp>(loc, reluValue, alloc, indices);
         return;
       }
 
