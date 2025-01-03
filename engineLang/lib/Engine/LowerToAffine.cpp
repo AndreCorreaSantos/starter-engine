@@ -335,6 +335,62 @@ public:
   }
 };
 
+class ReLUOpLowering : public mlir::OpRewritePattern<engine::ReLUOp> {
+public:
+  using OpRewritePattern<engine::ReLUOp>::OpRewritePattern;
+
+  mlir::LogicalResult
+  matchAndRewrite(engine::ReLUOp op, mlir::PatternRewriter &rewriter) const override {
+    // Get location
+    auto loc = op.getLoc();
+
+    // Get input operands
+    mlir::Value input = op.getOperand(0);
+
+    // Validate input types
+    auto inputType = mlir::dyn_cast<mlir::MemRefType>(input.getType());
+    if (!inputType ) {
+      return rewriter.notifyMatchFailure(op, "expected memref types for input");
+    }
+
+    // Validate output type
+    auto resultType = mlir::dyn_cast<mlir::MemRefType>(op.getResult().getType());
+    if (!resultType) {
+      return rewriter.notifyMatchFailure(op, "expected memref result type");
+    } 
+
+  //debug printing shapes
+    auto lhsShape = lhsType.getShape();
+    llvm::errs() << "LHS_Shape: [";
+    for (auto dim : lhsShape) {
+      llvm::errs() << dim << " ";
+    }
+    llvm::errs() << "]\n";
+
+    auto rhsShape = rhsType.getShape();
+    llvm::errs() << "RHS_Shape: [";
+    for (auto dim : rhsShape) {
+      llvm::errs() << dim << " ";
+    }
+    llvm::errs() << "]\n";
+
+    // Allocate output memref
+    auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
+
+    // Create the linalg.Matmul operation
+    rewriter.create<mlir::linalg::MaxOp>(
+        loc,
+        mlir::ValueRange{lhs, rhs},
+        mlir::ValueRange{alloc}
+    );
+
+    // Replace the original operation with the allocated output memref
+    rewriter.replaceOp(op, alloc);
+
+    return mlir::success();
+  }
+};
+
 // class StoreOpLowering : public mlir::OpConversionPattern<engine::StoreOp> {
 // public:
 //   using OpConversionPattern<engine::StoreOp>::OpConversionPattern;
@@ -473,6 +529,7 @@ void EngineToAffineLowerPass::runOnOperation() { // Only engine:: opertions need
   patterns.add<MulOpLowering>(&getContext());
   patterns.add<DotOpLowering>(&getContext());
   patterns.add<MatmulOpLowering>(&getContext());
+  patterns.add<ReLUOpLowering>(&getContext());
   // patterns.add<StoreOpLowering>(&getContext());
   // patterns.add<LoadOpLowering>(&getContext());
 

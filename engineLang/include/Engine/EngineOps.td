@@ -87,6 +87,14 @@ def MatmulOp : Engine_Op<"matmul">{
   let results = (outs F64MemRef);
 }
 
+def ReLUOp : Engine_Op<"relu">{
+  let summary = "Applies the ReLU function to a tensor";
+  let description = [{
+    The ReLU operation applies the ReLU function to a tensor.
+  }];
+  let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef]>:$lhs);
+}
+
 
 def StoreOp : Engine_Op<"store"> {
   let summary = "stores a tensor under a name in the cache";
