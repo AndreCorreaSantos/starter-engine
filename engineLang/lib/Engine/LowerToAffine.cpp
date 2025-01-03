@@ -335,61 +335,65 @@ public:
   }
 };
 
+
 class ReLUOpLowering : public mlir::OpRewritePattern<engine::ReLUOp> {
 public:
   using OpRewritePattern<engine::ReLUOp>::OpRewritePattern;
 
   mlir::LogicalResult
   matchAndRewrite(engine::ReLUOp op, mlir::PatternRewriter &rewriter) const override {
-    // Get location
     auto loc = op.getLoc();
+    mlir::Value input = op.getValue();
 
-    // Get input operands
-    mlir::Value input = op.getOperand(0);
-
-    // Validate input types
-    auto inputType = mlir::dyn_cast<mlir::MemRefType>(input.getType());
-    if (!inputType ) {
-      return rewriter.notifyMatchFailure(op, "expected memref types for input");
+    auto inputType = input.getType().dyn_cast<mlir::MemRefType>();
+    if (!inputType) {
+      return rewriter.notifyMatchFailure(op, "expected memref type for input");
     }
 
-    // Validate output type
-    auto resultType = mlir::dyn_cast<mlir::MemRefType>(op.getResult().getType());
+    auto resultType = op.getResult().getType().dyn_cast<mlir::MemRefType>();
     if (!resultType) {
-      return rewriter.notifyMatchFailure(op, "expected memref result type");
-    } 
-
-  //debug printing shapes
-    auto lhsShape = lhsType.getShape();
-    llvm::errs() << "LHS_Shape: [";
-    for (auto dim : lhsShape) {
-      llvm::errs() << dim << " ";
+      return rewriter.notifyMatchFailure(op, "expected memref type for result");
     }
-    llvm::errs() << "]\n";
 
-    auto rhsShape = rhsType.getShape();
-    llvm::errs() << "RHS_Shape: [";
-    for (auto dim : rhsShape) {
-      llvm::errs() << dim << " ";
-    }
-    llvm::errs() << "]\n";
-
-    // Allocate output memref
     auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
+    
+    // Create constant indices for dimensions
+    auto valueShape = inputType.getShape();
+    mlir::SmallVector<mlir::Value, 8> constantIndices;
+    for (auto i : llvm::seq<int64_t>(0, *std::max_element(valueShape.begin(), valueShape.end()))) {
+      constantIndices.push_back(rewriter.create<mlir::arith::ConstantIndexOp>(loc, i));
+    }
 
-    // Create the linalg.Matmul operation
-    rewriter.create<mlir::linalg::MaxOp>(
-        loc,
-        mlir::ValueRange{lhs, rhs},
-        mlir::ValueRange{alloc}
-    );
+    // Create constant 1.0 for addition
+    auto oneAttr = rewriter.getFloatAttr(inputType.getElementType(), 1.0);
+    auto oneValue = rewriter.create<mlir::arith::ConstantOp>(loc, oneAttr);
 
-    // Replace the original operation with the allocated output memref
+    // Iterate and store
+    mlir::SmallVector<mlir::Value, 2> indices;
+    std::function<void(uint64_t)> processElements = [&](uint64_t dimension) {
+      if (dimension == valueShape.size()) {
+        // Load input value
+        auto loadedValue = rewriter.create<mlir::affine::AffineLoadOp>(loc, input, llvm::ArrayRef(indices));
+        // Add 1.0
+        auto addOp = rewriter.create<mlir::arith::AddFOp>(loc, loadedValue, oneValue);
+        // Store result
+        rewriter.create<mlir::affine::AffineStoreOp>(loc, addOp, alloc, llvm::ArrayRef(indices));
+        return;
+      }
+
+      for (uint64_t i = 0, e = valueShape[dimension]; i != e; ++i) {
+        indices.push_back(constantIndices[i]);
+        processElements(dimension + 1);
+        indices.pop_back();
+      }
+    };
+
+    processElements(0);
     rewriter.replaceOp(op, alloc);
-
     return mlir::success();
   }
 };
+
 
 // class StoreOpLowering : public mlir::OpConversionPattern<engine::StoreOp> {
 // public:

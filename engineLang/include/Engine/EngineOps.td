@@ -92,7 +92,8 @@ def ReLUOp : Engine_Op<"relu">{
   let description = [{
     The ReLU operation applies the ReLU function to a tensor.
   }];
-  let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef]>:$lhs);
+  let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef]>:$value);
+  let results = (outs F64MemRef);
 }
 
 
