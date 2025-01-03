@@ -13,7 +13,7 @@ def ConstantOp : Engine_Op<"constant"> {
     ```mlir
       %0 = "engine.constant"()
       { value = dense<[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]> : tensor<2x3xf64> }
-      : () -> tensor<2x3xf64> 
+      : () -> memref<2x3xf64> 
     ```
   }];
 
@@ -26,7 +26,7 @@ def ConstantOp : Engine_Op<"constant"> {
 
 //  let parser = [{ return ::parseConstantOp(parser, result); }];
   let arguments = (ins F64ElementsAttr:$value);
-  let results = (outs F64Tensor);
+  let results = (outs F64MemRef);
 }
 
 def PrintOp : Engine_Op<"print"> {
@@ -73,8 +73,8 @@ def DotOp : Engine_Op<"dot">{
   let description = [{
     the dot operation calculates the dot product between two tensors, it is a wrapper on the linalg dialect.
   }];
-  let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef]>:$lhs, AnyTypeOf<[F64Tensor, F64MemRef]>:$rhs);
-  let results = (outs F64Tensor);
+  let arguments = (ins AnyTypeOf<[F64MemRef]>:$lhs, AnyTypeOf<[F64MemRef]>:$rhs);
+  let results = (outs F64MemRef);
 }
 
 

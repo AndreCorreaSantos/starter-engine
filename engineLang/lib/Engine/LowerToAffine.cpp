@@ -71,8 +71,10 @@ class ConstantOpLowering : public mlir::OpRewritePattern<engine::ConstantOp> {
 
     // When lowering the constant operation, we allocate and assign the constant
     // values to a corresponding memref allocation.
-    auto tensorType = mlir::cast<mlir::TensorType>(op.getType());
-    auto memRefType = convertTensorToMemRef(tensorType);
+    auto memRefType = op.getType().dyn_cast<mlir::MemRefType>();
+    if (!memRefType) {
+      return rewriter.notifyMatchFailure(op, "expected memref result");
+    }
     auto alloc = insertAllocAndDealloc(memRefType, loc, rewriter);
 
     // We will be generating constant indices up-to the largest dimension.
@@ -229,49 +231,31 @@ public:
     mlir::Value lhs = op.getOperand(0);
     mlir::Value rhs = op.getOperand(1);
 
-    // Convert tensor operands to memref type if needed
-    auto lhsMemRef = lhs;
-    auto rhsMemRef = rhs;
-    
-    // convert lhs type to memref
-    if (lhs.getType().isa<mlir::TensorType>()) {
-      lhsMemRef = rewriter.create<mlir::bufferization::ToMemrefOp>(
-          loc, 
-          mlir::MemRefType::get(
-              lhs.getType().cast<mlir::TensorType>().getShape(),
-              lhs.getType().cast<mlir::TensorType>().getElementType()),
-          lhs);
-    }
-    // convert rhs to memref
-    if (rhs.getType().isa<mlir::TensorType>()) {
-      rhsMemRef = rewriter.create<mlir::bufferization::ToMemrefOp>(
-          loc,
-          mlir::MemRefType::get(
-              rhs.getType().cast<mlir::TensorType>().getShape(),
-              rhs.getType().cast<mlir::TensorType>().getElementType()),
-          rhs);
+    // Validate input types
+    auto lhsType = mlir::dyn_cast<mlir::MemRefType>(lhs.getType());
+    auto rhsType = mlir::dyn_cast<mlir::MemRefType>(rhs.getType());
+    if (!lhsType || !rhsType) {
+      return rewriter.notifyMatchFailure(op, "expected memref types for lhs and rhs");
     }
 
-    // Create output memref type and allocation
-    auto resultType = op.getResult().getType().cast<mlir::TensorType>();
-    auto resultMemRefType = mlir::MemRefType::get(
-        resultType.getShape(),
-        resultType.getElementType());
-    auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, resultMemRefType);
+    // Validate output type
+    auto resultType = mlir::dyn_cast<mlir::MemRefType>(op.getResult().getType());
+    if (!resultType) {
+      return rewriter.notifyMatchFailure(op, "expected memref result type");
+    }
+
+    // Allocate output memref
+    auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
 
     // Create the linalg.dot operation
-    auto dotOp = rewriter.create<mlir::linalg::DotOp>(
+    rewriter.create<mlir::linalg::DotOp>(
         loc,
-        mlir::TypeRange{},
-        mlir::ValueRange{lhsMemRef, rhsMemRef},
-        mlir::ValueRange{alloc}
-    );
+        mlir::TypeRange{},                     // No return values; outputs written to memref
+        mlir::ValueRange{lhs, rhs},            // Inputs
+        mlir::ValueRange{alloc});              // Output memref
 
-    // Convert the result back to tensor type
-    auto result = rewriter.create<mlir::bufferization::ToTensorOp>(loc, resultType, alloc);
-
-    // Replace the original operation with our new result
-    rewriter.replaceOp(op, result);
+    // Replace the original operation with the allocated output memref
+    rewriter.replaceOp(op, alloc.getResult());
 
     return mlir::success();
   }
