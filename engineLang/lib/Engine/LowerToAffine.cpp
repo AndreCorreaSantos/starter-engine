@@ -408,6 +408,13 @@ public:
   }
 };
 
+// class FlattenOpLowering : public mlir::OpRewritePattern<engine::FlattenOp> {
+// public:
+//   using OpRewritePattern<engine::FlattenOp>::OpRewritePattern;
+
+//   mlir::LogicalResult
+// }
+
 
 // class StoreOpLowering : public mlir::OpConversionPattern<engine::StoreOp> {
 // public:

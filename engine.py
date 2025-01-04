@@ -23,8 +23,9 @@ def write_data(path, model):
         f.write("| \n")
         for i in model.graph.node:
             f.write(f"{i.op_type}\n")
-            f.write(f"{" ".join(i.output)}\n")
-            f.write(f"{" ".join(i.input)}\n")
+            f.write(f"{' '.join(i.output)}\n")
+            f.write(f"{' '.join(i.input)}\n")
+
 
 
 class Node():
@@ -33,6 +34,8 @@ class Node():
         self.op_type = op_type
 
     def Gemm(self, m, w, b):
+        print("SHAPES ON DOT")
+        print(f"m: {m.shape}, w: {w.shape}")
         return np.dot(m, w.T) + b
 
     def Relu(self, m):

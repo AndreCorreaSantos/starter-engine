@@ -138,3 +138,11 @@ tasks:
  - OR MAKE IT RECEIVE TENSORS AND OUTPUT MEMREFS ALWAYS. -> IT'S OUTPUT GETS LOWERED INTO A MEMREF, BUT IT DOESNT ACCEPT AN OUTPUT TYPE OF MEMREF, ONLY TENSOR.
 
  for now make it return memref? -> this way it will easily be able to be inserted into linalg ops
+
+
+#### 6) 
+
+ - All ops seem fine. 
+ - [] Need to find a way to insert input into the compiled program and make it into an op.
+ - [] Revise user input and global cache again.
+ - [] Generate engine dialect's ops from the AST read in the C++ -> follow toy tutorial logic.
