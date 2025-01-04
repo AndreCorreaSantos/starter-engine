@@ -149,4 +149,6 @@ tasks:
 
  PROBLEM RIGHT NOW:
   - CHANGE RESULT ALLOC FOR LAYER OPERATIONS TO BE INFERRED AND NOT DECLARED BY THE OP. --> python does not know the shape of the result.
-  - SHAPE OF INPUTS MUST ALSO BE ?, MUST BE DETERMINED DURING LOWERING.
+  - SHAPE OF INPUTS MUST ALSO BE ?, MUST BE DETERMINED DURING LOWERING. --> can't do it. I need to know the shapes at compile time.
+  - Python will need to keep a cache tracking each tensor and their respective shape and calculate operation's outputted shapes.
+
