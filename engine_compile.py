@@ -1,6 +1,9 @@
 import onnx
 import numpy as np
 
+def print_shape(array):
+    return np.array2string(array, separator=', ', formatter={'float_kind': lambda x: f'{x:.1f}'}, max_line_width=np.inf).replace("\n","")
+
 def convert_raw_data(initializer):
     data_type = initializer.data_type
     if data_type == onnx.TensorProto.FLOAT:
@@ -29,21 +32,27 @@ def write_data(path, model):
 
 
 class Node():
-    def __init__(self, op_type, inputs):
+    def __init__(self, op_type, inputs, output):
         self.inputs = inputs
+        self.output = output
         self.op_type = op_type
 
-    def Gemm(self, m, w, b):
-        return ""
+    def Gemm(self, m, w, b): # m, w and b will be their respective names
+        mlir = f"%{self.output}_int = \"engine.matmul\"(%{m},%{w}) : (memref<?xf64>,memref<?xf64>) -> memref<?xf64>\n" # matmul with weights
+        mlir += f"%{self.output} = \"engine.add\"(%{self.output}_int,%{b}) : (memref<?xf64>,memref<?xf64>) -> memref<?xf64>\n" # add bias 
+        return mlir
        # return np.dot(m, w.T) + b
 
     def Relu(self, m):
+        return f"%{self.output} = \"engine.relu\"(%{m}) : (memref<?xf64>) -> memref<?xf64> \n"
        # return np.maximum(m, 0)
 
     def Flatten(self, m):
+        return "to be implemented (FLATTEN) \n"
        # return m.reshape(1, -1)
 
     def Add(self, m1, m2):
+        return f"%{self.output} = \"engine.add\"(%{m1},%{m2}) : (memref<?xf64>,memref<?xf64>) -> memref<?xf64> \n"
        # return m1 + m2
 
     def execute(self):
@@ -67,17 +76,32 @@ class Model():
             self.cache[init.name] = data
         self.nodes = o_model.graph.node
 
-    def infer(self, input):
+    def load_constant(self, input, name):
+        shape = ""
+        for i in range(0,len(input.shape)):
+            shape += f"{i}x"
+        shape += "f64"
+        data = print_shape(input)
+        mlir = f"%{name} = \"engine.constant\"() {{value=dense<{data}>:tensor<{shape}}}> \n"
+        return mlir
+
+    def translate(self, input):
+        result = ""
         for i, nd in enumerate(self.nodes):
             if i == 0:
-                self.cache[nd.input[0]] = input
-            inputs = [self.cache[inp] for inp in nd.input]
-            n_obj = Node(nd.op_type, inputs)
-            self.cache[nd.output[0]] = n_obj.execute()
-            out = nd.output[0]
-        return self.cache[out]
+                result += self.load_constant(input, nd.input)
+            n_obj = Node(nd.op_type, nd.input, nd.output[0])
+            result += n_obj.execute()
+
+        return result
     
 
 
     # PASSAR AST PARA MINHA LINGUAGEM 
     #
+
+
+mod = Model("train/mnist_ffn_complex.onnx")
+with open("output.mlir", "w+") as f:
+    f.write(mod.translate(np.random.rand(1, 784).astype(np.float32)))
+
