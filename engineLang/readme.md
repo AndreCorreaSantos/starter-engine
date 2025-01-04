@@ -146,3 +146,7 @@ tasks:
  - [] Need to find a way to insert input into the compiled program and make it into an op.
  - [] Revise user input and global cache again.
  - [] Generate engine dialect's ops from the AST read in the C++ -> follow toy tutorial logic.
+
+ PROBLEM RIGHT NOW:
+  - CHANGE RESULT ALLOC FOR LAYER OPERATIONS TO BE INFERRED AND NOT DECLARED BY THE OP. --> python does not know the shape of the result.
+  - SHAPE OF INPUTS MUST ALSO BE ?, MUST BE DETERMINED DURING LOWERING.
