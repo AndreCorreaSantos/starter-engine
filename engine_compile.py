@@ -2,7 +2,15 @@ import onnx
 import numpy as np
 
 def print_shape(array):
+    result =""
+    for dim in array.shape:
+        result += str(dim) + "x"
+    result += "f64"
+    return result
+
+def print_data(array):
     return np.array2string(array, separator=', ', formatter={'float_kind': lambda x: f'{x:.1f}'}, max_line_width=np.inf).replace("\n","")
+
 
 def convert_raw_data(initializer):
     data_type = initializer.data_type
@@ -88,32 +96,40 @@ class Node():
 
 class Model():
     def __init__(self, path):
-        self.cache = {}
+        self.cache = {} # cache to store tensor {name: shape}
         o_model = onnx.load(path)
-        for init in o_model.graph.initializer:
-            data = convert_raw_data(init)
-            self.cache[init.name] = data
-        self.nodes = o_model.graph.node
+        self.initializers = o_model.graph.initializer # weights and biases
+        self.nodes = o_model.graph.node # layers
+        self.result = "" # final mlir code
 
-    def load_constant(self, input, name,cache):
-        shape = ""
-        for i in range(0,len(input.shape)):
-            shape += f"{i}x"
-        shape += "f64"
-        data = print_shape(input)
-        print(shape)
-        cache[name] = "a"
+    def init_model(self):
+        for init in self.initializers:
+            data = convert_raw_data(init)
+            print(data.shape)
+            data_shape = print_shape(data)
+            print(data_shape)
+            self.cache[init.name] = data_shape
+    
+
+    def load_constant(self, input, name):
+
+        shape = print_shape(input)
+        data = input
+        self.cache[name] = shape
         mlir = f"%{name} = \"engine.constant\"() {{value=dense<{data}>:tensor<{shape}}}> \n"
         return mlir
 
-    def translate(self, input):
+    def translate(self, input): # CACHE NEEDS TO STORE NP.SHAPE SO I CAN INFER THE SHAPE OF THE RESULTING TENSOR ON THE OPS
         result = ""
-        for i, nd in enumerate(self.nodes):
-            if i == 0:
-                result += self.load_constant(input, nd.input[0],self.cache)
+        # print(self.cache)
+        # for i, nd in enumerate(self.nodes):
+        #     if i == 0:
+        #         for i in nd.input:
+        #             print("input",i)
+        #         result += self.load_constant(input, nd.input[0],self.cache)
             # print(self.cache)
-            n_obj = Node(nd.op_type, nd.input, nd.output[0])
-            result += n_obj.execute(self.cache)
+            # n_obj = Node(nd.op_type, nd.input, nd.output[0])
+            # result += n_obj.execute(self.cache)
 
         return result
     
@@ -124,6 +140,7 @@ class Model():
 
 
 mod = Model("train/mnist_ffn_complex.onnx")
+mod.init_model()
 with open("output.mlir", "w+") as f:
     f.write(mod.translate(np.random.rand(1, 784).astype(np.float32)))
 
