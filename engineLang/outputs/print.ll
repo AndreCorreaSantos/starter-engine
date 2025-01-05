@@ -13,49 +13,60 @@ declare i32 @printf(ptr, ...)
 declare ptr @malloc(i64)
 
 define void @main() {
-  %1 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (double, ptr null, i64 1) to i64))
-  %2 = insertvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } undef, ptr %1, 0
-  %3 = insertvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %2, ptr %1, 1
-  %4 = insertvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %3, i64 0, 2
-  %5 = insertvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %4, i64 1, 3, 0
-  %6 = insertvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %5, i64 1, 3, 1
-  %7 = insertvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %6, i64 1, 4, 0
-  %8 = insertvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %7, i64 1, 4, 1
-  %9 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 1
-  %10 = getelementptr double, ptr %9, i64 0
-  store double 1.000000e+00, ptr %10, align 8
-  br label %11
+  %1 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (double, ptr null, i64 10) to i64))
+  %2 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } undef, ptr %1, 0
+  %3 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %2, ptr %1, 1
+  %4 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %3, i64 0, 2
+  %5 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %4, i64 10, 3, 0
+  %6 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %5, i64 1, 4, 0
+  %7 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %8 = getelementptr double, ptr %7, i64 0
+  store double -2.000000e-01, ptr %8, align 8
+  %9 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %10 = getelementptr double, ptr %9, i64 1
+  store double 3.000000e-01, ptr %10, align 8
+  %11 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %12 = getelementptr double, ptr %11, i64 2
+  store double 1.000000e-01, ptr %12, align 8
+  %13 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %14 = getelementptr double, ptr %13, i64 3
+  store double -1.000000e-01, ptr %14, align 8
+  %15 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %16 = getelementptr double, ptr %15, i64 4
+  store double -1.000000e-01, ptr %16, align 8
+  %17 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %18 = getelementptr double, ptr %17, i64 5
+  store double 1.000000e-01, ptr %18, align 8
+  %19 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %20 = getelementptr double, ptr %19, i64 6
+  store double -0.000000e+00, ptr %20, align 8
+  %21 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %22 = getelementptr double, ptr %21, i64 7
+  store double -0.000000e+00, ptr %22, align 8
+  %23 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %24 = getelementptr double, ptr %23, i64 8
+  store double -1.000000e-01, ptr %24, align 8
+  %25 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %26 = getelementptr double, ptr %25, i64 9
+  store double 0.000000e+00, ptr %26, align 8
+  br label %27
 
-11:                                               ; preds = %25, %0
-  %12 = phi i64 [ 0, %0 ], [ %27, %25 ]
-  %13 = icmp slt i64 %12, 1
-  br i1 %13, label %14, label %28
+27:                                               ; preds = %30, %0
+  %28 = phi i64 [ 0, %0 ], [ %35, %30 ]
+  %29 = icmp slt i64 %28, 10
+  br i1 %29, label %30, label %36
 
-14:                                               ; preds = %11
-  br label %15
+30:                                               ; preds = %27
+  %31 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %32 = getelementptr double, ptr %31, i64 %28
+  %33 = load double, ptr %32, align 8
+  %34 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %33)
+  %35 = add i64 %28, 1
+  br label %27
 
-15:                                               ; preds = %18, %14
-  %16 = phi i64 [ 0, %14 ], [ %24, %18 ]
-  %17 = icmp slt i64 %16, 1
-  br i1 %17, label %18, label %25
-
-18:                                               ; preds = %15
-  %19 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 1
-  %20 = add i64 %12, %16
-  %21 = getelementptr double, ptr %19, i64 %20
-  %22 = load double, ptr %21, align 8
-  %23 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %22)
-  %24 = add i64 %16, 1
-  br label %15
-
-25:                                               ; preds = %15
-  %26 = call i32 (ptr, ...) @printf(ptr @nl)
-  %27 = add i64 %12, 1
-  br label %11
-
-28:                                               ; preds = %11
-  %29 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 0
-  call void @free(ptr %29)
+36:                                               ; preds = %27
+  %37 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 0
+  call void @free(ptr %37)
   ret void
 }
 

@@ -145,10 +145,9 @@ tasks:
  - All ops seem fine. 
  - [] Need to find a way to insert input into the compiled program and make it into an op.
  - [] Revise user input and global cache again.
- - [] Generate engine dialect's ops from the AST read in the C++ -> follow toy tutorial logic.
+ - [in progress] Generate engine dialect's ops from the AST read in the C++ -> follow toy tutorial logic.
 
  PROBLEM RIGHT NOW:
-  - CHANGE RESULT ALLOC FOR LAYER OPERATIONS TO BE INFERRED AND NOT DECLARED BY THE OP. --> python does not know the shape of the result.
-  - SHAPE OF INPUTS MUST ALSO BE ?, MUST BE DETERMINED DURING LOWERING. --> can't do it. I need to know the shapes at compile time.
-  - Python will need to keep a cache tracking each tensor and their respective shape and calculate operation's outputted shapes.
 
+  - URGENT:: IMPROVE WEIGHT LOADING METHOD -> first weight crashes the loadConstantMethod -> maybe batch?.
+  - Implement flatten layer.

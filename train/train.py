@@ -7,17 +7,15 @@ from torchvision import datasets, transforms
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Linear(28*28, 512)
-        self.fc2_left = nn.Linear(512, 200)
-        self.fc2_left2 = nn.Linear(200, 100)
-        self.fc2_right = nn.Linear(512, 100)
-        self.fc3 = nn.Linear(100, 10)
+        self.fc1 = nn.Linear(28*28, 10)
+        self.fc2_left2 = nn.Linear(10, 10)
+        self.fc2_right = nn.Linear(10, 10)
+        self.fc3 = nn.Linear(10, 10)
 
     def forward(self, x):
         x = torch.flatten(x, 1)
         x = torch.relu(self.fc1(x))
-        left = torch.relu(self.fc2_left(x))
-        left = torch.relu(self.fc2_left2(left))
+        left = torch.relu(self.fc2_left2(x))
         right = torch.relu(self.fc2_right(x))
         x = torch.add(left, right)
         x = self.fc3(x)

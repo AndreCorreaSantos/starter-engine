@@ -2,7 +2,7 @@
 
 // CHECK: define void @main()
 func.func @main() {
-    %0 = "engine.constant"() {value = dense<[[1.000000e+00]]> : tensor<1x1xf64>} : () -> tensor<1x1xf64>
-    "engine.print"(%0) : (tensor<1x1xf64>) -> ()
+    %fc3.bias = "engine.constant"() {value=dense<[-0.2, 0.3, 0.1, -0.1, -0.1, 0.1, -0.0, -0.0, -0.1, 0.0]>:tensor<10xf64>} : () -> memref<10xf64>
+    "engine.print"(%fc3.bias) : (memref<10xf64>) -> ()
     return
 }
