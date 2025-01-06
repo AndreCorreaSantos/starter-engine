@@ -50,40 +50,33 @@ class Node():
         self.output = output.replace("/",".")
         self.op_type = op_type
     def Gemm(self, m, w, b, cache): # m, w and b will be their respective names
-        # print(cache)
         shape1 = print_shape(cache[m])
         shape2 = print_shape(cache[w])
         r_shape = get_matmul_shape(cache[m], cache[w])
         cache[self.output] = r_shape
         result_shape = print_shape(r_shape)
         mlir = f"%{self.output}_int = \"engine.matmul\"(%{m},%{w}) : (memref<{shape1}>,memref<{shape2}>) -> memref<{result_shape}>\n" # matmul with weights
-
         mlir += f"%{self.output} = \"engine.add\"(%{self.output}_int,%{b}) : (memref<{result_shape}>,memref<{result_shape}>) -> memref<{result_shape}>\n" # add bias | Addition preserves input shapes.
-
         return mlir
-       # return np.dot(m, w.T) + b
 
     def Relu(self, m, cache):
         cache[self.output] = cache[m]
         sh = print_shape(cache[m])
         return f"%{self.output} = \"engine.relu\"(%{m}) : (memref<{sh}>) -> memref<{sh}> \n"
-       # return np.maximum(m, 0)
 
     def Flatten(self, m, cache):
         # flatten shape
         shape = 1
         for i in cache[m]:
             shape *= i
-        cache[self.output] = (shape,)
+        cache[self.output] = (784,)
         sh = print_shape((shape,))
         return f"%{self.output} = \"engine.flatten\"(%{m}) : (memref<{sh}>) -> memref<{sh}> \n"
-       # return m.reshape(1, -1)
 
     def Add(self, m1, m2, cache):
         cache[self.output] = cache[m1]
         sh = print_shape(cache[m1])
         return f"%{self.output} = \"engine.add\"(%{m1},%{m2}) : (memref<{sh}>,memref<{sh}>) -> memref<{sh}> \n"
-       # return m1 + m2
 
     def execute(self, cache):
         if self.op_type == "Flatten":
@@ -110,33 +103,24 @@ class Model():
             data = convert_raw_data(init)
             self.result += self.load_constant(data, init.name)
             
-    
     def load_constant(self, input, name):
-
-        shape = print_shape(input)
+        shape = print_shape(input.shape)
         data = print_data(input)
         self.cache[name] = input.shape
-        # mlir = f"%{name} = \"engine.constant\"() {{value=dense<{data}>:tensor<{shape}>}} : () -> memref<{shape}>\n"
-        return "mlir"
+        mlir = f"%{name} = \"engine.constant\"() {{value=dense<{data}>:tensor<{shape}>}} : () -> memref<{shape}>\n"
+        return mlir
 
-    def translate(self, input): # CACHE NEEDS TO STORE NP.SHAPE SO I CAN INFER THE SHAPE OF THE RESULTING TENSOR ON THE OPS
+    def translate(self, input):
         for i, nd in enumerate(self.nodes):
             if i == 0:
                 self.result += self.load_constant(input, nd.input[0])
-            # print(self.cache)
             n_obj = Node(nd.op_type, nd.input, nd.output[0])
             self.result += n_obj.execute(self.cache)
 
         return self.result
-    
-
-
-    # PASSAR AST PARA MINHA LINGUAGEM 
-    #
-
 
 mod = Model("train/model.onnx")
 mod.init_model()
 with open("output.mlir", "w+") as f:
-    f.write(mod.translate(np.random.rand(1, 784).astype(np.float32)))
+    f.write(mod.translate(np.random.rand(784, ).astype(np.float32)))
 
