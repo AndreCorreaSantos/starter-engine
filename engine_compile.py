@@ -46,10 +46,9 @@ def write_data(path, model):
 
 class Node():
     def __init__(self, op_type, inputs, output):
-        self.inputs = inputs
-        self.output = output
+        self.inputs = [i.replace("/",".") for i in inputs]
+        self.output = output.replace("/",".")
         self.op_type = op_type
-
     def Gemm(self, m, w, b, cache): # m, w and b will be their respective names
         # print(cache)
         shape1 = print_shape(cache[m])
@@ -58,8 +57,8 @@ class Node():
         cache[self.output] = r_shape
         result_shape = print_shape(r_shape)
         mlir = f"%{self.output}_int = \"engine.matmul\"(%{m},%{w}) : (memref<{shape1}>,memref<{shape2}>) -> memref<{result_shape}>\n" # matmul with weights
-        shape3 = cache[b]
-        mlir += f"%{self.output} = \"engine.add\"(%{self.output}_int,%{b}) : (memref<{result_shape}>,memref<{shape3}>) -> memref<{result_shape}>\n" # add bias | Addition preserves input shapes.
+
+        mlir += f"%{self.output} = \"engine.add\"(%{self.output}_int,%{b}) : (memref<{result_shape}>,memref<{result_shape}>) -> memref<{result_shape}>\n" # add bias | Addition preserves input shapes.
 
         return mlir
        # return np.dot(m, w.T) + b
@@ -76,8 +75,8 @@ class Node():
         for i in cache[m]:
             shape *= i
         cache[self.output] = (shape,)
-        sh = f"{shape}xf64"
-        return f"%{self.output} = \"engine.flatten\"(%{m}) : (memref<{cache[m]}>) -> memref<{sh}> \n"
+        sh = print_shape((shape,))
+        return f"%{self.output} = \"engine.flatten\"(%{m}) : (memref<{sh}>) -> memref<{sh}> \n"
        # return m.reshape(1, -1)
 
     def Add(self, m1, m2, cache):
@@ -117,8 +116,8 @@ class Model():
         shape = print_shape(input)
         data = print_data(input)
         self.cache[name] = input.shape
-        mlir = f"%{name} = \"engine.constant\"() {{value=dense<{data}>:tensor<{shape}>}} : () -> memref<{shape}>\n"
-        return mlir
+        # mlir = f"%{name} = \"engine.constant\"() {{value=dense<{data}>:tensor<{shape}>}} : () -> memref<{shape}>\n"
+        return "mlir"
 
     def translate(self, input): # CACHE NEEDS TO STORE NP.SHAPE SO I CAN INFER THE SHAPE OF THE RESULTING TENSOR ON THE OPS
         for i, nd in enumerate(self.nodes):
