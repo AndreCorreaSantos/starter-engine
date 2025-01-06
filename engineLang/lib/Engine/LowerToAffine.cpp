@@ -189,35 +189,61 @@ static void lowerOpToLoops(mlir::Operation *op, mlir::ValueRange operands,
 }
 
 // namespace {
-
-// template <typename BinaryOp, typename LoweredBinaryOp> // CHECK IF THIS CONVERTS THE TENSORS TO MEMREF
+// template <typename BinaryOp, typename LoweredBinaryOp>
 // struct BinaryOpLowering : public mlir::ConversionPattern {
 //   BinaryOpLowering(mlir::MLIRContext *ctx)
 //       : mlir::ConversionPattern(BinaryOp::getOperationName(), 1, ctx) {}
 
 //   mlir::LogicalResult
 //   matchAndRewrite(mlir::Operation *op, llvm::ArrayRef<mlir::Value> operands,
-//                   mlir::ConversionPatternRewriter &rewriter) const final {
+//                  mlir::ConversionPatternRewriter &rewriter) const final {
+//     // Get location for error reporting
 //     mlir::Location loc = op->getLoc();
-//     lowerOpToLoops(op, operands, rewriter,
-//                    [loc](mlir::OpBuilder &builder, mlir::ValueRange memRefOperands,
-//                          mlir::ValueRange loopIvs) {
-//                      typename BinaryOp::Adaptor binaryAdaptor(memRefOperands);
-//                      mlir::Value loadedLhs = builder.create<mlir::affine::AffineLoadOp>(
-//                          loc, binaryAdaptor.getLhs(), loopIvs);
-//                      mlir::Value loadedRhs = builder.create<mlir::affine::AffineLoadOp>(
-//                          loc, binaryAdaptor.getRhs(), loopIvs);
 
-//                      return builder.create<LoweredBinaryOp>(loc, loadedLhs, loadedRhs).getResult();
-//                    });
+//     // Get the input types
+//     auto lhsType = op->getOperand(0).getType();
+//     auto rhsType = op->getOperand(1).getType();
+
+//     // Check if inputs are MemRef types
+//     auto lhsMemRef = lhsType.dyn_cast<mlir::MemRefType>();
+//     auto rhsMemRef = rhsType.dyn_cast<mlir::MemRefType>();
+    
+//     if (!lhsMemRef || !rhsMemRef) {
+//       return rewriter.notifyMatchFailure(op, "expected memref operands");
+//     }
+
+//     // Verify shapes are compatible
+//     if (lhsMemRef.getShape() != rhsMemRef.getShape()) {
+//       return rewriter.notifyMatchFailure(op, "operand shapes must match");
+//     }
+
+//     // Create the lowering function
+//     auto elementType = lhsMemRef.getElementType();
+//     lowerOpToLoops(op, operands, rewriter,
+//       [loc, elementType](mlir::OpBuilder &builder, mlir::ValueRange memRefOperands,
+//                         mlir::ValueRange loopIvs) {
+//         // Adapt the operands
+//         typename BinaryOp::Adaptor binaryAdaptor(memRefOperands);
+        
+//         // Load values from memrefs
+//         mlir::Value loadedLhs = builder.create<mlir::memref::LoadOp>(
+//             loc, binaryAdaptor.getLhs(), loopIvs);
+//         mlir::Value loadedRhs = builder.create<mlir::memref::LoadOp>(
+//             loc, binaryAdaptor.getRhs(), loopIvs);
+
+//         // Perform the binary operation
+//         return builder.create<LoweredBinaryOp>(loc, loadedLhs, loadedRhs);
+//     });
+
 //     return mlir::success();
 //   }
 // };
 
+// // Define the specific binary operations
 // using AddOpLowering = BinaryOpLowering<engine::AddOp, mlir::arith::AddFOp>;
-// using MulOpLowering = BinaryOpLowering<engine::MulOp, mlir::arith::MulFOp>;
-// } 
+// // using MulOpLowering = BinaryOpLowering<engine::MulOp, mlir::arith::MulFOp>;
 
+// }
 
 class DotOpLowering : public mlir::OpRewritePattern<engine::DotOp> {
 public:
@@ -332,7 +358,7 @@ public:
     } 
 
     // Allocate output memref
-    auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
+    auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
 
     // Create the linalg.Matmul operation
     rewriter.create<mlir::linalg::AddOp>(

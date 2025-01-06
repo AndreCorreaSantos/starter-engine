@@ -55,7 +55,7 @@ def AddOp : Engine_Op<"add"> {
   let description = [{
     The "add" operation adds two tensors element-wise.
   }];
-  let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef]>:$lhs, AnyTypeOf<[F64Tensor, F64MemRef]>:$rhs);
+  let arguments = (ins F64MemRef:$lhs, F64MemRef:$rhs);
   let results = (outs F64MemRef);
 }
 
@@ -64,7 +64,7 @@ def MulOp : Engine_Op<"mul">{
   let description = [{
     The "mul" operation multiplies two tensors.
   }];
-  let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef]>:$lhs, AnyTypeOf<[F64Tensor, F64MemRef]>:$rhs);
+  let arguments = (ins F64MemRef:$lhs, F64MemRef:$rhs);
   let results = (outs F64MemRef);
 }
 
