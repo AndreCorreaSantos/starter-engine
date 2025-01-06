@@ -22,6 +22,7 @@ func.func @main() {
 %_.Add_output_0 = "engine.add"(%_.Relu_1_output_0,%_.Relu_2_output_0) : (memref<5xf64>,memref<5xf64>) -> memref<5xf64> 
 %_17_int = "engine.matmul"(%_.Add_output_0,%_fc3.weight) : (memref<5xf64>,memref<10x5xf64>) -> memref<10xf64>
 %_17 = "engine.add"(%_17_int,%_fc3.bias) : (memref<10xf64>,memref<10xf64>) -> memref<10xf64>
+"engine.print"(%_17) : (memref<10xf64>) -> ()
 return
 }
 }

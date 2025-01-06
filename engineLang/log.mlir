@@ -22,6 +22,7 @@ func.func @main() {
 %_.Add_output_0 = "engine.add"(%_.Relu_1_output_0,%_.Relu_2_output_0) : (memref<5xf64>,memref<5xf64>) -> memref<5xf64> 
 %_17_int = "engine.matmul"(%_.Add_output_0,%_fc3.weight) : (memref<5xf64>,memref<10x5xf64>) -> memref<10xf64>
 %_17 = "engine.add"(%_17_int,%_fc3.bias) : (memref<10xf64>,memref<10xf64>) -> memref<10xf64>
+"engine.print"(%_17) : (memref<10xf64>) -> ()
 return
 }
 }loc("./test/Engine/stressTest.mlir":13:28): error: 'linalg.matmul' op expected operand rank (1) to match the result rank of indexing_map #0 (2)
@@ -11457,6 +11458,7 @@ return
       %6530 = "arith.addf"(%arg0, %arg1) <{denormal = #arith.denormal<ieee>, fastmath = #arith.fastmath<none>}> : (f64, f64) -> f64
       "linalg.yield"(%6530) : (f64) -> ()
     }) : (memref<10xf64>, memref<10xf64>, memref<10xf64>) -> ()
+    "engine.print"(%0) : (memref<10xf64>) -> ()
     "memref.dealloc"(%20) : (memref<5x784xf64>) -> ()
     "memref.dealloc"(%19) : (memref<5xf64>) -> ()
     "memref.dealloc"(%18) : (memref<5x5xf64>) -> ()

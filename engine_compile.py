@@ -126,8 +126,11 @@ class Model():
 
         header = "module {\nfunc.func @main() {\n"
         footer = "return\n}\n}"
-        
-        return header + remove_illegals(self.result)+ footer
+        result_name = nd.output[0]
+        result_shape = print_shape(self.cache["_"+result_name])
+        print_result = f"\"engine.print\"(%_{result_name}) : ({result_shape}) -> ()\n"
+
+        return header + remove_illegals(self.result)+print_result+ footer
 
 mod = Model("train/model.onnx")
 mod.init_model()
