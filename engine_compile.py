@@ -59,7 +59,7 @@ class Node():
         r_shape = get_matmul_shape(cache[m], cache[w])
         cache[self.output] = r_shape
         result_shape = print_shape(r_shape)
-        mlir = f"%{self.output}_int = \"engine.matmul\"(%{m},%{w}) : (memref<{shape1}>,memref<{shape2}>) -> memref<{result_shape}>\n" # matmul with weights
+        mlir = f"%{self.output}_int = \"engine.matmul\"(%{w},%{m}) : (memref<{shape2}>,memref<{shape1}>) -> memref<{result_shape}>\n" # matmul with weights
         mlir += f"%{self.output} = \"engine.add\"(%{self.output}_int,%{b}) : (memref<{result_shape}>,memref<{result_shape}>) -> memref<{result_shape}>\n" # add bias | Addition preserves input shapes.
         return mlir
 
@@ -71,7 +71,6 @@ class Node():
     def Flatten(self, m, cache):
         # flatten shape
         shape = 1
-        print(cache)
         for i in cache[m]:
             shape *= i
         cache[self.output] = (784,)
@@ -128,7 +127,7 @@ class Model():
         footer = "return\n}\n}"
         result_name = nd.output[0]
         result_shape = print_shape(self.cache["_"+result_name])
-        print_result = f"\"engine.print\"(%_{result_name}) : ({result_shape}) -> ()\n"
+        print_result = f"\"engine.print\"(%_{result_name}) : (memref<{result_shape}>) -> ()\n"
 
         return header + remove_illegals(self.result)+print_result+ footer
 

@@ -292,7 +292,7 @@ public:
     auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
 
     // Create the linalg.Matmul operation
-    rewriter.create<mlir::linalg::MatmulOp>(
+    rewriter.create<mlir::linalg::MatvecOp>(
         loc,
         mlir::ValueRange{lhs, rhs},
         mlir::ValueRange{alloc}
