@@ -421,12 +421,50 @@ public:
   }
 };
 
-// class FlattenOpLowering : public mlir::OpRewritePattern<engine::FlattenOp> {
-// public:
-//   using OpRewritePattern<engine::FlattenOp>::OpRewritePattern;
+class FlattenOpLowering : public mlir::OpRewritePattern<engine::FlattenOp> {
+public:
+  using OpRewritePattern<engine::FlattenOp>::OpRewritePattern;
 
-//   mlir::LogicalResult
-// }
+  mlir::LogicalResult
+  matchAndRewrite(engine::FlattenOp op, mlir::PatternRewriter &rewriter) const override {
+    auto loc = op.getLoc();
+    mlir::Value input = op.getValue();
+    
+    auto inputType = input.getType().dyn_cast<mlir::MemRefType>();
+    if (!inputType) {
+      return rewriter.notifyMatchFailure(op, "expected memref type for input");
+    }
+
+    // Calculate flattened size
+    auto shape = inputType.getShape();
+    int64_t flattenedSize = 1;
+    for (auto dim : shape) {
+      if (dim == mlir::ShapedType::kDynamic)
+        return rewriter.notifyMatchFailure(op, "dynamic shapes not supported");
+      flattenedSize *= dim;
+    }
+
+    // Create shape tensor with flattened dimension
+    auto shapeTy = mlir::MemRefType::get({1}, rewriter.getIndexType());
+    auto shapeAlloc = rewriter.create<mlir::memref::AllocOp>(loc, shapeTy);
+    auto idx0 = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0);
+    auto flatSize = rewriter.create<mlir::arith::ConstantIndexOp>(loc, flattenedSize);
+    
+    auto storeOp = rewriter.create<mlir::memref::StoreOp>(
+        loc, 
+        flatSize.getResult(),  // Use getResult() to get the Value
+        shapeAlloc.getResult(),  // Use getResult() to get the Value
+        mlir::ValueRange{idx0.getResult()}  // Wrap index in ValueRange
+    );
+
+    auto elementType = inputType.getElementType();
+    auto flattenedType = mlir::MemRefType::get({flattenedSize}, elementType);
+    auto reshapeOp = rewriter.create<mlir::memref::ReshapeOp>(loc, flattenedType, input, shapeAlloc);
+    
+    rewriter.replaceOp(op, reshapeOp.getResult());
+    return mlir::success();
+  }
+};
 
 
 // class StoreOpLowering : public mlir::OpConversionPattern<engine::StoreOp> {
@@ -568,6 +606,7 @@ void EngineToAffineLowerPass::runOnOperation() { // Only engine:: opertions need
   patterns.add<DotOpLowering>(&getContext());
   patterns.add<MatmulOpLowering>(&getContext());
   patterns.add<ReLUOpLowering>(&getContext());
+  patterns.add<FlattenOpLowering>(&getContext());
   // patterns.add<StoreOpLowering>(&getContext());
   // patterns.add<LoadOpLowering>(&getContext());
 

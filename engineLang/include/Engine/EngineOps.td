@@ -97,6 +97,16 @@ def ReLUOp : Engine_Op<"relu">{
 }
 
 
+def FlattenOp : Engine_Op<"flatten">{
+  let summary = "Flattens a tensor";
+  let description = [{
+    The Flatten operation flattens a tensor.
+  }];
+  let arguments = (ins F64MemRef:$value);
+  let results = (outs F64MemRef);
+}
+
+
 def StoreOp : Engine_Op<"store"> {
   let summary = "stores a tensor under a name in the cache";
   let description = [{
