@@ -1,6 +1,9 @@
 import onnx
 import numpy as np
 
+def remove_illegals(result):
+    return result.replace("/",".").replace("::",".")
+
 def print_shape(array):
     result =""
     for dim in array:
@@ -45,9 +48,10 @@ def write_data(path, model):
 
 
 class Node():
+
     def __init__(self, op_type, inputs, output):
-        self.inputs = [i.replace("/",".") for i in inputs]
-        self.output = output.replace("/",".")
+        self.inputs = ["_"+i for i in inputs] # last two layers give SSA errors without _ prefix dont know why.
+        self.output = "_"+output
         self.op_type = op_type
     def Gemm(self, m, w, b, cache): # m, w and b will be their respective names
         shape1 = print_shape(cache[m])
@@ -67,6 +71,7 @@ class Node():
     def Flatten(self, m, cache):
         # flatten shape
         shape = 1
+        print(cache)
         for i in cache[m]:
             shape *= i
         cache[self.output] = (784,)
@@ -101,7 +106,7 @@ class Model():
     def init_model(self):
         for init in self.initializers:
             data = convert_raw_data(init)
-            self.result += self.load_constant(data, init.name)
+            self.result += self.load_constant(data, "_"+init.name) # doing this for same reason as in Node class
             
     def load_constant(self, input, name):
         shape = print_shape(input.shape)
@@ -109,15 +114,20 @@ class Model():
         self.cache[name] = input.shape
         mlir = f"%{name} = \"engine.constant\"() {{value=dense<{data}>:tensor<{shape}>}} : () -> memref<{shape}>\n"
         return mlir
-
+ 
     def translate(self, input):
         for i, nd in enumerate(self.nodes):
             if i == 0:
-                self.result += self.load_constant(input, nd.input[0])
+                self.result += self.load_constant(input, "_"+nd.input[0]) # "_" same reason as in Node class
             n_obj = Node(nd.op_type, nd.input, nd.output[0])
             self.result += n_obj.execute(self.cache)
 
-        return self.result
+        
+
+        header = "module {\nfunc.func @main() {\n"
+        footer = "return\n}\n}"
+        
+        return header + remove_illegals(self.result)+ footer
 
 mod = Model("train/model.onnx")
 mod.init_model()
