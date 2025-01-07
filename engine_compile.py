@@ -131,8 +131,5 @@ class Model():
 
         return header + remove_illegals(self.result)+print_result+ footer
 
-mod = Model("train/model.onnx")
-mod.init_model()
-with open("output.mlir", "w+") as f:
-    f.write(mod.translate(np.random.rand(784, ).astype(np.float32)))
+
 
