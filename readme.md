@@ -72,3 +72,6 @@ return
 The output from each of the passes needed to lower the "engine" dialect's operations into LLVM can be seen in:
 
 [log.mlir](./engineDialect/log.mlir)
+
+#### Disclaimer
+This project was greatly inspired by this article: [build-your-own-inference-engine](https://michalpitr.substack.com/p/build-your-own-inference-engine-from), the neural network is the same as seen on the article, and I started the project after building a very simple inference engine in python just after reading the article.
