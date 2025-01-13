@@ -103,6 +103,10 @@ int dumpLLVMIR(mlir::ModuleOp module) {
   return 0;
 }
 
+int dumpIR(mlir::ModuleOp module) { // dump the dialect lowered to MLIR upstream dialects which will be used by circt to lower into verilog.
+
+}
+
 int loadMLIR(mlir::MLIRContext &context,
              mlir::OwningOpRef<mlir::ModuleOp> &module) {
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr =
@@ -138,7 +142,7 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   
   passManager.addPass(engine::createLowerToAffinePass());
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
-  passManager.addPass(engine::createLowerToLLVMPass());
+  // passManager.addPass(engine::createLowerToLLVMPass());
 
 
   if (mlir::failed(passManager.run(*module))) {
@@ -197,13 +201,6 @@ int main(int argc, char **argv) {
   registry.insert<mlir::scf::SCFDialect>();
   registry.insert<mlir::tensor::TensorDialect>();
 
-  // mlir::ub::registerConvertUBToLLVMInterface(registry);
-  // mlir::registerConvertMemRefToLLVMInterface(registry);
-  // mlir::registerConvertMathToLLVMInterface(registry);
-  // mlir::registerConvertFuncToLLVMInterface(registry);
-  // mlir::registerConvertComplexToLLVMInterface(registry);
-  // mlir::arith::registerConvertArithToLLVMInterface(registry);
-  // mlir::cf::registerConvertControlFlowToLLVMInterface(registry);
 
 
   // // Register BufferizableOpInterface external models
@@ -225,7 +222,7 @@ int main(int argc, char **argv) {
   }
 
   // Dump the LLVM IR (assuming `dumpLLVMIR` is implemented elsewhere).
-  dumpLLVMIR(*module);
+  // dumpLLVMIR(*module);
 
   return 0;
 }

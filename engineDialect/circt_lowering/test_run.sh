@@ -1,0 +1,1 @@
+../build/bin/engine-opt --mlir-print-ir-after-all input.mlir
