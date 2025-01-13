@@ -60,4 +60,7 @@ module {
 }
 
 
-lli: Symbols not found: [ main ]
+lli: lli: outputs/verilog_convert.ll:1:8: error: expected 'module asm'
+module {
+       ^
+

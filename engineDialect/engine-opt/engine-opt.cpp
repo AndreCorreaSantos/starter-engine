@@ -104,7 +104,9 @@ int dumpLLVMIR(mlir::ModuleOp module) {
 }
 
 int dumpIR(mlir::ModuleOp module) { // dump the dialect lowered to MLIR upstream dialects which will be used by circt to lower into verilog.
-
+  module.print(llvm::outs());
+  llvm::outs() << "\n";
+  return 0;
 }
 
 int loadMLIR(mlir::MLIRContext &context,
@@ -223,6 +225,7 @@ int main(int argc, char **argv) {
 
   // Dump the LLVM IR (assuming `dumpLLVMIR` is implemented elsewhere).
   // dumpLLVMIR(*module);
+  dumpIR(*module);
 
   return 0;
 }

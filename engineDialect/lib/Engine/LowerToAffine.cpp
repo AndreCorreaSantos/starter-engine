@@ -75,7 +75,8 @@ class ConstantOpLowering : public mlir::OpRewritePattern<engine::ConstantOp> {
     if (!memRefType) {
       return rewriter.notifyMatchFailure(op, "expected memref result");
     }
-    auto alloc = insertAllocAndDealloc(memRefType, loc, rewriter);
+    // auto alloc = insertAllocAndDealloc(memRefType, loc, rewriter);
+    auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, memRefType);
 
     // We will be generating constant indices up-to the largest dimension.
     // Create these constants up-front to avoid large amounts of redundant
@@ -173,7 +174,8 @@ static void lowerOpToLoops(mlir::Operation *op, mlir::ValueRange operands,
   mlir::Location loc = op->getLoc();
 
   auto memRefType = convertTensorToMemRef(tensorType); 
-  mlir::Value alloc = insertAllocAndDealloc(memRefType, loc, rewriter); 
+  // mlir::Value alloc = insertAllocAndDealloc(memRefType, loc, rewriter); 
+  auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, memRefType);
 
   llvm::SmallVector<int64_t, 4> lowerBounds(tensorType.getRank(), /*Value=*/0);
   llvm::SmallVector<int64_t, 4> steps(tensorType.getRank(), /*Value=*/1);
@@ -271,9 +273,9 @@ public:
       return rewriter.notifyMatchFailure(op, "expected memref result type");
     } 
 
-    // Allocate output memref
-    auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
-
+    // // Allocate output memref
+    // auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
+    auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
     // Create the linalg.dot operation
     rewriter.create<mlir::linalg::DotOp>(
         loc,
@@ -314,8 +316,10 @@ public:
       return rewriter.notifyMatchFailure(op, "expected memref result type");
     } 
 
+    // // Allocate output memref
+    // auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
     // Allocate output memref
-    auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
+    auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
 
     // Create the linalg.Matmul operation
     rewriter.create<mlir::linalg::MatvecOp>(
@@ -394,7 +398,8 @@ public:
       return rewriter.notifyMatchFailure(op, "expected memref type for result");
     }
 
-    auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
+    // auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
+    auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
     
     // Create constant indices for dimensions
     auto valueShape = inputType.getShape();
