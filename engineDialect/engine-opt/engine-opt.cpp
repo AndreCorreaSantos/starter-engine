@@ -129,7 +129,8 @@ int loadMLIR(mlir::MLIRContext &context,
 }
 
 int loadAndProcessMLIR(mlir::MLIRContext &context,
-                       mlir::OwningOpRef<mlir::ModuleOp> &module) {
+                       mlir::OwningOpRef<mlir::ModuleOp> &module,
+                       engine::settingsInfo &settings) {
   if (int error = loadMLIR(context, module)) {
     return error;
   }
@@ -138,9 +139,6 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   mlir::PassManager settingsPassManager(&context);
   if (mlir::failed(mlir::applyPassManagerCLOptions(settingsPassManager)))
     return 4;
-
-  settingsInfo settings;
-  settings.lowerSettings = 0; // if no lowerSettings has been set they default to llvm compilation
 
   settingsPassManager.addPass(engine::createLowerSettingsPass(settings));
   if (mlir::failed(settingsPassManager.run(*module))) {
@@ -153,8 +151,12 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   mlir::PassManager passManager(&context);
   if (mlir::failed(mlir::applyPassManagerCLOptions(passManager)))
     return 4;
-  passManager.addPass(engine::createLowerToAffinePass());
+  passManager.addPass(engine::createLowerToAffinePass(settings));
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
+
+  if (settings.lowerSettings == 0) {
+    passManager.addPass(engine::createLowerToLLVMPass());
+  }
   if (mlir::failed(passManager.run(*module))) {
     return 4;
   }
@@ -228,14 +230,19 @@ int main(int argc, char **argv) {
   llvm::cl::ParseCommandLineOptions(argc, argv, "Engine compiler\n");
 
   // Load and process MLIR file.
+  engine::settingsInfo settings;
+  settings.lowerSettings = 0; // if no lowerSettings has been set they default to llvm compilation
   mlir::OwningOpRef<mlir::ModuleOp> module;
-  if (int error = loadAndProcessMLIR(context, module)) {
+  if (int error = loadAndProcessMLIR(context, module, settings)) {
     return error;
   }
 
   // Dump the LLVM IR (assuming `dumpLLVMIR` is implemented elsewhere).
-  // dumpLLVMIR(*module);
-  dumpIR(*module);
+  if (settings.lowerSettings == 0) {
+    dumpLLVMIR(*module);
+  } else{
+    dumpIR(*module);
+  }
 
   return 0;
 }

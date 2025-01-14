@@ -499,7 +499,7 @@ class EngineToAffineLowerPass
     : public mlir::PassWrapper<EngineToAffineLowerPass,
                                mlir::OperationPass<mlir::ModuleOp>> {
 public:
-
+  explicit EngineToAffineLowerPass(engine::settingsInfo &settings) : settings(settings) {}
   MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(EngineToAffineLowerPass)
 
   void getDependentDialects(mlir::DialectRegistry &registry) const override { // shouldnt need this, check it later.
@@ -508,6 +508,8 @@ public:
   }
 
   void runOnOperation() final;
+private:
+  engine::settingsInfo &settings;
 };
 } // namespace
 
@@ -540,7 +542,8 @@ void EngineToAffineLowerPass::runOnOperation() { // Only engine:: opertions need
     signalPassFailure();
   }
 }
-
-std::unique_ptr<mlir::Pass> engine::createLowerToAffinePass() {
-  return std::make_unique<EngineToAffineLowerPass>();
+namespace engine{
+std::unique_ptr<mlir::Pass> createLowerToAffinePass(settingsInfo &settings) {
+  return std::make_unique<EngineToAffineLowerPass>(settings);
+}
 }
