@@ -156,9 +156,6 @@ class PrintOpLowering : public mlir::OpConversionPattern<engine::PrintOp> {
   }
 };
 
-
-
-
 /// This defines the function type used to process an iteration of a lowered
 /// loop. It takes as input an OpBuilder, an range of memRefOperands
 /// corresponding to the operands of the input operation, and the range of loop
@@ -497,112 +494,12 @@ public:
   }
 };
 
-
-// class StoreOpLowering : public mlir::OpConversionPattern<engine::StoreOp> {
-// public:
-//   using OpConversionPattern<engine::StoreOp>::OpConversionPattern;
-
-//   mlir::LogicalResult
-//   matchAndRewrite(engine::StoreOp op, OpAdaptor adaptor,
-//                   mlir::ConversionPatternRewriter &rewriter) const final {
-//     mlir::Location loc = op->getLoc();
-//     mlir::Value input = adaptor.getValue(); // The tensor value
-//     llvm::StringRef symbolName = adaptor.getName(); // The name for the global
-//     mlir::Type inputType = input.getType();
-
-//     // Ensure input is a MemRef
-//     if (auto tensorType = mlir::dyn_cast<mlir::TensorType>(inputType)) {
-//       mlir::MemRefType memrefType = mlir::MemRefType::get(
-//           tensorType.getShape(), tensorType.getElementType());
-//       input = rewriter.create<mlir::bufferization::ToMemrefOp>(
-//           loc, memrefType, input);
-//     }
-
-//     // Get the MemRef type of the input
-//     mlir::MemRefType memrefType = mlir::cast<mlir::MemRefType>(input.getType());
-
-//     // Get the parent module
-//     mlir::ModuleOp moduleOp = op->getParentOfType<mlir::ModuleOp>();
-
-//     // Check if a global with the same name already exists
-//     if (!moduleOp.lookupSymbol<mlir::memref::GlobalOp>(symbolName)) {
-//       // Create a zero-initialized DenseElementsAttr
-//       mlir::DenseElementsAttr initialValue = mlir::DenseElementsAttr::get(
-//           mlir::RankedTensorType::get(
-//               memrefType.getShape(), memrefType.getElementType()),
-//           rewriter.getZeroAttr(memrefType.getElementType()));
-
-//       // Create a global if it does not exist
-//       mlir::OpBuilder::InsertionGuard guard(rewriter);
-//       rewriter.setInsertionPointToStart(moduleOp.getBody());
-//       rewriter.create<mlir::memref::GlobalOp>(
-//           loc,                                // Location
-//           symbolName,                         // Symbol name
-//           rewriter.getStringAttr("private"),  // Visibility ("private" or "public")
-//           memrefType,                         // MemRef type
-//           initialValue,                       // Initial value (zero initializer)
-//           false,                              // Is constant (false for mutable)
-//           nullptr                             // Alignment (nullptr for default)
-//       );
-//     }
-
-//     // Create a GetGlobalOp to get a reference to the global
-//     mlir::Value globalRef =
-//         rewriter.create<mlir::memref::GetGlobalOp>(loc, memrefType, symbolName);
-
-//     // Copy the tensor data into the global
-//     rewriter.create<mlir::memref::CopyOp>(loc, input, globalRef);
-
-//     // Erase the original operation
-//     rewriter.eraseOp(op);
-//     return mlir::success();
-//   }
-// };
-
-
-// class LoadOpLowering : public mlir::OpConversionPattern<engine::LoadOp> {
-// public:
-//   using OpConversionPattern<engine::LoadOp>::OpConversionPattern;
-
-//   mlir::LogicalResult
-//   matchAndRewrite(engine::LoadOp op, OpAdaptor adaptor,
-//                   mlir::ConversionPatternRewriter &rewriter) const final {
-//     mlir::Location loc = op.getLoc();
-//     llvm::StringRef symbolName = adaptor.getName();
-
-//     // Our op now says its result is already a memref type.
-//     auto resultType = op.getResult().getType().cast<mlir::MemRefType>();
-
-//     // Verify the global exists
-//     mlir::ModuleOp moduleOp = op->getParentOfType<mlir::ModuleOp>();
-//     auto globalOp = moduleOp.lookupSymbol<mlir::memref::GlobalOp>(symbolName);
-//     if (!globalOp) {
-//       llvm::errs() << "Error: Global variable '" << symbolName
-//                    << "' does not exist.\n";
-//       return rewriter.notifyMatchFailure(op, "global variable does not exist");
-//     }
-
-//     // Create memref.get_global
-//     mlir::Value globalRef = rewriter.create<mlir::memref::GetGlobalOp>(
-//         loc, resultType, symbolName);
-
-//     // Directly replace the LoadOp with the memref (no to_tensor!)
-//     rewriter.replaceOp(op, globalRef);
-
-//     return mlir::success();
-//   }
-// };
-
-
-
-
-
-
 namespace {
 class EngineToAffineLowerPass
     : public mlir::PassWrapper<EngineToAffineLowerPass,
                                mlir::OperationPass<mlir::ModuleOp>> {
 public:
+
   MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(EngineToAffineLowerPass)
 
   void getDependentDialects(mlir::DialectRegistry &registry) const override { // shouldnt need this, check it later.
@@ -621,8 +518,7 @@ void EngineToAffineLowerPass::runOnOperation() { // Only engine:: opertions need
   target.addLegalDialect<mlir::affine::AffineDialect, mlir::BuiltinDialect,
                          mlir::func::FuncDialect, mlir::arith::ArithDialect,
                          mlir::memref::MemRefDialect,mlir::bufferization::BufferizationDialect,mlir::linalg::LinalgDialect>();
-  // target.addLegalOp<mlir::bufferization::ToTensorOp>();
-  // target.addLegalOp<mlir::bufferization::ToMemrefOp>();
+                         
   target.addDynamicallyLegalOp<engine::PrintOp>([](engine::PrintOp op) {
     return llvm::none_of(op->getOperandTypes(), [](mlir::Type type) {
       return mlir::isa<mlir::TensorType>(type);
@@ -638,8 +534,6 @@ void EngineToAffineLowerPass::runOnOperation() { // Only engine:: opertions need
   patterns.add<MatmulOpLowering>(&getContext());
   patterns.add<ReLUOpLowering>(&getContext());
   patterns.add<FlattenOpLowering>(&getContext());
-  // patterns.add<StoreOpLowering>(&getContext());
-  // patterns.add<LoadOpLowering>(&getContext());
 
   if (mlir::failed(mlir::applyPartialConversion(getOperation(), target,
                                                 std::move(patterns)))) {

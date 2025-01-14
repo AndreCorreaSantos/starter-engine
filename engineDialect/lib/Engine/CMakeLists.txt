@@ -2,7 +2,7 @@ add_mlir_dialect_library(MLIREngine
 		EngineDialect.cpp
 		EngineOps.cpp
 		LowerToAffine.cpp
-		LowerLinalg.cpp
+		LowerSettings.cpp
 		LowerToLLVM.cpp
 
         ADDITIONAL_HEADER_DIRS

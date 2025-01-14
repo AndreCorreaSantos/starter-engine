@@ -143,6 +143,16 @@ def LoadOp : Engine_Op<"load"> {
   let assemblyFormat = "$name attr-dict `:` type($result)";
 }
 
+def SettingsOp: Engine_Op<"settings"> {
+  let summary = "sets engine lowering settings";
+  let description = [{
+    The "set" operation sets engine lowering settings.
+    Binary, 0 = lowers to llvm,
+    1 = lowers to fpga.
+  }];
+  let arguments = (ins I32Attr:$value);
+}
+
 
 
 

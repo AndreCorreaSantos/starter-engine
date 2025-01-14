@@ -136,15 +136,10 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   mlir::PassManager passManager(&context);
   if (mlir::failed(mlir::applyPassManagerCLOptions(passManager)))
     return 4;
-
-  // passManager.addPass(mlir::createConvertTensorToLinalgPass());
-  // passManager.addPass(mlir::bufferization::createEmptyTensorToAllocTensorPass());
-  // passManager.addPass(mlir::bufferization::createOneShotBufferizePass());
-  // passManager.addPass(mlir::createBufferizationToMemRefPass());
-  
+  int64_t lowerSettings = 0;
+  passManager.addPass(engine::createLowerSettingsPass());
   passManager.addPass(engine::createLowerToAffinePass());
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
-  // passManager.addPass(engine::createLowerToLLVMPass());
 
 
   if (mlir::failed(passManager.run(*module))) {
