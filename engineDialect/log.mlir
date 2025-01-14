@@ -86,6 +86,7 @@ module {
 }
 
 
+lowerSettings: 1
 lli: lli: outputs/settings.ll:1:8: error: expected 'module asm'
 module {
        ^

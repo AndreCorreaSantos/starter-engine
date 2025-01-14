@@ -137,7 +137,7 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (mlir::failed(mlir::applyPassManagerCLOptions(passManager)))
     return 4;
   int64_t lowerSettings = 0;
-  passManager.addPass(engine::createLowerSettingsPass());
+  passManager.addPass(engine::createLowerSettingsPass(lowerSettings));
   passManager.addPass(engine::createLowerToAffinePass());
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
 
@@ -145,6 +145,8 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (mlir::failed(passManager.run(*module))) {
     return 4;
   }
+
+  llvm::errs() << "lowerSettings: " << lowerSettings << "\n";
 
   return 0;
 }

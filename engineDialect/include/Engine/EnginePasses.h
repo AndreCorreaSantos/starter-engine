@@ -23,7 +23,7 @@
 #include "mlir/Pass/Pass.h"
 
 namespace engine {
-std::unique_ptr<mlir::Pass> createLowerSettingsPass();
+std::unique_ptr<mlir::Pass> createLowerSettingsPass(int64_t &lowerSettings);
 std::unique_ptr<mlir::Pass> createLowerToAffinePass();
 std::unique_ptr<mlir::Pass> createLowerToLLVMPass();
 } // namespace engine
