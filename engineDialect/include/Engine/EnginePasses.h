@@ -22,8 +22,14 @@
 
 #include "mlir/Pass/Pass.h"
 
+struct settingsInfo {
+  int64_t lowerSettings;
+};
+
 namespace engine {
-std::unique_ptr<mlir::Pass> createLowerSettingsPass(int64_t &lowerSettings);
+
+
+std::unique_ptr<mlir::Pass> createLowerSettingsPass(settingsInfo &settings);
 std::unique_ptr<mlir::Pass> createLowerToAffinePass();
 std::unique_ptr<mlir::Pass> createLowerToLLVMPass();
 } // namespace engine

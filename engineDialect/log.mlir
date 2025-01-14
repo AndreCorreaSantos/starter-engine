@@ -12,6 +12,7 @@ module {
 }
 
 
+lowerSettings: 1
 // -----// IR Dump After {anonymous}::EngineToAffineLowerPass () //----- //
 module {
   func.func @main() {
@@ -86,7 +87,6 @@ module {
 }
 
 
-lowerSettings: 1
 lli: lli: outputs/settings.ll:1:8: error: expected 'module asm'
 module {
        ^
