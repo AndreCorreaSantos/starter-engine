@@ -151,3 +151,11 @@ tasks:
 
   - URGENT:: IMPROVE WEIGHT LOADING METHOD -> first weight crashes the loadConstantMethod -> maybe batch?.
   - Implement flatten layer.
+
+
+##### 7)
+
+CURRENT PROBLEM WITH CIRCT: 
+  - CANNOT DEAL WITH FUNCTIONS.
+  - MLIR CANNOT LOWER FUNCTIONS TO ANYTHING ELSE BUT LLVM.
+  

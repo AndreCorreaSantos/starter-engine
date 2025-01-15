@@ -6,5 +6,3 @@ cmake -G Ninja .. \
   -DMLIR_DIR=$LLVM_REPO/build/lib/cmake/mlir \
 
 cmake --build . --target engine-opt
-
-

@@ -103,6 +103,12 @@ int dumpLLVMIR(mlir::ModuleOp module) {
   return 0;
 }
 
+int dumpIR(mlir::ModuleOp module) { // dump the dialect lowered to MLIR upstream dialects which will be used by circt to lower into verilog.
+  module.print(llvm::outs());
+  llvm::outs() << "\n";
+  return 0;
+}
+
 int loadMLIR(mlir::MLIRContext &context,
              mlir::OwningOpRef<mlir::ModuleOp> &module) {
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr =
@@ -123,27 +129,39 @@ int loadMLIR(mlir::MLIRContext &context,
 }
 
 int loadAndProcessMLIR(mlir::MLIRContext &context,
-                       mlir::OwningOpRef<mlir::ModuleOp> &module) {
+                       mlir::OwningOpRef<mlir::ModuleOp> &module,
+                       engine::settingsInfo &settings) {
   if (int error = loadMLIR(context, module)) {
     return error;
   }
+
+  // run settings pass manager and get settings information
+  mlir::PassManager settingsPassManager(&context);
+  if (mlir::failed(mlir::applyPassManagerCLOptions(settingsPassManager)))
+    return 4;
+
+  settingsPassManager.addPass(engine::createLowerSettingsPass(settings));
+  if (mlir::failed(settingsPassManager.run(*module))) {
+    return 4;
+  }
+  llvm::errs() << "lowerSettings: " << settings.lowerSettings << "\n";
+
+
+  // run main pass manager
   mlir::PassManager passManager(&context);
   if (mlir::failed(mlir::applyPassManagerCLOptions(passManager)))
     return 4;
-
-  // passManager.addPass(mlir::createConvertTensorToLinalgPass());
-  // passManager.addPass(mlir::bufferization::createEmptyTensorToAllocTensorPass());
-  // passManager.addPass(mlir::bufferization::createOneShotBufferizePass());
-  // passManager.addPass(mlir::createBufferizationToMemRefPass());
-  
-  passManager.addPass(engine::createLowerToAffinePass());
+  passManager.addPass(engine::createLowerToAffinePass(settings));
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
-  passManager.addPass(engine::createLowerToLLVMPass());
 
-
+  if (settings.lowerSettings == 0) {
+    passManager.addPass(engine::createLowerToLLVMPass());
+  }
   if (mlir::failed(passManager.run(*module))) {
     return 4;
   }
+
+
 
   return 0;
 }
@@ -197,13 +215,6 @@ int main(int argc, char **argv) {
   registry.insert<mlir::scf::SCFDialect>();
   registry.insert<mlir::tensor::TensorDialect>();
 
-  // mlir::ub::registerConvertUBToLLVMInterface(registry);
-  // mlir::registerConvertMemRefToLLVMInterface(registry);
-  // mlir::registerConvertMathToLLVMInterface(registry);
-  // mlir::registerConvertFuncToLLVMInterface(registry);
-  // mlir::registerConvertComplexToLLVMInterface(registry);
-  // mlir::arith::registerConvertArithToLLVMInterface(registry);
-  // mlir::cf::registerConvertControlFlowToLLVMInterface(registry);
 
 
   // // Register BufferizableOpInterface external models
@@ -219,13 +230,19 @@ int main(int argc, char **argv) {
   llvm::cl::ParseCommandLineOptions(argc, argv, "Engine compiler\n");
 
   // Load and process MLIR file.
+  engine::settingsInfo settings;
+  settings.lowerSettings = 0; // if no lowerSettings has been set they default to llvm compilation
   mlir::OwningOpRef<mlir::ModuleOp> module;
-  if (int error = loadAndProcessMLIR(context, module)) {
+  if (int error = loadAndProcessMLIR(context, module, settings)) {
     return error;
   }
 
   // Dump the LLVM IR (assuming `dumpLLVMIR` is implemented elsewhere).
-  dumpLLVMIR(*module);
+  if (settings.lowerSettings == 0) {
+    dumpLLVMIR(*module);
+  } else{
+    dumpIR(*module);
+  }
 
   return 0;
 }
