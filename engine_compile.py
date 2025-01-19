@@ -1,14 +1,17 @@
 import onnx
 import numpy as np
 
+F = "f64"
+I = "i32"
+
 def remove_illegals(result):
     return result.replace("/",".").replace("::",".")
 
-def print_shape(array):
+def print_shape(array,f_type=F):
     result =""
     for dim in array:
         result += str(dim) + "x"
-    result += "f64"
+    result += f_type
     return result
 
 def print_data(array):
@@ -81,6 +84,12 @@ class Node():
         cache[self.output] = cache[m1]
         sh = print_shape(cache[m1])
         return f"%{self.output} = \"engine.add\"(%{m1},%{m2}) : (memref<{sh}>,memref<{sh}>) -> memref<{sh}> \n"
+    
+    def ArgMax(self, m, cache):
+        cache[self.output] = (1,)
+        sh1 = print_shape(cache[m])
+        sh2 = print_shape((1,),I)
+        return f"%{self.output} = \"engine.argmax\"(%{m}) : (memref<{sh1}>) -> memref<{sh2}> \n"
 
     def execute(self, cache):
         if self.op_type == "Flatten":
@@ -91,6 +100,8 @@ class Node():
             return self.Relu(self.inputs[0],cache)
         elif self.op_type == "Add":
             return self.Add(self.inputs[0], self.inputs[1], cache)
+        elif self.op_type == "ArgMax":
+            return self.ArgMax(self.inputs[0], cache)
         else:
             raise Exception(f"Activation Function not recognized: {self.op_type}")
 
@@ -126,7 +137,7 @@ class Model():
         header = "module {\nfunc.func @main() {\n"
         footer = "return\n}\n}"
         result_name = nd.output[0]
-        result_shape = print_shape(self.cache["_"+result_name])
+        result_shape = print_shape(self.cache["_"+result_name],I) # fix this later, hardcoding int result in print for now.
         print_result = f"\"engine.print\"(%_{result_name}) : (memref<{result_shape}>) -> ()\n"
 
         return header + remove_illegals(self.result)+print_result+ footer

@@ -1,0 +1,82 @@
+OVERVIEW: CIRCT HLS tool
+
+USAGE: hlstool [options] <input file>
+
+OPTIONS:
+
+General options:
+
+  --mlir-disable-threading                             - Disable multi-threading within MLIR, overrides any further call to MLIRContext::enableMultiThreading()
+  --mlir-elide-elementsattrs-if-larger=<uint>          - Elide ElementsAttrs with "..." that have more elements than the given upper limit
+  --mlir-elide-resource-strings-if-larger=<uint>       - Elide printing value of resources if string is too long in chars.
+  --mlir-output-format=<value>                         - Output format for timing data
+    =text                                              -   display the results in text format
+    =json                                              -   display the results in JSON format
+  --mlir-pass-pipeline-crash-reproducer=<string>       - Generate a .mlir reproducer file at the given output path if the pass manager crashes or fails
+  --mlir-pass-pipeline-local-reproducer                - When generating a crash reproducer, attempt to generated a reproducer with the smallest pipeline.
+  --mlir-pass-statistics                               - Display the statistics of each pass
+  --mlir-pass-statistics-display=<value>               - Display method for pass statistics
+    =list                                              -   display the results in a merged list sorted by pass name
+    =pipeline                                          -   display the results with a nested pipeline view
+  --mlir-pretty-debuginfo                              - Print pretty debug info in MLIR output
+  --mlir-print-debuginfo                               - Print debug info in MLIR output
+  --mlir-print-elementsattrs-with-hex-if-larger=<long> - Print DenseElementsAttrs with a hex string that have more elements than the given upper limit (use -1 to disable)
+  --mlir-print-ir-after=<pass-arg>                     - Print IR after specified passes
+  --mlir-print-ir-after-all                            - Print IR after each pass
+  --mlir-print-ir-after-change                         - When printing the IR after a pass, only print if the IR changed
+  --mlir-print-ir-after-failure                        - When printing the IR after a pass, only print if the pass failed
+  --mlir-print-ir-before=<pass-arg>                    - Print IR before specified passes
+  --mlir-print-ir-before-all                           - Print IR before each pass
+  --mlir-print-ir-module-scope                         - When printing IR for print-ir-[before|after]{-all} always print the top-level operation
+  --mlir-print-ir-tree-dir=<string>                    - When printing the IR before/after a pass, print file tree rooted at this directory. Use in conjunction with mlir-print-ir-* flags
+  --mlir-print-local-scope                             - Print with local scope and inline information (eliding aliases for attributes, types, and locations
+  --mlir-print-op-on-diagnostic                        - When a diagnostic is emitted on an operation, also print the operation as an attached note
+  --mlir-print-skip-regions                            - Skip regions when printing ops.
+  --mlir-print-stacktrace-on-diagnostic                - When a diagnostic is emitted, also print the stack trace as an attached note
+  --mlir-print-unique-ssa-ids                          - Print unique SSA ID numbers for values, block arguments and naming conflicts across all regions
+  --mlir-print-value-users                             - Print users of operation results and block arguments as a comment
+  --mlir-timing                                        - Display execution times
+  --mlir-timing-display=<value>                        - Display method for timing data
+    =list                                              -   display the results in a list sorted by total time
+    =tree                                              -   display the results ina with a nested tree view
+
+Generic Options:
+
+  --help                                               - Display available options (--help-hidden for more)
+  --help-list                                          - Display list of available options (--help-list-hidden for more)
+  --version                                            - Display the version of this program
+
+hlstool Options:
+
+  --buffer-size=<uint>                                 - Number of slots in each buffer
+  --buffering-strategy=<string>                        - Strategy to apply. Possible values are: cycles, allFIFO, all (default)
+  --dc                                                 - Use the DC flow
+  HLS flow
+      --dynamic-hw                                        - Dynamically scheduled (HW path)
+      --calyx-hw                                          - Statically scheduled (Calyx path)
+  --dynamic-parallelism=<value>                        - Specify the DHLS task parallelism kind
+    =none                                              -   Add no protection mechanisms that could prevent data races when a function has multiple active invocations.
+    =locking                                           -   Add function locking protection mechanism which ensures that only one function invocation is active.
+    =pipelining                                        -   Add function pipelining mechanism that enables a pipelined execution of multiple function invocations while preserving correctness.
+  --input-level=<value>                                - Level at which to input IR at. It is flow-defined which value corersponds to which IR level.
+    =high                                              -   High-level dialects like affine
+    =pre-compile                                       -   The IR right before the core lowering dialect (handshake/calyx)
+    =core                                              -   The IR in core dialect (handshake/calyx)
+    =post-compile                                      -   The lowest form of core IR (handshake/calyx) (i.e. after all passes have run)
+    =rtl                                               -   The IR after lowering is performed
+  --lowering-options=<value>                           - Style options.  Valid flags include: noAlwaysComb, exprInEventControl, disallowPackedArrays, disallowLocalVariables, verifLabels, emittedLineLength=<n>, maximumNumberOfTermsPerExpression=<n>, explicitBitcast, emitReplicatedOpsToHeader, locationInfoStyle={plain,wrapInAtSquareBracket,none}, disallowPortDeclSharing, printDebugInfo, disallowExpressionInliningInPorts, disallowMuxInlining, emitWireInPort, emitBindComments, omitVersionComment, caseInsensitiveKeywords
+  -o <filename>                                        - Output filename, or directory for split output
+  --output-level=<value>                               - Level at which to output IR at. It is flow-defined which value corersponds to which IR level.
+    =pre-compile                                       -   The IR right before the core lowering dialect (handshake/calyx)
+    =core                                              -   The IR in core dialect (handshake/calyx)
+    =post-compile                                      -   The lowest form of core IR (handshake/calyx) (i.e. after all passes have run)
+    =rtl                                               -   The IR after lowering is performed
+    =sv                                                -   System verilog representation
+  Specify output format:
+      --ir                                                - Emit post-HLS IR
+      --verilog                                           - Emit Verilog
+      --split-verilog                                     - Emit Verilog (one file per module; specify directory with -o=<dir>)
+  --sv-trace-iverilog                                  - Add tracing to an iverilog simulated module
+  --verbose-pass-executions                            - Log executions of toplevel module passes
+  --verify-each                                        - Run the verifier after each transformation pass
+  --with-esi                                           - Create ESI compatible modules
