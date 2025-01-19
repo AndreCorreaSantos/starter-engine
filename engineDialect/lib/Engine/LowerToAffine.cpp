@@ -18,7 +18,7 @@
 #include "Engine/EngineDialect.h"
 #include "Engine/EngineOps.h"
 #include "Engine/EnginePasses.h"
-
+#include "mlir/Dialect/SCF/IR/SCF.h"
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
@@ -494,6 +494,88 @@ public:
   }
 };
 
+class ArgMaxOpLowering : public mlir::OpRewritePattern<engine::ArgMaxOp> {
+public:
+  using OpRewritePattern<engine::ArgMaxOp>::OpRewritePattern;
+  
+  mlir::LogicalResult
+  matchAndRewrite(engine::ArgMaxOp op, mlir::PatternRewriter &rewriter) const override {
+    auto loc = op.getLoc();
+    auto value = op.getValue();
+    auto inputType = value.getType().dyn_cast<mlir::MemRefType>();
+    if (!inputType) {
+      return rewriter.notifyMatchFailure(op, "expected memref type for input");
+    }
+
+    // Get input shape
+    auto shape = inputType.getShape();
+    int64_t totalElements = 1;
+    for (auto dim : shape) {
+      totalElements *= dim;
+    }
+
+    // Index variable for loop
+    auto indexType = rewriter.getIndexType();
+    mlir::Value index = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0);
+
+    // maxvalue = input[0]
+    auto maxValue = rewriter.create<mlir::memref::LoadOp>(loc, value, 
+                                                         mlir::ValueRange{index});
+
+    // Loop
+    auto loop = rewriter.create<mlir::scf::ForOp>(
+        loc, 
+        index,  // lower bound
+        rewriter.create<mlir::arith::ConstantIndexOp>(loc, totalElements),  // upper bound
+        rewriter.create<mlir::arith::ConstantIndexOp>(loc, 1),  // step
+        mlir::ValueRange{maxValue}  // initial value
+    );
+
+    // Create the loop body
+    rewriter.setInsertionPointToStart(loop.getBody());
+
+    // Load current element
+    auto currentValue = rewriter.create<mlir::memref::LoadOp>(
+        loc, value, loop.getInductionVar());
+
+    // Compare with max val
+    auto cmp = rewriter.create<mlir::arith::CmpFOp>(
+        loc, 
+        mlir::arith::CmpFPredicate::OGT,
+        currentValue, 
+        loop.getRegionIterArgs().front()
+    );
+
+    // Select the larger val
+    auto newMax = rewriter.create<mlir::arith::SelectOp>(
+        loc, cmp, currentValue, loop.getRegionIterArgs().front()
+    );
+
+    // Yield the new max - fixed
+    rewriter.create<mlir::scf::YieldOp>(loc, mlir::ValueRange{newMax.getResult()});
+
+    // Reset insertion point
+    rewriter.setInsertionPointAfter(loop);
+
+    // Create output memref
+    auto resultType = mlir::MemRefType::get({}, inputType.getElementType());
+    auto result = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
+
+    // Store the maximum value - fixed
+    auto zeroIndex = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0);
+    rewriter.create<mlir::memref::StoreOp>(
+        loc, 
+        loop.getResult(0),  // value to store
+        result.getResult(),  // memref to store into
+        mlir::ValueRange{}  // indices
+    );
+
+    // Replace the original op with our result
+    rewriter.replaceOp(op, result);
+    return mlir::success();
+  }
+};
+
 namespace {
 class EngineToAffineLowerPass
     : public mlir::PassWrapper<EngineToAffineLowerPass,
@@ -518,7 +600,7 @@ void EngineToAffineLowerPass::runOnOperation() { // Only engine:: opertions need
 
   target.addIllegalDialect<engine::EngineDialect>();
   target.addLegalDialect<mlir::affine::AffineDialect, mlir::BuiltinDialect,
-                         mlir::func::FuncDialect, mlir::arith::ArithDialect,
+                         mlir::func::FuncDialect, mlir::arith::ArithDialect,mlir::scf::SCFDialect,
                          mlir::memref::MemRefDialect,mlir::bufferization::BufferizationDialect,mlir::linalg::LinalgDialect>();
                          
   target.addDynamicallyLegalOp<engine::PrintOp>([](engine::PrintOp op) {
@@ -536,6 +618,7 @@ void EngineToAffineLowerPass::runOnOperation() { // Only engine:: opertions need
   patterns.add<MatmulOpLowering>(&getContext());
   patterns.add<ReLUOpLowering>(&getContext());
   patterns.add<FlattenOpLowering>(&getContext());
+  patterns.add<ArgMaxOpLowering>(&getContext());
 
   if (mlir::failed(mlir::applyPartialConversion(getOperation(), target,
                                                 std::move(patterns)))) {

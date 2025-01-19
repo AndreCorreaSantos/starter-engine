@@ -1,17 +1,14 @@
 import onnx
 import numpy as np
 
-F = "f64"
-I = "i32"
-
 def remove_illegals(result):
     return result.replace("/",".").replace("::",".")
 
-def print_shape(array,f_type=F):
+def print_shape(array):
     result =""
     for dim in array:
         result += str(dim) + "x"
-    result += f_type
+    result += "f64"
     return result
 
 def print_data(array):
@@ -88,7 +85,7 @@ class Node():
     def ArgMax(self, m, cache):
         cache[self.output] = (1,)
         sh1 = print_shape(cache[m])
-        sh2 = print_shape((1,),I)
+        sh2 = print_shape((1,))
         return f"%{self.output} = \"engine.argmax\"(%{m}) : (memref<{sh1}>) -> memref<{sh2}> \n"
 
     def execute(self, cache):
@@ -137,7 +134,7 @@ class Model():
         header = "module {\nfunc.func @main() {\n"
         footer = "return\n}\n}"
         result_name = nd.output[0]
-        result_shape = print_shape(self.cache["_"+result_name],I) # fix this later, hardcoding int result in print for now.
+        result_shape = print_shape(self.cache["_"+result_name])
         print_result = f"\"engine.print\"(%_{result_name}) : (memref<{result_shape}>) -> ()\n"
 
         return header + remove_illegals(self.result)+print_result+ footer
