@@ -496,84 +496,102 @@ public:
 
 class ArgMaxOpLowering : public mlir::OpRewritePattern<engine::ArgMaxOp> {
 public:
-  using OpRewritePattern<engine::ArgMaxOp>::OpRewritePattern;
-  
-  mlir::LogicalResult
-  matchAndRewrite(engine::ArgMaxOp op, mlir::PatternRewriter &rewriter) const override {
-    auto loc = op.getLoc();
-    auto value = op.getValue();
-    auto inputType = value.getType().dyn_cast<mlir::MemRefType>();
-    if (!inputType) {
-      return rewriter.notifyMatchFailure(op, "expected memref type for input");
+    using OpRewritePattern<engine::ArgMaxOp>::OpRewritePattern;
+
+    mlir::LogicalResult
+    matchAndRewrite(engine::ArgMaxOp op, mlir::PatternRewriter &rewriter) const override {
+        auto loc = op.getLoc();
+        auto value = op.getValue();
+        auto inputType = value.getType().dyn_cast<mlir::MemRefType>();
+        if (!inputType) {
+            return rewriter.notifyMatchFailure(op, "expected memref type for input");
+        }
+
+        // Get input shape
+        auto shape = inputType.getShape();
+        int64_t totalElements = 1;
+        for (auto dim : shape) {
+            totalElements *= dim;
+        }
+
+        // Index variable for loop
+        auto indexType = rewriter.getIndexType();
+        mlir::Value index = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0);
+
+        // Initialize maxValue and maxIndex
+        auto maxValue = rewriter.create<mlir::memref::LoadOp>(loc, value, 
+            mlir::ValueRange{index});
+        auto maxIndex = index;  // Start with index 0
+
+        // Loop with both maxValue and maxIndex as region arguments
+        auto loop = rewriter.create<mlir::scf::ForOp>(
+            loc,
+            index, // lower bound
+            rewriter.create<mlir::arith::ConstantIndexOp>(loc, totalElements), // upper bound
+            rewriter.create<mlir::arith::ConstantIndexOp>(loc, 1), // step
+            mlir::ValueRange{maxValue, maxIndex} // initial values
+        );
+
+        // Create the loop body
+        rewriter.setInsertionPointToStart(loop.getBody());
+
+        // Load current element
+        auto currentValue = rewriter.create<mlir::memref::LoadOp>(
+            loc, value, loop.getInductionVar());
+
+        // Compare with max val
+        auto cmp = rewriter.create<mlir::arith::CmpFOp>(
+            loc,
+            mlir::arith::CmpFPredicate::OGT,
+            currentValue,
+            loop.getRegionIterArgs()[0]  // First argument is maxValue
+        );
+
+        // Select the larger value and corresponding index
+        auto newMax = rewriter.create<mlir::arith::SelectOp>(
+            loc, cmp, currentValue, loop.getRegionIterArgs()[0]
+        );
+        auto newMaxIndex = rewriter.create<mlir::arith::SelectOp>(
+            loc, cmp, loop.getInductionVar(), loop.getRegionIterArgs()[1]
+        );
+
+        // Yield both the new max value and index
+        rewriter.create<mlir::scf::YieldOp>(loc, 
+            mlir::ValueRange{newMax.getResult(), newMaxIndex.getResult()});
+
+        // Reset insertion point
+        rewriter.setInsertionPointAfter(loop);
+
+        // Convert index to i64
+        auto maxIndexInt = rewriter.create<mlir::arith::IndexCastOp>(
+            loc,
+            rewriter.getI64Type(),
+            loop.getResult(1)
+        );
+
+        // Convert i64 to float
+        auto maxIndexFloat = rewriter.create<mlir::arith::SIToFPOp>(
+            loc,
+            inputType.getElementType(),  // Convert to same float type as input
+            maxIndexInt
+        );
+
+        // Create output memref for float
+        auto resultType = mlir::MemRefType::get({}, inputType.getElementType());
+        auto result = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
+
+        // Store the float value
+        rewriter.create<mlir::memref::StoreOp>(
+            loc,
+            maxIndexFloat,
+            result.getResult(),
+            mlir::ValueRange{}
+        );
+
+        // Replace the original op with our result
+        rewriter.replaceOp(op, result);
+        return mlir::success();
     }
-
-    // Get input shape
-    auto shape = inputType.getShape();
-    int64_t totalElements = 1;
-    for (auto dim : shape) {
-      totalElements *= dim;
-    }
-
-    // Index variable for loop
-    auto indexType = rewriter.getIndexType();
-    mlir::Value index = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0);
-
-    // maxvalue = input[0]
-    auto maxValue = rewriter.create<mlir::memref::LoadOp>(loc, value, 
-                                                         mlir::ValueRange{index});
-
-    // Loop
-    auto loop = rewriter.create<mlir::scf::ForOp>(
-        loc, 
-        index,  // lower bound
-        rewriter.create<mlir::arith::ConstantIndexOp>(loc, totalElements),  // upper bound
-        rewriter.create<mlir::arith::ConstantIndexOp>(loc, 1),  // step
-        mlir::ValueRange{maxValue}  // initial value
-    );
-
-    // Create the loop body
-    rewriter.setInsertionPointToStart(loop.getBody());
-
-    // Load current element
-    auto currentValue = rewriter.create<mlir::memref::LoadOp>(
-        loc, value, loop.getInductionVar());
-
-    // Compare with max val
-    auto cmp = rewriter.create<mlir::arith::CmpFOp>(
-        loc, 
-        mlir::arith::CmpFPredicate::OGT,
-        currentValue, 
-        loop.getRegionIterArgs().front()
-    );
-
-    // Select the larger val
-    auto newMax = rewriter.create<mlir::arith::SelectOp>(
-        loc, cmp, currentValue, loop.getRegionIterArgs().front()
-    );
-
-    // Yield the new max - fixed
-    rewriter.create<mlir::scf::YieldOp>(loc, mlir::ValueRange{newMax.getResult()});
-
-    // Reset insertion point
-    rewriter.setInsertionPointAfter(loop);
-
-    // Create output memref
-    auto resultType = mlir::MemRefType::get({}, inputType.getElementType());
-    auto result = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
-
-    // Store the maximum value - fixed
-    auto zeroIndex = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0);
-    rewriter.create<mlir::memref::StoreOp>(
-        loc, 
-        loop.getResult(0),  // value to store
-        result.getResult(),  // memref to store into
-        mlir::ValueRange{}  // indices
-    );
-
-    // Replace the original op with our result
-    rewriter.replaceOp(op, result);
-    return mlir::success();
-  }
 };
 
 namespace {

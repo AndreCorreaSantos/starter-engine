@@ -12579,28 +12579,28 @@ define void @main() {
   store double 0.000000e+00, ptr %8398, align 8
   %8399 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8400 = getelementptr double, ptr %8399, i64 123
-  store double 0.000000e+00, ptr %8400, align 8
+  store double 2.000000e-01, ptr %8400, align 8
   %8401 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8402 = getelementptr double, ptr %8401, i64 124
   store double 0.000000e+00, ptr %8402, align 8
   %8403 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8404 = getelementptr double, ptr %8403, i64 125
-  store double 0.000000e+00, ptr %8404, align 8
+  store double 2.000000e-01, ptr %8404, align 8
   %8405 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8406 = getelementptr double, ptr %8405, i64 126
-  store double 0.000000e+00, ptr %8406, align 8
+  store double 5.000000e-01, ptr %8406, align 8
   %8407 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8408 = getelementptr double, ptr %8407, i64 127
-  store double 0.000000e+00, ptr %8408, align 8
+  store double 8.000000e-01, ptr %8408, align 8
   %8409 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8410 = getelementptr double, ptr %8409, i64 128
-  store double 0.000000e+00, ptr %8410, align 8
+  store double 5.000000e-01, ptr %8410, align 8
   %8411 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8412 = getelementptr double, ptr %8411, i64 129
-  store double 0.000000e+00, ptr %8412, align 8
+  store double 5.000000e-01, ptr %8412, align 8
   %8413 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8414 = getelementptr double, ptr %8413, i64 130
-  store double 0.000000e+00, ptr %8414, align 8
+  store double 2.000000e-01, ptr %8414, align 8
   %8415 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8416 = getelementptr double, ptr %8415, i64 131
   store double 0.000000e+00, ptr %8416, align 8
@@ -12657,40 +12657,40 @@ define void @main() {
   store double 0.000000e+00, ptr %8450, align 8
   %8451 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8452 = getelementptr double, ptr %8451, i64 149
-  store double 0.000000e+00, ptr %8452, align 8
+  store double 1.000000e-01, ptr %8452, align 8
   %8453 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8454 = getelementptr double, ptr %8453, i64 150
-  store double 0.000000e+00, ptr %8454, align 8
+  store double 0x3FE6666666666666, ptr %8454, align 8
   %8455 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8456 = getelementptr double, ptr %8455, i64 151
-  store double 0.000000e+00, ptr %8456, align 8
+  store double 1.000000e+00, ptr %8456, align 8
   %8457 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8458 = getelementptr double, ptr %8457, i64 152
-  store double 0.000000e+00, ptr %8458, align 8
+  store double 9.000000e-01, ptr %8458, align 8
   %8459 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8460 = getelementptr double, ptr %8459, i64 153
-  store double 0.000000e+00, ptr %8460, align 8
+  store double 9.000000e-01, ptr %8460, align 8
   %8461 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8462 = getelementptr double, ptr %8461, i64 154
-  store double 0.000000e+00, ptr %8462, align 8
+  store double 1.000000e+00, ptr %8462, align 8
   %8463 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8464 = getelementptr double, ptr %8463, i64 155
-  store double 0.000000e+00, ptr %8464, align 8
+  store double 1.000000e+00, ptr %8464, align 8
   %8465 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8466 = getelementptr double, ptr %8465, i64 156
-  store double 3.000000e-01, ptr %8466, align 8
+  store double 1.000000e+00, ptr %8466, align 8
   %8467 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8468 = getelementptr double, ptr %8467, i64 157
   store double 1.000000e+00, ptr %8468, align 8
   %8469 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8470 = getelementptr double, ptr %8469, i64 158
-  store double 4.000000e-01, ptr %8470, align 8
+  store double 1.000000e+00, ptr %8470, align 8
   %8471 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8472 = getelementptr double, ptr %8471, i64 159
-  store double 0.000000e+00, ptr %8472, align 8
+  store double 9.000000e-01, ptr %8472, align 8
   %8473 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8474 = getelementptr double, ptr %8473, i64 160
-  store double 0.000000e+00, ptr %8474, align 8
+  store double 3.000000e-01, ptr %8474, align 8
   %8475 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8476 = getelementptr double, ptr %8475, i64 161
   store double 0.000000e+00, ptr %8476, align 8
@@ -12741,43 +12741,43 @@ define void @main() {
   store double 0.000000e+00, ptr %8506, align 8
   %8507 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8508 = getelementptr double, ptr %8507, i64 177
-  store double 0.000000e+00, ptr %8508, align 8
+  store double 6.000000e-01, ptr %8508, align 8
   %8509 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8510 = getelementptr double, ptr %8509, i64 178
-  store double 0.000000e+00, ptr %8510, align 8
+  store double 1.000000e+00, ptr %8510, align 8
   %8511 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8512 = getelementptr double, ptr %8511, i64 179
-  store double 0.000000e+00, ptr %8512, align 8
+  store double 1.000000e+00, ptr %8512, align 8
   %8513 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8514 = getelementptr double, ptr %8513, i64 180
-  store double 0.000000e+00, ptr %8514, align 8
+  store double 1.000000e+00, ptr %8514, align 8
   %8515 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8516 = getelementptr double, ptr %8515, i64 181
-  store double 0.000000e+00, ptr %8516, align 8
+  store double 8.000000e-01, ptr %8516, align 8
   %8517 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8518 = getelementptr double, ptr %8517, i64 182
-  store double 0.000000e+00, ptr %8518, align 8
+  store double 8.000000e-01, ptr %8518, align 8
   %8519 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8520 = getelementptr double, ptr %8519, i64 183
-  store double 1.000000e-01, ptr %8520, align 8
+  store double 0x3FE6666666666666, ptr %8520, align 8
   %8521 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8522 = getelementptr double, ptr %8521, i64 184
-  store double 9.000000e-01, ptr %8522, align 8
+  store double 0x3FE6666666666666, ptr %8522, align 8
   %8523 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8524 = getelementptr double, ptr %8523, i64 185
-  store double 1.000000e+00, ptr %8524, align 8
+  store double 0x3FE6666666666666, ptr %8524, align 8
   %8525 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8526 = getelementptr double, ptr %8525, i64 186
   store double 1.000000e+00, ptr %8526, align 8
   %8527 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8528 = getelementptr double, ptr %8527, i64 187
-  store double 0.000000e+00, ptr %8528, align 8
+  store double 1.000000e+00, ptr %8528, align 8
   %8529 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8530 = getelementptr double, ptr %8529, i64 188
-  store double 0.000000e+00, ptr %8530, align 8
+  store double 9.000000e-01, ptr %8530, align 8
   %8531 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8532 = getelementptr double, ptr %8531, i64 189
-  store double 0.000000e+00, ptr %8532, align 8
+  store double 2.000000e-01, ptr %8532, align 8
   %8533 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8534 = getelementptr double, ptr %8533, i64 190
   store double 0.000000e+00, ptr %8534, align 8
@@ -12822,49 +12822,49 @@ define void @main() {
   store double 0.000000e+00, ptr %8560, align 8
   %8561 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8562 = getelementptr double, ptr %8561, i64 204
-  store double 0.000000e+00, ptr %8562, align 8
+  store double 2.000000e-01, ptr %8562, align 8
   %8563 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8564 = getelementptr double, ptr %8563, i64 205
-  store double 0.000000e+00, ptr %8564, align 8
+  store double 9.000000e-01, ptr %8564, align 8
   %8565 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8566 = getelementptr double, ptr %8565, i64 206
-  store double 0.000000e+00, ptr %8566, align 8
+  store double 1.000000e+00, ptr %8566, align 8
   %8567 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8568 = getelementptr double, ptr %8567, i64 207
-  store double 0.000000e+00, ptr %8568, align 8
+  store double 9.000000e-01, ptr %8568, align 8
   %8569 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8570 = getelementptr double, ptr %8569, i64 208
-  store double 0.000000e+00, ptr %8570, align 8
+  store double 3.000000e-01, ptr %8570, align 8
   %8571 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8572 = getelementptr double, ptr %8571, i64 209
-  store double 0.000000e+00, ptr %8572, align 8
+  store double 1.000000e-01, ptr %8572, align 8
   %8573 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8574 = getelementptr double, ptr %8573, i64 210
   store double 0.000000e+00, ptr %8574, align 8
   %8575 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8576 = getelementptr double, ptr %8575, i64 211
-  store double 3.000000e-01, ptr %8576, align 8
+  store double 0.000000e+00, ptr %8576, align 8
   %8577 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8578 = getelementptr double, ptr %8577, i64 212
-  store double 1.000000e+00, ptr %8578, align 8
+  store double 0.000000e+00, ptr %8578, align 8
   %8579 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8580 = getelementptr double, ptr %8579, i64 213
-  store double 1.000000e+00, ptr %8580, align 8
+  store double 0.000000e+00, ptr %8580, align 8
   %8581 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8582 = getelementptr double, ptr %8581, i64 214
-  store double 6.000000e-01, ptr %8582, align 8
+  store double 5.000000e-01, ptr %8582, align 8
   %8583 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8584 = getelementptr double, ptr %8583, i64 215
-  store double 0.000000e+00, ptr %8584, align 8
+  store double 1.000000e+00, ptr %8584, align 8
   %8585 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8586 = getelementptr double, ptr %8585, i64 216
-  store double 0.000000e+00, ptr %8586, align 8
+  store double 1.000000e+00, ptr %8586, align 8
   %8587 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8588 = getelementptr double, ptr %8587, i64 217
-  store double 0.000000e+00, ptr %8588, align 8
+  store double 0x3FE6666666666666, ptr %8588, align 8
   %8589 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8590 = getelementptr double, ptr %8589, i64 218
-  store double 0.000000e+00, ptr %8590, align 8
+  store double 1.000000e-01, ptr %8590, align 8
   %8591 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8592 = getelementptr double, ptr %8591, i64 219
   store double 0.000000e+00, ptr %8592, align 8
@@ -12906,16 +12906,16 @@ define void @main() {
   store double 0.000000e+00, ptr %8616, align 8
   %8617 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8618 = getelementptr double, ptr %8617, i64 232
-  store double 0.000000e+00, ptr %8618, align 8
+  store double 2.000000e-01, ptr %8618, align 8
   %8619 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8620 = getelementptr double, ptr %8619, i64 233
-  store double 0.000000e+00, ptr %8620, align 8
+  store double 1.000000e+00, ptr %8620, align 8
   %8621 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8622 = getelementptr double, ptr %8621, i64 234
-  store double 0.000000e+00, ptr %8622, align 8
+  store double 1.000000e+00, ptr %8622, align 8
   %8623 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8624 = getelementptr double, ptr %8623, i64 235
-  store double 0.000000e+00, ptr %8624, align 8
+  store double 4.000000e-01, ptr %8624, align 8
   %8625 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8626 = getelementptr double, ptr %8625, i64 236
   store double 0.000000e+00, ptr %8626, align 8
@@ -12927,28 +12927,28 @@ define void @main() {
   store double 0.000000e+00, ptr %8630, align 8
   %8631 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8632 = getelementptr double, ptr %8631, i64 239
-  store double 8.000000e-01, ptr %8632, align 8
+  store double 0.000000e+00, ptr %8632, align 8
   %8633 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8634 = getelementptr double, ptr %8633, i64 240
-  store double 1.000000e+00, ptr %8634, align 8
+  store double 0.000000e+00, ptr %8634, align 8
   %8635 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8636 = getelementptr double, ptr %8635, i64 241
-  store double 1.000000e+00, ptr %8636, align 8
+  store double 0.000000e+00, ptr %8636, align 8
   %8637 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8638 = getelementptr double, ptr %8637, i64 242
-  store double 3.000000e-01, ptr %8638, align 8
+  store double 0.000000e+00, ptr %8638, align 8
   %8639 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8640 = getelementptr double, ptr %8639, i64 243
-  store double 0.000000e+00, ptr %8640, align 8
+  store double 5.000000e-01, ptr %8640, align 8
   %8641 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8642 = getelementptr double, ptr %8641, i64 244
-  store double 0.000000e+00, ptr %8642, align 8
+  store double 1.000000e+00, ptr %8642, align 8
   %8643 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8644 = getelementptr double, ptr %8643, i64 245
-  store double 0.000000e+00, ptr %8644, align 8
+  store double 1.000000e+00, ptr %8644, align 8
   %8645 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8646 = getelementptr double, ptr %8645, i64 246
-  store double 0.000000e+00, ptr %8646, align 8
+  store double 3.000000e-01, ptr %8646, align 8
   %8647 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8648 = getelementptr double, ptr %8647, i64 247
   store double 0.000000e+00, ptr %8648, align 8
@@ -12990,13 +12990,13 @@ define void @main() {
   store double 0.000000e+00, ptr %8672, align 8
   %8673 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8674 = getelementptr double, ptr %8673, i64 260
-  store double 0.000000e+00, ptr %8674, align 8
+  store double 2.000000e-01, ptr %8674, align 8
   %8675 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8676 = getelementptr double, ptr %8675, i64 261
-  store double 0.000000e+00, ptr %8676, align 8
+  store double 1.000000e+00, ptr %8676, align 8
   %8677 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8678 = getelementptr double, ptr %8677, i64 262
-  store double 0.000000e+00, ptr %8678, align 8
+  store double 6.000000e-01, ptr %8678, align 8
   %8679 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8680 = getelementptr double, ptr %8679, i64 263
   store double 0.000000e+00, ptr %8680, align 8
@@ -13008,16 +13008,16 @@ define void @main() {
   store double 0.000000e+00, ptr %8684, align 8
   %8685 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8686 = getelementptr double, ptr %8685, i64 266
-  store double 2.000000e-01, ptr %8686, align 8
+  store double 0.000000e+00, ptr %8686, align 8
   %8687 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8688 = getelementptr double, ptr %8687, i64 267
-  store double 1.000000e+00, ptr %8688, align 8
+  store double 0.000000e+00, ptr %8688, align 8
   %8689 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8690 = getelementptr double, ptr %8689, i64 268
-  store double 1.000000e+00, ptr %8690, align 8
+  store double 0.000000e+00, ptr %8690, align 8
   %8691 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8692 = getelementptr double, ptr %8691, i64 269
-  store double 1.000000e+00, ptr %8692, align 8
+  store double 0.000000e+00, ptr %8692, align 8
   %8693 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8694 = getelementptr double, ptr %8693, i64 270
   store double 0.000000e+00, ptr %8694, align 8
@@ -13026,13 +13026,13 @@ define void @main() {
   store double 0.000000e+00, ptr %8696, align 8
   %8697 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8698 = getelementptr double, ptr %8697, i64 272
-  store double 0.000000e+00, ptr %8698, align 8
+  store double 9.000000e-01, ptr %8698, align 8
   %8699 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8700 = getelementptr double, ptr %8699, i64 273
-  store double 0.000000e+00, ptr %8700, align 8
+  store double 1.000000e+00, ptr %8700, align 8
   %8701 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8702 = getelementptr double, ptr %8701, i64 274
-  store double 0.000000e+00, ptr %8702, align 8
+  store double 6.000000e-01, ptr %8702, align 8
   %8703 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8704 = getelementptr double, ptr %8703, i64 275
   store double 0.000000e+00, ptr %8704, align 8
@@ -13074,13 +13074,13 @@ define void @main() {
   store double 0.000000e+00, ptr %8728, align 8
   %8729 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8730 = getelementptr double, ptr %8729, i64 288
-  store double 0.000000e+00, ptr %8730, align 8
+  store double 8.000000e-01, ptr %8730, align 8
   %8731 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8732 = getelementptr double, ptr %8731, i64 289
-  store double 0.000000e+00, ptr %8732, align 8
+  store double 1.000000e+00, ptr %8732, align 8
   %8733 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8734 = getelementptr double, ptr %8733, i64 290
-  store double 0.000000e+00, ptr %8734, align 8
+  store double 4.000000e-01, ptr %8734, align 8
   %8735 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8736 = getelementptr double, ptr %8735, i64 291
   store double 0.000000e+00, ptr %8736, align 8
@@ -13092,16 +13092,16 @@ define void @main() {
   store double 0.000000e+00, ptr %8740, align 8
   %8741 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8742 = getelementptr double, ptr %8741, i64 294
-  store double 5.000000e-01, ptr %8742, align 8
+  store double 0.000000e+00, ptr %8742, align 8
   %8743 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8744 = getelementptr double, ptr %8743, i64 295
-  store double 1.000000e+00, ptr %8744, align 8
+  store double 0.000000e+00, ptr %8744, align 8
   %8745 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8746 = getelementptr double, ptr %8745, i64 296
-  store double 1.000000e+00, ptr %8746, align 8
+  store double 0.000000e+00, ptr %8746, align 8
   %8747 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8748 = getelementptr double, ptr %8747, i64 297
-  store double 0x3FE6666666666666, ptr %8748, align 8
+  store double 0.000000e+00, ptr %8748, align 8
   %8749 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8750 = getelementptr double, ptr %8749, i64 298
   store double 0.000000e+00, ptr %8750, align 8
@@ -13110,13 +13110,13 @@ define void @main() {
   store double 0.000000e+00, ptr %8752, align 8
   %8753 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8754 = getelementptr double, ptr %8753, i64 300
-  store double 0.000000e+00, ptr %8754, align 8
+  store double 6.000000e-01, ptr %8754, align 8
   %8755 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8756 = getelementptr double, ptr %8755, i64 301
-  store double 0.000000e+00, ptr %8756, align 8
+  store double 1.000000e+00, ptr %8756, align 8
   %8757 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8758 = getelementptr double, ptr %8757, i64 302
-  store double 0.000000e+00, ptr %8758, align 8
+  store double 8.000000e-01, ptr %8758, align 8
   %8759 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8760 = getelementptr double, ptr %8759, i64 303
   store double 0.000000e+00, ptr %8760, align 8
@@ -13155,16 +13155,16 @@ define void @main() {
   store double 0.000000e+00, ptr %8782, align 8
   %8783 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8784 = getelementptr double, ptr %8783, i64 315
-  store double 0.000000e+00, ptr %8784, align 8
+  store double 1.000000e-01, ptr %8784, align 8
   %8785 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8786 = getelementptr double, ptr %8785, i64 316
-  store double 0.000000e+00, ptr %8786, align 8
+  store double 9.000000e-01, ptr %8786, align 8
   %8787 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8788 = getelementptr double, ptr %8787, i64 317
-  store double 0.000000e+00, ptr %8788, align 8
+  store double 9.000000e-01, ptr %8788, align 8
   %8789 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8790 = getelementptr double, ptr %8789, i64 318
-  store double 0.000000e+00, ptr %8790, align 8
+  store double 2.000000e-01, ptr %8790, align 8
   %8791 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8792 = getelementptr double, ptr %8791, i64 319
   store double 0.000000e+00, ptr %8792, align 8
@@ -13176,16 +13176,16 @@ define void @main() {
   store double 0.000000e+00, ptr %8796, align 8
   %8797 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8798 = getelementptr double, ptr %8797, i64 322
-  store double 8.000000e-01, ptr %8798, align 8
+  store double 0.000000e+00, ptr %8798, align 8
   %8799 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8800 = getelementptr double, ptr %8799, i64 323
-  store double 1.000000e+00, ptr %8800, align 8
+  store double 0.000000e+00, ptr %8800, align 8
   %8801 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8802 = getelementptr double, ptr %8801, i64 324
-  store double 1.000000e+00, ptr %8802, align 8
+  store double 0.000000e+00, ptr %8802, align 8
   %8803 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8804 = getelementptr double, ptr %8803, i64 325
-  store double 2.000000e-01, ptr %8804, align 8
+  store double 0.000000e+00, ptr %8804, align 8
   %8805 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8806 = getelementptr double, ptr %8805, i64 326
   store double 0.000000e+00, ptr %8806, align 8
@@ -13194,13 +13194,13 @@ define void @main() {
   store double 0.000000e+00, ptr %8808, align 8
   %8809 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8810 = getelementptr double, ptr %8809, i64 328
-  store double 0.000000e+00, ptr %8810, align 8
+  store double 3.000000e-01, ptr %8810, align 8
   %8811 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8812 = getelementptr double, ptr %8811, i64 329
-  store double 0.000000e+00, ptr %8812, align 8
+  store double 1.000000e+00, ptr %8812, align 8
   %8813 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8814 = getelementptr double, ptr %8813, i64 330
-  store double 0.000000e+00, ptr %8814, align 8
+  store double 8.000000e-01, ptr %8814, align 8
   %8815 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8816 = getelementptr double, ptr %8815, i64 331
   store double 0.000000e+00, ptr %8816, align 8
@@ -13239,13 +13239,13 @@ define void @main() {
   store double 0.000000e+00, ptr %8838, align 8
   %8839 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8840 = getelementptr double, ptr %8839, i64 343
-  store double 0.000000e+00, ptr %8840, align 8
+  store double 5.000000e-01, ptr %8840, align 8
   %8841 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8842 = getelementptr double, ptr %8841, i64 344
-  store double 0.000000e+00, ptr %8842, align 8
+  store double 1.000000e+00, ptr %8842, align 8
   %8843 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8844 = getelementptr double, ptr %8843, i64 345
-  store double 0.000000e+00, ptr %8844, align 8
+  store double 0x3FE6666666666666, ptr %8844, align 8
   %8845 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8846 = getelementptr double, ptr %8845, i64 346
   store double 0.000000e+00, ptr %8846, align 8
@@ -13257,16 +13257,16 @@ define void @main() {
   store double 0.000000e+00, ptr %8850, align 8
   %8851 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8852 = getelementptr double, ptr %8851, i64 349
-  store double 2.000000e-01, ptr %8852, align 8
+  store double 0.000000e+00, ptr %8852, align 8
   %8853 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8854 = getelementptr double, ptr %8853, i64 350
-  store double 1.000000e+00, ptr %8854, align 8
+  store double 0.000000e+00, ptr %8854, align 8
   %8855 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8856 = getelementptr double, ptr %8855, i64 351
-  store double 1.000000e+00, ptr %8856, align 8
+  store double 0.000000e+00, ptr %8856, align 8
   %8857 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8858 = getelementptr double, ptr %8857, i64 352
-  store double 9.000000e-01, ptr %8858, align 8
+  store double 0.000000e+00, ptr %8858, align 8
   %8859 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8860 = getelementptr double, ptr %8859, i64 353
   store double 0.000000e+00, ptr %8860, align 8
@@ -13278,13 +13278,13 @@ define void @main() {
   store double 0.000000e+00, ptr %8864, align 8
   %8865 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8866 = getelementptr double, ptr %8865, i64 356
-  store double 0.000000e+00, ptr %8866, align 8
+  store double 3.000000e-01, ptr %8866, align 8
   %8867 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8868 = getelementptr double, ptr %8867, i64 357
-  store double 0.000000e+00, ptr %8868, align 8
+  store double 1.000000e+00, ptr %8868, align 8
   %8869 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8870 = getelementptr double, ptr %8869, i64 358
-  store double 0.000000e+00, ptr %8870, align 8
+  store double 8.000000e-01, ptr %8870, align 8
   %8871 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8872 = getelementptr double, ptr %8871, i64 359
   store double 0.000000e+00, ptr %8872, align 8
@@ -13323,13 +13323,13 @@ define void @main() {
   store double 0.000000e+00, ptr %8894, align 8
   %8895 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8896 = getelementptr double, ptr %8895, i64 371
-  store double 0.000000e+00, ptr %8896, align 8
+  store double 8.000000e-01, ptr %8896, align 8
   %8897 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8898 = getelementptr double, ptr %8897, i64 372
-  store double 0.000000e+00, ptr %8898, align 8
+  store double 9.000000e-01, ptr %8898, align 8
   %8899 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8900 = getelementptr double, ptr %8899, i64 373
-  store double 0.000000e+00, ptr %8900, align 8
+  store double 2.000000e-01, ptr %8900, align 8
   %8901 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8902 = getelementptr double, ptr %8901, i64 374
   store double 0.000000e+00, ptr %8902, align 8
@@ -13341,16 +13341,16 @@ define void @main() {
   store double 0.000000e+00, ptr %8906, align 8
   %8907 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8908 = getelementptr double, ptr %8907, i64 377
-  store double 4.000000e-01, ptr %8908, align 8
+  store double 0.000000e+00, ptr %8908, align 8
   %8909 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8910 = getelementptr double, ptr %8909, i64 378
-  store double 1.000000e+00, ptr %8910, align 8
+  store double 0.000000e+00, ptr %8910, align 8
   %8911 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8912 = getelementptr double, ptr %8911, i64 379
-  store double 1.000000e+00, ptr %8912, align 8
+  store double 0.000000e+00, ptr %8912, align 8
   %8913 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8914 = getelementptr double, ptr %8913, i64 380
-  store double 5.000000e-01, ptr %8914, align 8
+  store double 0.000000e+00, ptr %8914, align 8
   %8915 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8916 = getelementptr double, ptr %8915, i64 381
   store double 0.000000e+00, ptr %8916, align 8
@@ -13362,13 +13362,13 @@ define void @main() {
   store double 0.000000e+00, ptr %8920, align 8
   %8921 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8922 = getelementptr double, ptr %8921, i64 384
-  store double 0.000000e+00, ptr %8922, align 8
+  store double 3.000000e-01, ptr %8922, align 8
   %8923 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8924 = getelementptr double, ptr %8923, i64 385
-  store double 0.000000e+00, ptr %8924, align 8
+  store double 1.000000e+00, ptr %8924, align 8
   %8925 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8926 = getelementptr double, ptr %8925, i64 386
-  store double 0.000000e+00, ptr %8926, align 8
+  store double 8.000000e-01, ptr %8926, align 8
   %8927 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8928 = getelementptr double, ptr %8927, i64 387
   store double 0.000000e+00, ptr %8928, align 8
@@ -13407,10 +13407,10 @@ define void @main() {
   store double 0.000000e+00, ptr %8950, align 8
   %8951 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8952 = getelementptr double, ptr %8951, i64 399
-  store double 0.000000e+00, ptr %8952, align 8
+  store double 8.000000e-01, ptr %8952, align 8
   %8953 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8954 = getelementptr double, ptr %8953, i64 400
-  store double 0.000000e+00, ptr %8954, align 8
+  store double 8.000000e-01, ptr %8954, align 8
   %8955 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8956 = getelementptr double, ptr %8955, i64 401
   store double 0.000000e+00, ptr %8956, align 8
@@ -13425,16 +13425,16 @@ define void @main() {
   store double 0.000000e+00, ptr %8962, align 8
   %8963 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8964 = getelementptr double, ptr %8963, i64 405
-  store double 6.000000e-01, ptr %8964, align 8
+  store double 0.000000e+00, ptr %8964, align 8
   %8965 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8966 = getelementptr double, ptr %8965, i64 406
-  store double 1.000000e+00, ptr %8966, align 8
+  store double 0.000000e+00, ptr %8966, align 8
   %8967 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8968 = getelementptr double, ptr %8967, i64 407
-  store double 9.000000e-01, ptr %8968, align 8
+  store double 0.000000e+00, ptr %8968, align 8
   %8969 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8970 = getelementptr double, ptr %8969, i64 408
-  store double 1.000000e-01, ptr %8970, align 8
+  store double 0.000000e+00, ptr %8970, align 8
   %8971 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8972 = getelementptr double, ptr %8971, i64 409
   store double 0.000000e+00, ptr %8972, align 8
@@ -13446,13 +13446,13 @@ define void @main() {
   store double 0.000000e+00, ptr %8976, align 8
   %8977 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8978 = getelementptr double, ptr %8977, i64 412
-  store double 0.000000e+00, ptr %8978, align 8
+  store double 3.000000e-01, ptr %8978, align 8
   %8979 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8980 = getelementptr double, ptr %8979, i64 413
-  store double 0.000000e+00, ptr %8980, align 8
+  store double 1.000000e+00, ptr %8980, align 8
   %8981 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8982 = getelementptr double, ptr %8981, i64 414
-  store double 0.000000e+00, ptr %8982, align 8
+  store double 8.000000e-01, ptr %8982, align 8
   %8983 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %8984 = getelementptr double, ptr %8983, i64 415
   store double 0.000000e+00, ptr %8984, align 8
@@ -13491,10 +13491,10 @@ define void @main() {
   store double 0.000000e+00, ptr %9006, align 8
   %9007 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9008 = getelementptr double, ptr %9007, i64 427
-  store double 0.000000e+00, ptr %9008, align 8
+  store double 9.000000e-01, ptr %9008, align 8
   %9009 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9010 = getelementptr double, ptr %9009, i64 428
-  store double 0.000000e+00, ptr %9010, align 8
+  store double 8.000000e-01, ptr %9010, align 8
   %9011 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9012 = getelementptr double, ptr %9011, i64 429
   store double 0.000000e+00, ptr %9012, align 8
@@ -13506,16 +13506,16 @@ define void @main() {
   store double 0.000000e+00, ptr %9016, align 8
   %9017 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9018 = getelementptr double, ptr %9017, i64 432
-  store double 2.000000e-01, ptr %9018, align 8
+  store double 0.000000e+00, ptr %9018, align 8
   %9019 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9020 = getelementptr double, ptr %9019, i64 433
-  store double 1.000000e+00, ptr %9020, align 8
+  store double 0.000000e+00, ptr %9020, align 8
   %9021 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9022 = getelementptr double, ptr %9021, i64 434
-  store double 1.000000e+00, ptr %9022, align 8
+  store double 0.000000e+00, ptr %9022, align 8
   %9023 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9024 = getelementptr double, ptr %9023, i64 435
-  store double 9.000000e-01, ptr %9024, align 8
+  store double 0.000000e+00, ptr %9024, align 8
   %9025 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9026 = getelementptr double, ptr %9025, i64 436
   store double 0.000000e+00, ptr %9026, align 8
@@ -13530,13 +13530,13 @@ define void @main() {
   store double 0.000000e+00, ptr %9032, align 8
   %9033 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9034 = getelementptr double, ptr %9033, i64 440
-  store double 0.000000e+00, ptr %9034, align 8
+  store double 3.000000e-01, ptr %9034, align 8
   %9035 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9036 = getelementptr double, ptr %9035, i64 441
-  store double 0.000000e+00, ptr %9036, align 8
+  store double 1.000000e+00, ptr %9036, align 8
   %9037 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9038 = getelementptr double, ptr %9037, i64 442
-  store double 0.000000e+00, ptr %9038, align 8
+  store double 8.000000e-01, ptr %9038, align 8
   %9039 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9040 = getelementptr double, ptr %9039, i64 443
   store double 0.000000e+00, ptr %9040, align 8
@@ -13572,13 +13572,13 @@ define void @main() {
   store double 0.000000e+00, ptr %9060, align 8
   %9061 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9062 = getelementptr double, ptr %9061, i64 454
-  store double 0.000000e+00, ptr %9062, align 8
+  store double 4.000000e-01, ptr %9062, align 8
   %9063 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9064 = getelementptr double, ptr %9063, i64 455
-  store double 0.000000e+00, ptr %9064, align 8
+  store double 1.000000e+00, ptr %9064, align 8
   %9065 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9066 = getelementptr double, ptr %9065, i64 456
-  store double 0.000000e+00, ptr %9066, align 8
+  store double 8.000000e-01, ptr %9066, align 8
   %9067 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9068 = getelementptr double, ptr %9067, i64 457
   store double 0.000000e+00, ptr %9068, align 8
@@ -13590,16 +13590,16 @@ define void @main() {
   store double 0.000000e+00, ptr %9072, align 8
   %9073 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9074 = getelementptr double, ptr %9073, i64 460
-  store double 3.000000e-01, ptr %9074, align 8
+  store double 0.000000e+00, ptr %9074, align 8
   %9075 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9076 = getelementptr double, ptr %9075, i64 461
-  store double 1.000000e+00, ptr %9076, align 8
+  store double 0.000000e+00, ptr %9076, align 8
   %9077 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9078 = getelementptr double, ptr %9077, i64 462
-  store double 1.000000e+00, ptr %9078, align 8
+  store double 0.000000e+00, ptr %9078, align 8
   %9079 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9080 = getelementptr double, ptr %9079, i64 463
-  store double 6.000000e-01, ptr %9080, align 8
+  store double 0.000000e+00, ptr %9080, align 8
   %9081 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9082 = getelementptr double, ptr %9081, i64 464
   store double 0.000000e+00, ptr %9082, align 8
@@ -13614,13 +13614,13 @@ define void @main() {
   store double 0.000000e+00, ptr %9088, align 8
   %9089 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9090 = getelementptr double, ptr %9089, i64 468
-  store double 0.000000e+00, ptr %9090, align 8
+  store double 6.000000e-01, ptr %9090, align 8
   %9091 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9092 = getelementptr double, ptr %9091, i64 469
-  store double 0.000000e+00, ptr %9092, align 8
+  store double 1.000000e+00, ptr %9092, align 8
   %9093 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9094 = getelementptr double, ptr %9093, i64 470
-  store double 0.000000e+00, ptr %9094, align 8
+  store double 8.000000e-01, ptr %9094, align 8
   %9095 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9096 = getelementptr double, ptr %9095, i64 471
   store double 0.000000e+00, ptr %9096, align 8
@@ -13656,13 +13656,13 @@ define void @main() {
   store double 0.000000e+00, ptr %9116, align 8
   %9117 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9118 = getelementptr double, ptr %9117, i64 482
-  store double 0.000000e+00, ptr %9118, align 8
+  store double 4.000000e-01, ptr %9118, align 8
   %9119 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9120 = getelementptr double, ptr %9119, i64 483
-  store double 0.000000e+00, ptr %9120, align 8
+  store double 1.000000e+00, ptr %9120, align 8
   %9121 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9122 = getelementptr double, ptr %9121, i64 484
-  store double 0.000000e+00, ptr %9122, align 8
+  store double 8.000000e-01, ptr %9122, align 8
   %9123 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9124 = getelementptr double, ptr %9123, i64 485
   store double 0.000000e+00, ptr %9124, align 8
@@ -13674,16 +13674,16 @@ define void @main() {
   store double 0.000000e+00, ptr %9128, align 8
   %9129 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9130 = getelementptr double, ptr %9129, i64 488
-  store double 6.000000e-01, ptr %9130, align 8
+  store double 0.000000e+00, ptr %9130, align 8
   %9131 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9132 = getelementptr double, ptr %9131, i64 489
-  store double 1.000000e+00, ptr %9132, align 8
+  store double 0.000000e+00, ptr %9132, align 8
   %9133 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9134 = getelementptr double, ptr %9133, i64 490
-  store double 9.000000e-01, ptr %9134, align 8
+  store double 0.000000e+00, ptr %9134, align 8
   %9135 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9136 = getelementptr double, ptr %9135, i64 491
-  store double 2.000000e-01, ptr %9136, align 8
+  store double 0.000000e+00, ptr %9136, align 8
   %9137 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9138 = getelementptr double, ptr %9137, i64 492
   store double 0.000000e+00, ptr %9138, align 8
@@ -13695,16 +13695,16 @@ define void @main() {
   store double 0.000000e+00, ptr %9142, align 8
   %9143 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9144 = getelementptr double, ptr %9143, i64 495
-  store double 0.000000e+00, ptr %9144, align 8
+  store double 2.000000e-01, ptr %9144, align 8
   %9145 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9146 = getelementptr double, ptr %9145, i64 496
-  store double 0.000000e+00, ptr %9146, align 8
+  store double 9.000000e-01, ptr %9146, align 8
   %9147 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9148 = getelementptr double, ptr %9147, i64 497
-  store double 0.000000e+00, ptr %9148, align 8
+  store double 1.000000e+00, ptr %9148, align 8
   %9149 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9150 = getelementptr double, ptr %9149, i64 498
-  store double 0.000000e+00, ptr %9150, align 8
+  store double 3.000000e-01, ptr %9150, align 8
   %9151 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9152 = getelementptr double, ptr %9151, i64 499
   store double 0.000000e+00, ptr %9152, align 8
@@ -13740,13 +13740,13 @@ define void @main() {
   store double 0.000000e+00, ptr %9172, align 8
   %9173 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9174 = getelementptr double, ptr %9173, i64 510
-  store double 0.000000e+00, ptr %9174, align 8
+  store double 4.000000e-01, ptr %9174, align 8
   %9175 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9176 = getelementptr double, ptr %9175, i64 511
-  store double 0.000000e+00, ptr %9176, align 8
+  store double 1.000000e+00, ptr %9176, align 8
   %9177 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9178 = getelementptr double, ptr %9177, i64 512
-  store double 0.000000e+00, ptr %9178, align 8
+  store double 8.000000e-01, ptr %9178, align 8
   %9179 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9180 = getelementptr double, ptr %9179, i64 513
   store double 0.000000e+00, ptr %9180, align 8
@@ -13755,16 +13755,16 @@ define void @main() {
   store double 0.000000e+00, ptr %9182, align 8
   %9183 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9184 = getelementptr double, ptr %9183, i64 515
-  store double 1.000000e-01, ptr %9184, align 8
+  store double 0.000000e+00, ptr %9184, align 8
   %9185 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9186 = getelementptr double, ptr %9185, i64 516
-  store double 1.000000e+00, ptr %9186, align 8
+  store double 0.000000e+00, ptr %9186, align 8
   %9187 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9188 = getelementptr double, ptr %9187, i64 517
-  store double 1.000000e+00, ptr %9188, align 8
+  store double 0.000000e+00, ptr %9188, align 8
   %9189 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9190 = getelementptr double, ptr %9189, i64 518
-  store double 8.000000e-01, ptr %9190, align 8
+  store double 0.000000e+00, ptr %9190, align 8
   %9191 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9192 = getelementptr double, ptr %9191, i64 519
   store double 0.000000e+00, ptr %9192, align 8
@@ -13776,16 +13776,16 @@ define void @main() {
   store double 0.000000e+00, ptr %9196, align 8
   %9197 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9198 = getelementptr double, ptr %9197, i64 522
-  store double 0.000000e+00, ptr %9198, align 8
+  store double 2.000000e-01, ptr %9198, align 8
   %9199 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9200 = getelementptr double, ptr %9199, i64 523
-  store double 0.000000e+00, ptr %9200, align 8
+  store double 6.000000e-01, ptr %9200, align 8
   %9201 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9202 = getelementptr double, ptr %9201, i64 524
-  store double 0.000000e+00, ptr %9202, align 8
+  store double 1.000000e+00, ptr %9202, align 8
   %9203 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9204 = getelementptr double, ptr %9203, i64 525
-  store double 0.000000e+00, ptr %9204, align 8
+  store double 8.000000e-01, ptr %9204, align 8
   %9205 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9206 = getelementptr double, ptr %9205, i64 526
   store double 0.000000e+00, ptr %9206, align 8
@@ -13824,13 +13824,13 @@ define void @main() {
   store double 0.000000e+00, ptr %9228, align 8
   %9229 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9230 = getelementptr double, ptr %9229, i64 538
-  store double 0.000000e+00, ptr %9230, align 8
+  store double 3.000000e-01, ptr %9230, align 8
   %9231 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9232 = getelementptr double, ptr %9231, i64 539
-  store double 0.000000e+00, ptr %9232, align 8
+  store double 9.000000e-01, ptr %9232, align 8
   %9233 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9234 = getelementptr double, ptr %9233, i64 540
-  store double 0.000000e+00, ptr %9234, align 8
+  store double 8.000000e-01, ptr %9234, align 8
   %9235 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9236 = getelementptr double, ptr %9235, i64 541
   store double 0.000000e+00, ptr %9236, align 8
@@ -13839,16 +13839,16 @@ define void @main() {
   store double 0.000000e+00, ptr %9238, align 8
   %9239 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9240 = getelementptr double, ptr %9239, i64 543
-  store double 3.000000e-01, ptr %9240, align 8
+  store double 0.000000e+00, ptr %9240, align 8
   %9241 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9242 = getelementptr double, ptr %9241, i64 544
-  store double 1.000000e+00, ptr %9242, align 8
+  store double 0.000000e+00, ptr %9242, align 8
   %9243 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9244 = getelementptr double, ptr %9243, i64 545
-  store double 1.000000e+00, ptr %9244, align 8
+  store double 0.000000e+00, ptr %9244, align 8
   %9245 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9246 = getelementptr double, ptr %9245, i64 546
-  store double 5.000000e-01, ptr %9246, align 8
+  store double 0.000000e+00, ptr %9246, align 8
   %9247 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9248 = getelementptr double, ptr %9247, i64 547
   store double 0.000000e+00, ptr %9248, align 8
@@ -13860,16 +13860,16 @@ define void @main() {
   store double 0.000000e+00, ptr %9252, align 8
   %9253 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9254 = getelementptr double, ptr %9253, i64 550
-  store double 0.000000e+00, ptr %9254, align 8
+  store double 0x3FE6666666666666, ptr %9254, align 8
   %9255 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9256 = getelementptr double, ptr %9255, i64 551
-  store double 0.000000e+00, ptr %9256, align 8
+  store double 1.000000e+00, ptr %9256, align 8
   %9257 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9258 = getelementptr double, ptr %9257, i64 552
-  store double 0.000000e+00, ptr %9258, align 8
+  store double 9.000000e-01, ptr %9258, align 8
   %9259 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9260 = getelementptr double, ptr %9259, i64 553
-  store double 0.000000e+00, ptr %9260, align 8
+  store double 2.000000e-01, ptr %9260, align 8
   %9261 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9262 = getelementptr double, ptr %9261, i64 554
   store double 0.000000e+00, ptr %9262, align 8
@@ -13911,46 +13911,46 @@ define void @main() {
   store double 0.000000e+00, ptr %9286, align 8
   %9287 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9288 = getelementptr double, ptr %9287, i64 567
-  store double 0.000000e+00, ptr %9288, align 8
+  store double 8.000000e-01, ptr %9288, align 8
   %9289 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9290 = getelementptr double, ptr %9289, i64 568
-  store double 0.000000e+00, ptr %9290, align 8
+  store double 8.000000e-01, ptr %9290, align 8
   %9291 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9292 = getelementptr double, ptr %9291, i64 569
-  store double 0.000000e+00, ptr %9292, align 8
+  store double 1.000000e-01, ptr %9292, align 8
   %9293 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9294 = getelementptr double, ptr %9293, i64 570
   store double 0.000000e+00, ptr %9294, align 8
   %9295 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9296 = getelementptr double, ptr %9295, i64 571
-  store double 4.000000e-01, ptr %9296, align 8
+  store double 0.000000e+00, ptr %9296, align 8
   %9297 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9298 = getelementptr double, ptr %9297, i64 572
-  store double 1.000000e+00, ptr %9298, align 8
+  store double 0.000000e+00, ptr %9298, align 8
   %9299 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9300 = getelementptr double, ptr %9299, i64 573
-  store double 9.000000e-01, ptr %9300, align 8
+  store double 0.000000e+00, ptr %9300, align 8
   %9301 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9302 = getelementptr double, ptr %9301, i64 574
-  store double 1.000000e-01, ptr %9302, align 8
+  store double 0.000000e+00, ptr %9302, align 8
   %9303 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9304 = getelementptr double, ptr %9303, i64 575
-  store double 0.000000e+00, ptr %9304, align 8
+  store double 2.000000e-01, ptr %9304, align 8
   %9305 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9306 = getelementptr double, ptr %9305, i64 576
-  store double 0.000000e+00, ptr %9306, align 8
+  store double 6.000000e-01, ptr %9306, align 8
   %9307 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9308 = getelementptr double, ptr %9307, i64 577
-  store double 0.000000e+00, ptr %9308, align 8
+  store double 8.000000e-01, ptr %9308, align 8
   %9309 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9310 = getelementptr double, ptr %9309, i64 578
-  store double 0.000000e+00, ptr %9310, align 8
+  store double 1.000000e+00, ptr %9310, align 8
   %9311 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9312 = getelementptr double, ptr %9311, i64 579
-  store double 0.000000e+00, ptr %9312, align 8
+  store double 1.000000e+00, ptr %9312, align 8
   %9313 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9314 = getelementptr double, ptr %9313, i64 580
-  store double 0.000000e+00, ptr %9314, align 8
+  store double 2.000000e-01, ptr %9314, align 8
   %9315 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9316 = getelementptr double, ptr %9315, i64 581
   store double 0.000000e+00, ptr %9316, align 8
@@ -13995,43 +13995,43 @@ define void @main() {
   store double 0.000000e+00, ptr %9342, align 8
   %9343 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9344 = getelementptr double, ptr %9343, i64 595
-  store double 0.000000e+00, ptr %9344, align 8
+  store double 8.000000e-01, ptr %9344, align 8
   %9345 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9346 = getelementptr double, ptr %9345, i64 596
-  store double 0.000000e+00, ptr %9346, align 8
+  store double 1.000000e+00, ptr %9346, align 8
   %9347 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9348 = getelementptr double, ptr %9347, i64 597
-  store double 0.000000e+00, ptr %9348, align 8
+  store double 8.000000e-01, ptr %9348, align 8
   %9349 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9350 = getelementptr double, ptr %9349, i64 598
-  store double 0.000000e+00, ptr %9350, align 8
+  store double 0x3FE6666666666666, ptr %9350, align 8
   %9351 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9352 = getelementptr double, ptr %9351, i64 599
   store double 0x3FE6666666666666, ptr %9352, align 8
   %9353 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9354 = getelementptr double, ptr %9353, i64 600
-  store double 1.000000e+00, ptr %9354, align 8
+  store double 0x3FE6666666666666, ptr %9354, align 8
   %9355 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9356 = getelementptr double, ptr %9355, i64 601
-  store double 8.000000e-01, ptr %9356, align 8
+  store double 0x3FE6666666666666, ptr %9356, align 8
   %9357 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9358 = getelementptr double, ptr %9357, i64 602
-  store double 0.000000e+00, ptr %9358, align 8
+  store double 0x3FE6666666666666, ptr %9358, align 8
   %9359 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9360 = getelementptr double, ptr %9359, i64 603
-  store double 0.000000e+00, ptr %9360, align 8
+  store double 9.000000e-01, ptr %9360, align 8
   %9361 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9362 = getelementptr double, ptr %9361, i64 604
-  store double 0.000000e+00, ptr %9362, align 8
+  store double 1.000000e+00, ptr %9362, align 8
   %9363 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9364 = getelementptr double, ptr %9363, i64 605
-  store double 0.000000e+00, ptr %9364, align 8
+  store double 1.000000e+00, ptr %9364, align 8
   %9365 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9366 = getelementptr double, ptr %9365, i64 606
-  store double 0.000000e+00, ptr %9366, align 8
+  store double 9.000000e-01, ptr %9366, align 8
   %9367 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9368 = getelementptr double, ptr %9367, i64 607
-  store double 0.000000e+00, ptr %9368, align 8
+  store double 6.000000e-01, ptr %9368, align 8
   %9369 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9370 = getelementptr double, ptr %9369, i64 608
   store double 0.000000e+00, ptr %9370, align 8
@@ -14079,40 +14079,40 @@ define void @main() {
   store double 0.000000e+00, ptr %9398, align 8
   %9399 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9400 = getelementptr double, ptr %9399, i64 623
-  store double 0.000000e+00, ptr %9400, align 8
+  store double 3.000000e-01, ptr %9400, align 8
   %9401 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9402 = getelementptr double, ptr %9401, i64 624
-  store double 0.000000e+00, ptr %9402, align 8
+  store double 8.000000e-01, ptr %9402, align 8
   %9403 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9404 = getelementptr double, ptr %9403, i64 625
-  store double 0.000000e+00, ptr %9404, align 8
+  store double 1.000000e+00, ptr %9404, align 8
   %9405 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9406 = getelementptr double, ptr %9405, i64 626
-  store double 0.000000e+00, ptr %9406, align 8
+  store double 1.000000e+00, ptr %9406, align 8
   %9407 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9408 = getelementptr double, ptr %9407, i64 627
-  store double 8.000000e-01, ptr %9408, align 8
+  store double 1.000000e+00, ptr %9408, align 8
   %9409 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9410 = getelementptr double, ptr %9409, i64 628
   store double 1.000000e+00, ptr %9410, align 8
   %9411 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9412 = getelementptr double, ptr %9411, i64 629
-  store double 8.000000e-01, ptr %9412, align 8
+  store double 1.000000e+00, ptr %9412, align 8
   %9413 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9414 = getelementptr double, ptr %9413, i64 630
-  store double 0.000000e+00, ptr %9414, align 8
+  store double 1.000000e+00, ptr %9414, align 8
   %9415 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9416 = getelementptr double, ptr %9415, i64 631
-  store double 0.000000e+00, ptr %9416, align 8
+  store double 1.000000e+00, ptr %9416, align 8
   %9417 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9418 = getelementptr double, ptr %9417, i64 632
-  store double 0.000000e+00, ptr %9418, align 8
+  store double 1.000000e+00, ptr %9418, align 8
   %9419 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9420 = getelementptr double, ptr %9419, i64 633
-  store double 0.000000e+00, ptr %9420, align 8
+  store double 9.000000e-01, ptr %9420, align 8
   %9421 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9422 = getelementptr double, ptr %9421, i64 634
-  store double 0.000000e+00, ptr %9422, align 8
+  store double 5.000000e-01, ptr %9422, align 8
   %9423 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9424 = getelementptr double, ptr %9423, i64 635
   store double 0.000000e+00, ptr %9424, align 8
@@ -14166,31 +14166,31 @@ define void @main() {
   store double 0.000000e+00, ptr %9456, align 8
   %9457 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9458 = getelementptr double, ptr %9457, i64 652
-  store double 0.000000e+00, ptr %9458, align 8
+  store double 1.000000e-01, ptr %9458, align 8
   %9459 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9460 = getelementptr double, ptr %9459, i64 653
-  store double 0.000000e+00, ptr %9460, align 8
+  store double 8.000000e-01, ptr %9460, align 8
   %9461 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9462 = getelementptr double, ptr %9461, i64 654
-  store double 0.000000e+00, ptr %9462, align 8
+  store double 1.000000e+00, ptr %9462, align 8
   %9463 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9464 = getelementptr double, ptr %9463, i64 655
-  store double 6.000000e-01, ptr %9464, align 8
+  store double 1.000000e+00, ptr %9464, align 8
   %9465 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9466 = getelementptr double, ptr %9465, i64 656
   store double 1.000000e+00, ptr %9466, align 8
   %9467 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9468 = getelementptr double, ptr %9467, i64 657
-  store double 6.000000e-01, ptr %9468, align 8
+  store double 1.000000e+00, ptr %9468, align 8
   %9469 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9470 = getelementptr double, ptr %9469, i64 658
-  store double 0.000000e+00, ptr %9470, align 8
+  store double 1.000000e+00, ptr %9470, align 8
   %9471 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9472 = getelementptr double, ptr %9471, i64 659
-  store double 0.000000e+00, ptr %9472, align 8
+  store double 6.000000e-01, ptr %9472, align 8
   %9473 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9474 = getelementptr double, ptr %9473, i64 660
-  store double 0.000000e+00, ptr %9474, align 8
+  store double 4.000000e-01, ptr %9474, align 8
   %9475 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9476 = getelementptr double, ptr %9475, i64 661
   store double 0.000000e+00, ptr %9476, align 8
@@ -14259,13 +14259,13 @@ define void @main() {
   store double 0.000000e+00, ptr %9518, align 8
   %9519 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9520 = getelementptr double, ptr %9519, i64 683
-  store double 1.000000e-01, ptr %9520, align 8
+  store double 0.000000e+00, ptr %9520, align 8
   %9521 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9522 = getelementptr double, ptr %9521, i64 684
-  store double 6.000000e-01, ptr %9522, align 8
+  store double 0.000000e+00, ptr %9522, align 8
   %9523 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9524 = getelementptr double, ptr %9523, i64 685
-  store double 4.000000e-01, ptr %9524, align 8
+  store double 0.000000e+00, ptr %9524, align 8
   %9525 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %8152, 1
   %9526 = getelementptr double, ptr %9525, i64 686
   store double 0.000000e+00, ptr %9526, align 8
@@ -15062,16 +15062,15 @@ define void @main() {
 
 10112:                                            ; preds = %10099
   %10113 = sitofp i64 %10102 to double
-  %10114 = fadd double %10113, 1.000000e+00
-  %10115 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (double, ptr null, i64 1) to i64))
-  %10116 = insertvalue { ptr, ptr, i64 } undef, ptr %10115, 0
-  %10117 = insertvalue { ptr, ptr, i64 } %10116, ptr %10115, 1
-  %10118 = insertvalue { ptr, ptr, i64 } %10117, i64 0, 2
-  %10119 = extractvalue { ptr, ptr, i64 } %10118, 1
-  store double %10114, ptr %10119, align 8
-  %10120 = extractvalue { ptr, ptr, i64 } %10118, 1
-  %10121 = load double, ptr %10120, align 8
-  %10122 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %10121)
+  %10114 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (double, ptr null, i64 1) to i64))
+  %10115 = insertvalue { ptr, ptr, i64 } undef, ptr %10114, 0
+  %10116 = insertvalue { ptr, ptr, i64 } %10115, ptr %10114, 1
+  %10117 = insertvalue { ptr, ptr, i64 } %10116, i64 0, 2
+  %10118 = extractvalue { ptr, ptr, i64 } %10117, 1
+  store double %10113, ptr %10118, align 8
+  %10119 = extractvalue { ptr, ptr, i64 } %10117, 1
+  %10120 = load double, ptr %10119, align 8
+  %10121 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %10120)
   ret void
 }
 
