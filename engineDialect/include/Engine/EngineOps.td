@@ -42,6 +42,14 @@ def PrintOp : Engine_Op<"print"> {
     let assemblyFormat = "$input attr-dict `:` type($input)";
 }
 
+def ReadOp : Engine_Op<"read"> {
+  let summary = "read operation";
+  let description = [{
+    The "read" operation reads a tensor from stdin.
+  }];
+  let results = (outs F64MemRef:$output);
+}
+
 def WorldOp : Engine_Op<"world", [Pure]> {
     let summary = "print Hello, World";
     let description = [{

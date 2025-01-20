@@ -162,6 +162,120 @@ private:
   }
 };
 
+
+class ReadOpLowering : public mlir::ConversionPattern {
+public:
+  explicit ReadOpLowering(mlir::MLIRContext *context)
+      : mlir::ConversionPattern("engine.read", 1, context) {}
+
+  mlir::LogicalResult
+  matchAndRewrite(mlir::Operation *op, mlir::ArrayRef<mlir::Value> operands,
+                  mlir::ConversionPatternRewriter &rewriter) const override {
+    auto *context = rewriter.getContext();
+    // Get the result type
+    auto memRefType = mlir::cast<mlir::MemRefType>(op->getResult(0).getType());
+    auto memRefShape = memRefType.getShape();
+    auto loc = op->getLoc();
+
+    mlir::ModuleOp parentModule = op->getParentOfType<mlir::ModuleOp>();
+
+    // Allocate the result memref
+    auto resultMemRef = rewriter.create<mlir::memref::AllocOp>(loc, memRefType);
+
+    // Get scanf function reference
+    auto scanfRef = getOrInsertScanf(rewriter, parentModule);
+    
+    // Create format specifier for reading doubles
+    mlir::Value formatSpecifierCst = getOrCreateGlobalString(
+        loc, rewriter, "scanf_fmt", mlir::StringRef("%lf"), parentModule);
+
+    // Create loop for reading values
+    auto lowerBound = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0);
+    auto upperBound = 
+        rewriter.create<mlir::arith::ConstantIndexOp>(loc, memRefShape[0]);
+    auto step = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 1);
+    
+    auto loop =
+        rewriter.create<mlir::scf::ForOp>(loc, lowerBound, upperBound, step);
+    
+    rewriter.setInsertionPointToStart(loop.getBody());
+
+    // Create temporary storage for scanned value
+    auto tempLoc = rewriter.create<mlir::memref::AllocaOp>(
+        loc, mlir::MemRefType::get({}, rewriter.getF64Type()));
+    
+    // Call scanf to read the value
+    auto scanfCall = rewriter.create<mlir::LLVM::CallOp>(
+        loc, getScanfType(context), scanfRef,
+        mlir::ArrayRef<mlir::Value>({formatSpecifierCst, tempLoc}));
+    
+    // Load the scanned value
+    auto loadedVal = rewriter.create<mlir::memref::LoadOp>(
+        loc, tempLoc, mlir::ValueRange{}
+    );
+
+    // Store into the result memref
+    rewriter.create<mlir::memref::StoreOp>(
+        loc, loadedVal, resultMemRef, loop.getInductionVar());
+    
+    rewriter.create<mlir::scf::YieldOp>(loc);
+    
+    // Replace the original op with our allocated memref
+    rewriter.replaceOp(op, resultMemRef);
+    return mlir::success();
+  }
+
+private:
+  static mlir::LLVM::LLVMFunctionType
+  getScanfType(mlir::MLIRContext *context) {
+    auto llvmI32Ty = mlir::IntegerType::get(context, 32);
+    auto llvmPtrTy = mlir::LLVM::LLVMPointerType::get(context);
+    return mlir::LLVM::LLVMFunctionType::get(llvmI32Ty, llvmPtrTy,
+                                            /*isVarArg=*/true);
+  }
+
+  static mlir::FlatSymbolRefAttr
+  getOrInsertScanf(mlir::PatternRewriter &rewriter, mlir::ModuleOp module) {
+    auto *context = module.getContext();
+    if (module.lookupSymbol<mlir::LLVM::LLVMFuncOp>("scanf"))
+      return mlir::SymbolRefAttr::get(context, "scanf");
+
+    mlir::PatternRewriter::InsertionGuard insertGuard(rewriter);
+    rewriter.setInsertionPointToStart(module.getBody());
+    rewriter.create<mlir::LLVM::LLVMFuncOp>(module.getLoc(), "scanf",
+                                           getScanfType(context));
+    return mlir::SymbolRefAttr::get(context, "scanf");
+  }
+  static mlir::Value getOrCreateGlobalString(mlir::Location loc,
+                                              mlir::OpBuilder &builder,
+                                              mlir::StringRef name,
+                                              mlir::StringRef value,
+                                              mlir::ModuleOp module) {
+      // Create the global at the entry of the module.
+      mlir::LLVM::GlobalOp global;
+      if (!(global = module.lookupSymbol<mlir::LLVM::GlobalOp>(name))) {
+        mlir::OpBuilder::InsertionGuard insertGuard(builder);
+        builder.setInsertionPointToStart(module.getBody());
+        auto type = mlir::LLVM::LLVMArrayType::get(
+            mlir::IntegerType::get(builder.getContext(), 8), value.size());
+        global = builder.create<mlir::LLVM::GlobalOp>(
+            loc, type, /*isConstant=*/true, mlir::LLVM::Linkage::Internal, name,
+            builder.getStringAttr(value));
+      }
+
+      // Get the pointer to the first character in the global string.
+      mlir::Value globalPtr =
+          builder.create<mlir::LLVM::AddressOfOp>(loc, global);
+      mlir::Value cst0 = builder.create<mlir::LLVM::ConstantOp>(
+          loc, mlir::IntegerType::get(builder.getContext(), 64),
+          builder.getIntegerAttr(builder.getIndexType(), 0));
+
+      return builder.create<mlir::LLVM::GEPOp>(
+          loc, mlir::LLVM::LLVMPointerType::get(builder.getContext()),
+          global.getType(), globalPtr, mlir::ArrayRef<mlir::Value>({cst0, cst0}));
+    }
+};
+
 class WorldOpLowering : public mlir::ConversionPattern {
 public:
   explicit WorldOpLowering(mlir::MLIRContext *context)
@@ -273,7 +387,7 @@ void EngineToLLVMLoweringPass::runOnOperation() {
                                                         patterns);
   populateFuncToLLVMConversionPatterns(typeConverter, patterns);
 
-  patterns.add<engine::PrintOpLowering, engine::WorldOpLowering>(&getContext());
+  patterns.add<engine::PrintOpLowering, engine::ReadOpLowering>(&getContext());
 
   auto module = getOperation();
   if (failed(applyFullConversion(module, target, std::move(patterns)))) {

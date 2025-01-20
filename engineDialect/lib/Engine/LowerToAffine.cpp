@@ -627,6 +627,7 @@ void EngineToAffineLowerPass::runOnOperation() { // Only engine:: opertions need
     });
   });
   target.addLegalOp<engine::WorldOp>();
+  target.addLegalOp<engine::ReadOp>();
   mlir::RewritePatternSet patterns(&getContext());
   patterns.add<ConstantOpLowering>(&getContext());
   patterns.add<PrintOpLowering>(&getContext());
