@@ -83,9 +83,9 @@ class Node():
         return f"%{self.output} = \"engine.add\"(%{m1},%{m2}) : (memref<{sh}>,memref<{sh}>) -> memref<{sh}> \n"
     
     def ArgMax(self, m, cache):
-        cache[self.output] = (1,)
+        cache[self.output] = ()
         sh1 = print_shape(cache[m])
-        sh2 = print_shape((1,))
+        sh2 = print_shape(())
         return f"%{self.output} = \"engine.argmax\"(%{m}) : (memref<{sh1}>) -> memref<{sh2}> \n"
 
     def execute(self, cache):
