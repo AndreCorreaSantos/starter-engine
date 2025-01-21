@@ -41,6 +41,7 @@
 #include "mlir/Pass/Pass.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "llvm/ADT/Sequence.h"
+#include "mlir/Dialect/MemRef/Transforms/Transforms.h"
 
 #include <iostream>
 
@@ -165,66 +166,82 @@ private:
 
 class ReadOpLowering : public mlir::ConversionPattern {
 public:
-  explicit ReadOpLowering(mlir::MLIRContext *context)
-      : mlir::ConversionPattern("engine.read", 1, context) {}
+    explicit ReadOpLowering(mlir::MLIRContext *context)
+        : mlir::ConversionPattern(engine::ReadOp::getOperationName(), 1, context) {}
 
-  mlir::LogicalResult
-  matchAndRewrite(mlir::Operation *op, mlir::ArrayRef<mlir::Value> operands,
-                  mlir::ConversionPatternRewriter &rewriter) const override {
-    auto *context = rewriter.getContext();
-    // Get the result type
-    auto memRefType = mlir::cast<mlir::MemRefType>(op->getResult(0).getType());
-    auto memRefShape = memRefType.getShape();
-    auto loc = op->getLoc();
-
-    mlir::ModuleOp parentModule = op->getParentOfType<mlir::ModuleOp>();
-
-    // Allocate the result memref
-    auto resultMemRef = rewriter.create<mlir::memref::AllocOp>(loc, memRefType);
-
-    // Get scanf function reference
-    auto scanfRef = getOrInsertScanf(rewriter, parentModule);
-    
-    // Create format specifier for reading doubles
-    mlir::Value formatSpecifierCst = getOrCreateGlobalString(
-        loc, rewriter, "scanf_fmt", mlir::StringRef("%lf"), parentModule);
-
-    // Create loop for reading values
-    auto lowerBound = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0);
-    auto upperBound = 
-        rewriter.create<mlir::arith::ConstantIndexOp>(loc, memRefShape[0]);
-    auto step = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 1);
-    
-    auto loop =
-        rewriter.create<mlir::scf::ForOp>(loc, lowerBound, upperBound, step);
-    
-    rewriter.setInsertionPointToStart(loop.getBody());
-
-    // Create temporary storage for scanned value
-    auto tempLoc = rewriter.create<mlir::memref::AllocaOp>(
-        loc, mlir::MemRefType::get({}, rewriter.getF64Type()));
-    
-    // Call scanf to read the value
-    auto scanfCall = rewriter.create<mlir::LLVM::CallOp>(
-        loc, getScanfType(context), scanfRef,
-        mlir::ArrayRef<mlir::Value>({formatSpecifierCst, tempLoc}));
-    
-    // Load the scanned value
-    auto loadedVal = rewriter.create<mlir::memref::LoadOp>(
-        loc, tempLoc, mlir::ValueRange{}
-    );
-
-    // Store into the result memref
-    rewriter.create<mlir::memref::StoreOp>(
-        loc, loadedVal, resultMemRef, loop.getInductionVar());
-    
-    rewriter.create<mlir::scf::YieldOp>(loc);
-    
-    // Replace the original op with our allocated memref
-    rewriter.replaceOp(op, resultMemRef);
-    return mlir::success();
-  }
-
+    mlir::LogicalResult
+    matchAndRewrite(mlir::Operation *op, mlir::ArrayRef<mlir::Value> operands,
+                    mlir::ConversionPatternRewriter &rewriter) const override {
+        auto readOp = mlir::cast<engine::ReadOp>(op);
+        auto loc = op->getLoc();
+        auto *context = rewriter.getContext();
+        
+        // Get the memref type
+        auto memRefType = mlir::cast<mlir::MemRefType>(readOp.getType());
+        auto memRefShape = memRefType.getShape();
+        
+        // Get module
+        mlir::ModuleOp parentModule = op->getParentOfType<mlir::ModuleOp>();
+            
+        // Allocate result memref
+        auto resultMemRef = rewriter.create<mlir::memref::AllocOp>(loc, memRefType);
+        
+        // Get scanf reference
+        auto scanfRef = getOrInsertScanf(rewriter, parentModule);
+        
+        // // Create format string with null terminator
+        mlir::Value formatSpecifierCst = getOrCreateGlobalString(
+            loc, rewriter, "scanf_fmt", mlir::StringRef("%lf\0", 4), parentModule);
+        
+        // // Create loop for reading values
+        auto lowerBound = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0);
+        auto upperBound = 
+            rewriter.create<mlir::arith::ConstantIndexOp>(loc, memRefShape[0]);
+        auto step = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 1);
+        
+        auto loop =
+            rewriter.create<mlir::scf::ForOp>(loc, lowerBound, upperBound, step);
+        
+        // rewriter.setInsertionPointToStart(loop.getBody());
+        
+        // // Create buffer for scanf
+        // auto doubleType = mlir::MemRefType::get({}, rewriter.getF64Type());
+        // auto tempLoc = rewriter.create<mlir::memref::AllocaOp>(loc, doubleType);
+        
+        // // Get the raw pointer to the buffer
+        // auto basePtr = rewriter.create<mlir::memref::ExtractAlignedPointerAsIndexOp>(
+        //     loc, rewriter.getIndexType(), tempLoc);
+            
+        // // Convert index to integer
+        // auto ptrAsInt = rewriter.create<mlir::arith::IndexCastOp>(
+        //     loc, rewriter.getIntegerType(64), basePtr);
+            
+        // // Convert integer to pointer
+        // auto llvmPtrType = mlir::LLVM::LLVMPointerType::get(context);
+        // auto castedPtr = rewriter.create<mlir::LLVM::IntToPtrOp>(
+        //     loc, llvmPtrType, ptrAsInt);
+        
+        // // Call scanf
+        // rewriter.create<mlir::LLVM::CallOp>(
+        //     loc, getScanfType(context), scanfRef,
+        //     mlir::ValueRange{formatSpecifierCst, castedPtr});
+        
+        // // Load scanned value
+        // auto loadedVal = rewriter.create<mlir::memref::LoadOp>(
+        //     loc, tempLoc, mlir::ValueRange{});
+        
+        // // Store into result memref
+        // rewriter.create<mlir::memref::StoreOp>(
+        //     loc, loadedVal, resultMemRef, loop.getInductionVar());
+        
+        // Create yield
+        // rewriter.setInsertionPointToEnd(loop.getBody());
+        // rewriter.create<mlir::scf::YieldOp>(loc);
+        
+        // Replace original op
+        rewriter.replaceOp(op, resultMemRef);
+        return mlir::success();
+    }
 private:
   static mlir::LLVM::LLVMFunctionType
   getScanfType(mlir::MLIRContext *context) {
@@ -370,9 +387,11 @@ public:
 } // namespace
 
 void EngineToLLVMLoweringPass::runOnOperation() {
+
+  // mlir::enableIRPrinting();
+  llvm::DebugFlag = true;
   mlir::LLVMConversionTarget target(getContext());
   target.addLegalOp<mlir::ModuleOp>();
-  target.addLegalDialect<mlir::linalg::LinalgDialect>();
 
   mlir::LLVMTypeConverter typeConverter(&getContext());
   mlir::RewritePatternSet patterns(&getContext());
@@ -381,7 +400,7 @@ void EngineToLLVMLoweringPass::runOnOperation() {
   populateSCFToControlFlowConversionPatterns(patterns);
   mlir::arith::populateArithToLLVMConversionPatterns(typeConverter, patterns);
 
-
+  mlir::memref::populateExpandStridedMetadataPatterns(patterns);
   mlir::populateFinalizeMemRefToLLVMConversionPatterns(typeConverter, patterns);
   mlir::cf::populateControlFlowToLLVMConversionPatterns(typeConverter,
                                                         patterns);

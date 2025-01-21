@@ -1,90 +1,72 @@
-module {
-  llvm.mlir.global internal constant @nl("\0A\00") {addr_space = 0 : i32}
-  llvm.mlir.global internal constant @frmt_spec("%f \00") {addr_space = 0 : i32}
-  llvm.func @printf(!llvm.ptr, ...) -> i32
-  llvm.func @malloc(i64) -> !llvm.ptr
-  llvm.func @main() {
-    %0 = llvm.mlir.constant(0.000000e+00 : f64) : f64
-    %1 = llvm.mlir.constant(-0.000000e+00 : f64) : f64
-    %2 = llvm.mlir.constant(-1.000000e-01 : f64) : f64
-    %3 = llvm.mlir.constant(1.000000e-01 : f64) : f64
-    %4 = llvm.mlir.constant(3.000000e-01 : f64) : f64
-    %5 = llvm.mlir.constant(-2.000000e-01 : f64) : f64
-    %6 = llvm.mlir.constant(9 : index) : i64
-    %7 = llvm.mlir.constant(8 : index) : i64
-    %8 = llvm.mlir.constant(7 : index) : i64
-    %9 = llvm.mlir.constant(6 : index) : i64
-    %10 = llvm.mlir.constant(5 : index) : i64
-    %11 = llvm.mlir.constant(4 : index) : i64
-    %12 = llvm.mlir.constant(3 : index) : i64
-    %13 = llvm.mlir.constant(2 : index) : i64
-    %14 = llvm.mlir.constant(1 : index) : i64
-    %15 = llvm.mlir.constant(0 : index) : i64
-    %16 = llvm.mlir.constant(10 : index) : i64
-    %17 = llvm.mlir.constant(1 : index) : i64
-    %18 = llvm.mlir.zero : !llvm.ptr
-    %19 = llvm.getelementptr %18[%16] : (!llvm.ptr, i64) -> !llvm.ptr, f64
-    %20 = llvm.ptrtoint %19 : !llvm.ptr to i64
-    %21 = llvm.call @malloc(%20) : (i64) -> !llvm.ptr
-    %22 = llvm.mlir.undef : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)>
-    %23 = llvm.insertvalue %21, %22[0] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %24 = llvm.insertvalue %21, %23[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %25 = llvm.mlir.constant(0 : index) : i64
-    %26 = llvm.insertvalue %25, %24[2] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %27 = llvm.insertvalue %16, %26[3, 0] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %28 = llvm.insertvalue %17, %27[4, 0] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %29 = llvm.extractvalue %28[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %30 = llvm.getelementptr %29[%15] : (!llvm.ptr, i64) -> !llvm.ptr, f64
-    llvm.store %5, %30 : f64, !llvm.ptr
-    %31 = llvm.extractvalue %28[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %32 = llvm.getelementptr %31[%14] : (!llvm.ptr, i64) -> !llvm.ptr, f64
-    llvm.store %4, %32 : f64, !llvm.ptr
-    %33 = llvm.extractvalue %28[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %34 = llvm.getelementptr %33[%13] : (!llvm.ptr, i64) -> !llvm.ptr, f64
-    llvm.store %3, %34 : f64, !llvm.ptr
-    %35 = llvm.extractvalue %28[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %36 = llvm.getelementptr %35[%12] : (!llvm.ptr, i64) -> !llvm.ptr, f64
-    llvm.store %2, %36 : f64, !llvm.ptr
-    %37 = llvm.extractvalue %28[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %38 = llvm.getelementptr %37[%11] : (!llvm.ptr, i64) -> !llvm.ptr, f64
-    llvm.store %2, %38 : f64, !llvm.ptr
-    %39 = llvm.extractvalue %28[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %40 = llvm.getelementptr %39[%10] : (!llvm.ptr, i64) -> !llvm.ptr, f64
-    llvm.store %3, %40 : f64, !llvm.ptr
-    %41 = llvm.extractvalue %28[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %42 = llvm.getelementptr %41[%9] : (!llvm.ptr, i64) -> !llvm.ptr, f64
-    llvm.store %1, %42 : f64, !llvm.ptr
-    %43 = llvm.extractvalue %28[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %44 = llvm.getelementptr %43[%8] : (!llvm.ptr, i64) -> !llvm.ptr, f64
-    llvm.store %1, %44 : f64, !llvm.ptr
-    %45 = llvm.extractvalue %28[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %46 = llvm.getelementptr %45[%7] : (!llvm.ptr, i64) -> !llvm.ptr, f64
-    llvm.store %2, %46 : f64, !llvm.ptr
-    %47 = llvm.extractvalue %28[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %48 = llvm.getelementptr %47[%6] : (!llvm.ptr, i64) -> !llvm.ptr, f64
-    llvm.store %0, %48 : f64, !llvm.ptr
-    %49 = llvm.mlir.addressof @frmt_spec : !llvm.ptr
-    %50 = llvm.mlir.constant(0 : index) : i64
-    %51 = llvm.getelementptr %49[%50, %50] : (!llvm.ptr, i64, i64) -> !llvm.ptr, !llvm.array<4 x i8>
-    %52 = llvm.mlir.addressof @nl : !llvm.ptr
-    %53 = llvm.mlir.constant(0 : index) : i64
-    %54 = llvm.getelementptr %52[%53, %53] : (!llvm.ptr, i64, i64) -> !llvm.ptr, !llvm.array<2 x i8>
-    %55 = llvm.mlir.constant(0 : index) : i64
-    %56 = llvm.mlir.constant(10 : index) : i64
-    %57 = llvm.mlir.constant(1 : index) : i64
-    llvm.br ^bb1(%55 : i64)
-  ^bb1(%58: i64):  // 2 preds: ^bb0, ^bb2
-    %59 = llvm.icmp "slt" %58, %56 : i64
-    llvm.cond_br %59, ^bb2, ^bb3
-  ^bb2:  // pred: ^bb1
-    %60 = llvm.extractvalue %28[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %61 = llvm.getelementptr %60[%58] : (!llvm.ptr, i64) -> !llvm.ptr, f64
-    %62 = llvm.load %61 : !llvm.ptr -> f64
-    %63 = llvm.call @printf(%51, %62) vararg(!llvm.func<i32 (ptr, ...)>) : (!llvm.ptr, f64) -> i32
-    %64 = llvm.add %58, %57 : i64
-    llvm.br ^bb1(%64 : i64)
-  ^bb3:  // pred: ^bb1
-    llvm.return
-  }
+; ModuleID = 'LLVMDialectModule'
+source_filename = "LLVMDialectModule"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+@nl = internal constant [2 x i8] c"\0A\00"
+@frmt_spec = internal constant [4 x i8] c"%f \00"
+
+declare i32 @printf(ptr, ...)
+
+declare ptr @malloc(i64)
+
+define void @main() {
+  %1 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (double, ptr null, i64 10) to i64))
+  %2 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } undef, ptr %1, 0
+  %3 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %2, ptr %1, 1
+  %4 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %3, i64 0, 2
+  %5 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %4, i64 10, 3, 0
+  %6 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %5, i64 1, 4, 0
+  %7 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %8 = getelementptr double, ptr %7, i64 0
+  store double -2.000000e-01, ptr %8, align 8
+  %9 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %10 = getelementptr double, ptr %9, i64 1
+  store double 3.000000e-01, ptr %10, align 8
+  %11 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %12 = getelementptr double, ptr %11, i64 2
+  store double 1.000000e-01, ptr %12, align 8
+  %13 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %14 = getelementptr double, ptr %13, i64 3
+  store double -1.000000e-01, ptr %14, align 8
+  %15 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %16 = getelementptr double, ptr %15, i64 4
+  store double -1.000000e-01, ptr %16, align 8
+  %17 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %18 = getelementptr double, ptr %17, i64 5
+  store double 1.000000e-01, ptr %18, align 8
+  %19 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %20 = getelementptr double, ptr %19, i64 6
+  store double -0.000000e+00, ptr %20, align 8
+  %21 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %22 = getelementptr double, ptr %21, i64 7
+  store double -0.000000e+00, ptr %22, align 8
+  %23 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %24 = getelementptr double, ptr %23, i64 8
+  store double -1.000000e-01, ptr %24, align 8
+  %25 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %26 = getelementptr double, ptr %25, i64 9
+  store double 0.000000e+00, ptr %26, align 8
+  br label %27
+
+27:                                               ; preds = %30, %0
+  %28 = phi i64 [ 0, %0 ], [ %35, %30 ]
+  %29 = icmp slt i64 %28, 10
+  br i1 %29, label %30, label %36
+
+30:                                               ; preds = %27
+  %31 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %32 = getelementptr double, ptr %31, i64 %28
+  %33 = load double, ptr %32, align 8
+  %34 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %33)
+  %35 = add i64 %28, 1
+  br label %27
+
+36:                                               ; preds = %27
+  ret void
 }
+
+!llvm.module.flags = !{!0}
+
+!0 = !{i32 2, !"Debug Info Version", i32 3}
 

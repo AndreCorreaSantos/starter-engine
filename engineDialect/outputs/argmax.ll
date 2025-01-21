@@ -71,16 +71,15 @@ define void @main() {
 
 43:                                               ; preds = %30
   %44 = sitofp i64 %33 to double
-  %45 = fadd double %44, 1.000000e+00
-  %46 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (double, ptr null, i64 1) to i64))
-  %47 = insertvalue { ptr, ptr, i64 } undef, ptr %46, 0
-  %48 = insertvalue { ptr, ptr, i64 } %47, ptr %46, 1
-  %49 = insertvalue { ptr, ptr, i64 } %48, i64 0, 2
-  %50 = extractvalue { ptr, ptr, i64 } %49, 1
-  store double %45, ptr %50, align 8
-  %51 = extractvalue { ptr, ptr, i64 } %49, 1
-  %52 = load double, ptr %51, align 8
-  %53 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %52)
+  %45 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (double, ptr null, i64 1) to i64))
+  %46 = insertvalue { ptr, ptr, i64 } undef, ptr %45, 0
+  %47 = insertvalue { ptr, ptr, i64 } %46, ptr %45, 1
+  %48 = insertvalue { ptr, ptr, i64 } %47, i64 0, 2
+  %49 = extractvalue { ptr, ptr, i64 } %48, 1
+  store double %44, ptr %49, align 8
+  %50 = extractvalue { ptr, ptr, i64 } %48, 1
+  %51 = load double, ptr %50, align 8
+  %52 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %51)
   ret void
 }
 
