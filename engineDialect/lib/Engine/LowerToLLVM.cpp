@@ -189,11 +189,11 @@ public:
         // Get scanf reference
         auto scanfRef = getOrInsertScanf(rewriter, parentModule);
         
-        // // Create format string with null terminator
+        // Create format string with null terminator
         mlir::Value formatSpecifierCst = getOrCreateGlobalString(
             loc, rewriter, "scanf_fmt", mlir::StringRef("%lf\0", 4), parentModule);
         
-        // // Create loop for reading values
+        // Create loop for reading values
         auto lowerBound = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0);
         auto upperBound = 
             rewriter.create<mlir::arith::ConstantIndexOp>(loc, memRefShape[0]);
@@ -202,41 +202,47 @@ public:
         auto loop =
             rewriter.create<mlir::scf::ForOp>(loc, lowerBound, upperBound, step);
         
-        // rewriter.setInsertionPointToStart(loop.getBody());
+        // Clear any existing operations in the loop body
+        for (mlir::Operation &nested : *loop.getBody()) {
+            rewriter.eraseOp(&nested);
+        }
         
-        // // Create buffer for scanf
-        // auto doubleType = mlir::MemRefType::get({}, rewriter.getF64Type());
-        // auto tempLoc = rewriter.create<mlir::memref::AllocaOp>(loc, doubleType);
+        // Set insertion point to start of loop body
+        rewriter.setInsertionPointToStart(loop.getBody());
         
-        // // Get the raw pointer to the buffer
-        // auto basePtr = rewriter.create<mlir::memref::ExtractAlignedPointerAsIndexOp>(
-        //     loc, rewriter.getIndexType(), tempLoc);
+        // Create buffer for scanf
+        auto doubleType = mlir::MemRefType::get({}, rewriter.getF64Type());
+        auto tempLoc = rewriter.create<mlir::memref::AllocaOp>(loc, doubleType);
+        
+        // Get the raw pointer to the buffer
+        auto basePtr = rewriter.create<mlir::memref::ExtractAlignedPointerAsIndexOp>(
+            loc, rewriter.getIndexType(), tempLoc);
             
-        // // Convert index to integer
-        // auto ptrAsInt = rewriter.create<mlir::arith::IndexCastOp>(
-        //     loc, rewriter.getIntegerType(64), basePtr);
+        // Convert index to integer
+        auto ptrAsInt = rewriter.create<mlir::arith::IndexCastOp>(
+            loc, rewriter.getIntegerType(64), basePtr);
             
-        // // Convert integer to pointer
-        // auto llvmPtrType = mlir::LLVM::LLVMPointerType::get(context);
-        // auto castedPtr = rewriter.create<mlir::LLVM::IntToPtrOp>(
-        //     loc, llvmPtrType, ptrAsInt);
+        // Convert integer to pointer
+        auto llvmPtrType = mlir::LLVM::LLVMPointerType::get(context);
+        auto castedPtr = rewriter.create<mlir::LLVM::IntToPtrOp>(
+            loc, llvmPtrType, ptrAsInt);
         
-        // // Call scanf
-        // rewriter.create<mlir::LLVM::CallOp>(
-        //     loc, getScanfType(context), scanfRef,
-        //     mlir::ValueRange{formatSpecifierCst, castedPtr});
+        // Call scanf
+        rewriter.create<mlir::LLVM::CallOp>(
+            loc, getScanfType(context), scanfRef,
+            mlir::ValueRange{formatSpecifierCst, castedPtr});
         
-        // // Load scanned value
-        // auto loadedVal = rewriter.create<mlir::memref::LoadOp>(
-        //     loc, tempLoc, mlir::ValueRange{});
+        // Load scanned value
+        auto loadedVal = rewriter.create<mlir::memref::LoadOp>(
+            loc, tempLoc, mlir::ValueRange{});
         
-        // // Store into result memref
-        // rewriter.create<mlir::memref::StoreOp>(
-        //     loc, loadedVal, resultMemRef, loop.getInductionVar());
+        // Store into result memref
+        rewriter.create<mlir::memref::StoreOp>(
+            loc, loadedVal, resultMemRef, loop.getInductionVar());
         
-        // Create yield
-        // rewriter.setInsertionPointToEnd(loop.getBody());
-        // rewriter.create<mlir::scf::YieldOp>(loc);
+        // Explicitly set insertion point to end of loop body and create yield
+        rewriter.setInsertionPointToEnd(loop.getBody());
+        rewriter.create<mlir::scf::YieldOp>(loc);
         
         // Replace original op
         rewriter.replaceOp(op, resultMemRef);
