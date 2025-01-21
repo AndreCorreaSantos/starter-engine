@@ -254,7 +254,7 @@ private:
     auto llvmI32Ty = mlir::IntegerType::get(context, 32);
     auto llvmPtrTy = mlir::LLVM::LLVMPointerType::get(context);
     return mlir::LLVM::LLVMFunctionType::get(llvmI32Ty, llvmPtrTy,
-                                            /*isVarArg=*/true);
+                                            true);
   }
 
   static mlir::FlatSymbolRefAttr
@@ -395,7 +395,7 @@ public:
 void EngineToLLVMLoweringPass::runOnOperation() {
 
   // mlir::enableIRPrinting();
-  llvm::DebugFlag = true;
+  // llvm::DebugFlag = true;
   mlir::LLVMConversionTarget target(getContext());
   target.addLegalOp<mlir::ModuleOp>();
 
