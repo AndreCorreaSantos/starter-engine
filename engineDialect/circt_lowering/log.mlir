@@ -209,13 +209,12 @@ module attributes {calyx.entrypoint = "main"} {
 }
 
 
-Error: /tmp/calyxNativeTemp-441a3f
-84 |    group bb0_6 {
-   |    ^^^^^^^^^^^^^ [Papercut] Required signal not driven inside the group. When writing to the port `mem_0.write_en', the ports [mem_0.write_data] must also be written to. The primitive type `seq_mem_d1' specifies this using a @write_together spec.
-
-/tmp/calyxNativeTemp-441a3f
-93 |    group bb0_7 {
-   |    ^^^^^^^^^^^^^ [Papercut] Required signal not driven inside the group. When writing to the port `mem_1.write_en', the ports [mem_1.write_data] must also be written to. The primitive type `seq_mem_d1' specifies this using a @write_together spec.
+Error: Failed to parse `/tmp/calyxNativeTemp-143691`:  --> /tmp/calyxNativeTemp-143691:8:28
+  |
+8 |     cst_2 = std_float_const(0, 64, 1.000000);
+  |                            ^---
+  |
+  = expected args
 <stdin>:1:1: error: 
 module {
 ^

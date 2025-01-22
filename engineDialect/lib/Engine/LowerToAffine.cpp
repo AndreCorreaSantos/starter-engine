@@ -61,85 +61,82 @@ static mlir::Value insertAllocAndDealloc(mlir::MemRefType type,
 }
 
 class ConstantOpLowering : public mlir::OpRewritePattern<engine::ConstantOp> {
-  using OpRewritePattern<engine::ConstantOp>::OpRewritePattern;
+using OpRewritePattern<engine::ConstantOp>::OpRewritePattern;
 
-  mlir::LogicalResult
-  matchAndRewrite(engine::ConstantOp op,
-                  mlir::PatternRewriter &rewriter) const final {
-    mlir::DenseElementsAttr constantValue = op.getValue();
-    mlir::Location loc = op.getLoc();
+mlir::LogicalResult matchAndRewrite(engine::ConstantOp op,
+                                  mlir::PatternRewriter &rewriter) const final {
+  mlir::ElementsAttr constantValue = op.getValue();
+  mlir::Location loc = op.getLoc();
 
-    // When lowering the constant operation, we allocate and assign the constant
-    // values to a corresponding memref allocation.
-    auto memRefType = op.getType().dyn_cast<mlir::MemRefType>();
-    if (!memRefType) {
-      return rewriter.notifyMatchFailure(op, "expected memref result");
-    }
-    // auto alloc = insertAllocAndDealloc(memRefType, loc, rewriter);
-    auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, memRefType);
+  // When lowering the constant operation, we allocate and assign the constant
+  // values to a corresponding memref allocation.
+  auto memRefType = op.getType().dyn_cast<mlir::MemRefType>();
+  if (!memRefType) {
+    return rewriter.notifyMatchFailure(op, "expected memref result");
+  }
 
-    // We will be generating constant indices up-to the largest dimension.
-    // Create these constants up-front to avoid large amounts of redundant
-    // operations.
-    auto valueShape = memRefType.getShape();
-    mlir::SmallVector<mlir::Value, 8> constantIndices;
+  auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, memRefType);
 
-    if (!valueShape.empty()) {
-      for (auto i : llvm::seq<int64_t>(
-               0, *std::max_element(valueShape.begin(), valueShape.end())))
-        constantIndices.push_back(
-            rewriter.create<mlir::arith::ConstantIndexOp>(loc, i));
-    } else {
-      // This is the case of a tensor of rank 0.
+  // We will be generating constant indices up-to the largest dimension.
+  auto valueShape = memRefType.getShape();
+  mlir::SmallVector<mlir::Value, 8> constantIndices;
+  if (!valueShape.empty()) {
+    for (auto i : llvm::seq<int64_t>(
+         0, *std::max_element(valueShape.begin(), valueShape.end())))
       constantIndices.push_back(
-          rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0));
-    }
-    // The constant operation represents a multi-dimensional constant, so we
-    // will need to generate a store for each of the elements. The following
-    // functor recursively walks the dimensions of the constant shape,
-    // generating a store when the recursion hits the base case.
+          rewriter.create<mlir::arith::ConstantIndexOp>(loc, i));
+  } else {
+    constantIndices.push_back(
+        rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0));
+  }
 
-    // [4, 3] (1, 2, 3, 4, 5, 6, 7, 8)
-    // storeElements(0)
-    //   indices = [0]
-    //   storeElements(1)
-    //     indices = [0, 0]
-    //     storeElements(2)
-    //       store (const 1) [0, 0]
-    //     indices = [0]
-    //     indices = [0, 1]
-    //     storeElements(2)
-    //       store (const 2) [0, 1]
-    //  ...
-    //
-    mlir::SmallVector<mlir::Value, 2> indices;
+  mlir::SmallVector<mlir::Value, 2> indices;
+
+  // Handle different element types
+  if (memRefType.getElementType().isa<mlir::FloatType>()) {
+    // Handle float case
     auto valueIt = constantValue.getValues<mlir::FloatAttr>().begin();
     std::function<void(uint64_t)> storeElements = [&](uint64_t dimension) {
-      // The last dimension is the base case of the recursion, at this point
-      // we store the element at the given index.
       if (dimension == valueShape.size()) {
         rewriter.create<mlir::affine::AffineStoreOp>(
             loc, rewriter.create<mlir::arith::ConstantOp>(loc, *valueIt++),
             alloc, llvm::ArrayRef(indices));
         return;
       }
-
-      // Otherwise, iterate over the current dimension and add the indices to
-      // the list.
       for (uint64_t i = 0, e = valueShape[dimension]; i != e; ++i) {
         indices.push_back(constantIndices[i]);
         storeElements(dimension + 1);
         indices.pop_back();
       }
     };
-
-    // Start the element storing recursion from the first dimension.
-    storeElements(/*dimension=*/0);
-
-    // Replace this operation with the generated alloc.
-    rewriter.replaceOp(op, alloc);
-    return mlir::success();
+    storeElements(0);
+  } 
+  else if (memRefType.getElementType().isa<mlir::IntegerType>()) {
+    // Handle integer case
+    auto valueIt = constantValue.getValues<mlir::IntegerAttr>().begin();
+    std::function<void(uint64_t)> storeElements = [&](uint64_t dimension) {
+      if (dimension == valueShape.size()) {
+        rewriter.create<mlir::affine::AffineStoreOp>(
+            loc, rewriter.create<mlir::arith::ConstantOp>(loc, *valueIt++),
+            alloc, llvm::ArrayRef(indices));
+        return;
+      }
+      for (uint64_t i = 0, e = valueShape[dimension]; i != e; ++i) {
+        indices.push_back(constantIndices[i]);
+        storeElements(dimension + 1);
+        indices.pop_back();
+      }
+    };
+    storeElements(0);
   }
+  else {
+    return rewriter.notifyMatchFailure(op, "unsupported element type");
+  }
+
+  // Replace this operation with the generated alloc.
+  rewriter.replaceOp(op, alloc);
+  return mlir::success();
+}
 };
 
 class PrintOpLowering : public mlir::OpConversionPattern<engine::PrintOp> {

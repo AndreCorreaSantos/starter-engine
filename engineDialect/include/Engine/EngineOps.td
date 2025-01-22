@@ -4,28 +4,41 @@
 include "EngineDialect.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 
-def ConstantOp : Engine_Op<"constant"> { // NEED TO FIND OUT HOW TO CREATE ONE OF THESE FOR INTEGERS.
+def ConstantOp : Engine_Op<"constant"> {
   let summary = "constant";
   let description = [{
     Constant operation turns a literal into an SSA value. The data is attached
     to the operation as an attribute. For example:
-
     ```mlir
-      %0 = "engine.constant"()
-      { value = dense<[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]> : tensor<2x3xf64> }
-      : () -> memref<2x3xf64> 
+    // Float example
+    %0 = "engine.constant"()
+    { value = dense<[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]> : tensor<2x3xf64> }
+    : () -> memref<2x3xf64>
+    
+    // Integer example
+    %1 = "engine.constant"()
+    { value = dense<[[1, 2, 3], [4, 5, 6]]> : tensor<2x3xi64> }
+    : () -> memref<2x3xi64>
     ```
   }];
 
   let builders = [
+    // For dense tensors (both float and int)
     OpBuilder<(ins "mlir::DenseElementsAttr":$value), [{
       build($_builder, $_state, value.getType(), value);
     }]>,
-    OpBuilder<(ins "double":$value)>
+    // For single float value
+    OpBuilder<(ins "double":$value)>,
+    // For single integer value
+    OpBuilder<(ins "int64_t":$value)>
   ];
 
-  let arguments = (ins F64ElementsAttr:$value);
-  let results = (outs F64MemRef);
+  // Use ElementsAttr which can handle both types
+  let arguments = (ins ElementsAttr:$value);
+  
+  // Use AnyMemRef or you might want to be more specific with a constraint
+  let results = (outs AnyTypeOf<[F64MemRef, I32MemRef]>);
+  
 }
 
 def PrintOp : Engine_Op<"print"> {
