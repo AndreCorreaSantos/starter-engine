@@ -6,15 +6,18 @@ target triple = "x86_64-unknown-linux-gnu"
 declare ptr @malloc(i64)
 
 define void @main() {
-  %1 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (i32, ptr null, i64 1) to i64))
+  %1 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (i32, ptr null, i64 2) to i64))
   %2 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } undef, ptr %1, 0
   %3 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %2, ptr %1, 1
   %4 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %3, i64 0, 2
-  %5 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %4, i64 1, 3, 0
+  %5 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %4, i64 2, 3, 0
   %6 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %5, i64 1, 4, 0
   %7 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
   %8 = getelementptr i32, ptr %7, i64 0
-  store i32 1, ptr %8, align 4
+  store i32 -1, ptr %8, align 4
+  %9 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %6, 1
+  %10 = getelementptr i32, ptr %9, i64 1
+  store i32 2, ptr %10, align 4
   ret void
 }
 

@@ -4,7 +4,7 @@ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:
 target triple = "x86_64-unknown-linux-gnu"
 
 @nl = internal constant [2 x i8] c"\0A\00"
-@frmt_spec = internal constant [4 x i8] c"%f \00"
+@frmt_spec = internal constant [4 x i8] c"%d \00"
 
 declare i32 @printf(ptr, ...)
 
@@ -70,16 +70,16 @@ define void @main() {
   br label %30
 
 43:                                               ; preds = %30
-  %44 = sitofp i64 %33 to double
-  %45 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (double, ptr null, i64 1) to i64))
+  %44 = trunc i64 %33 to i32
+  %45 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (i32, ptr null, i64 1) to i64))
   %46 = insertvalue { ptr, ptr, i64 } undef, ptr %45, 0
   %47 = insertvalue { ptr, ptr, i64 } %46, ptr %45, 1
   %48 = insertvalue { ptr, ptr, i64 } %47, i64 0, 2
   %49 = extractvalue { ptr, ptr, i64 } %48, 1
-  store double %44, ptr %49, align 8
+  store i32 %44, ptr %49, align 4
   %50 = extractvalue { ptr, ptr, i64 } %48, 1
-  %51 = load double, ptr %50, align 8
-  %52 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %51)
+  %51 = load i32, ptr %50, align 4
+  %52 = call i32 (ptr, ...) @printf(ptr @frmt_spec, i32 %51)
   ret void
 }
 

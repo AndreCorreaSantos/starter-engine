@@ -60,13 +60,14 @@ public:
     auto memRefType = mlir::cast<mlir::MemRefType>(*op->operand_type_begin());
     auto memRefShape = memRefType.getShape();
     auto loc = op->getLoc();
-
     mlir::ModuleOp parentModule = op->getParentOfType<mlir::ModuleOp>();
 
+    // 
+    auto strRef = memRefType.getElementType().isa<mlir::FloatType>() ? mlir::StringRef("%f \0", 4) : mlir::StringRef("%d \0",4);
     // Get a symbol reference to the printf function, inserting it if necessary.
     auto printfRef = getOrInsertPrintf(rewriter, parentModule);
     mlir::Value formatSpecifierCst = getOrCreateGlobalString(
-        loc, rewriter, "frmt_spec", mlir::StringRef("%f \0", 4), parentModule); // CHECK IF INPUT IS FLOAT OR INT HERE AND CHANGE FORMAT
+        loc, rewriter, "frmt_spec", strRef, parentModule);
     mlir::Value newLineCst = getOrCreateGlobalString(
         loc, rewriter, "nl", mlir::StringRef("\n\0", 2), parentModule);
 

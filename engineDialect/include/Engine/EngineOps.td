@@ -30,7 +30,7 @@ def ConstantOp : Engine_Op<"constant"> {
     // For single float value
     OpBuilder<(ins "double":$value)>,
     // For single integer value
-    OpBuilder<(ins "int64_t":$value)>
+    OpBuilder<(ins "int32_t":$value)>
   ];
 
   // Use ElementsAttr which can handle both types
@@ -133,43 +133,6 @@ def ArgMaxOp : Engine_Op<"argmax">{
   }];
   let arguments = (ins AnyTypeOf<[F64MemRef, I32MemRef]>:$value);
   let results = (outs AnyTypeOf<[F64MemRef, I32MemRef]>);
-}
-
-
-def StoreOp : Engine_Op<"store"> {
-  let summary = "stores a tensor under a name in the cache";
-  let description = [{
-    The "store" operation stores a tensor under a name in the cache.
-    
-    Example:
-      %0 = ... : tensor<4x4xf64>
-      engine.store %0, "matrix_a" : tensor<4x4xf64>
-  }];
-  
-  let arguments = (ins 
-    AnyTypeOf<[F64Tensor, F64MemRef, I32MemRef]>:$value,
-    StrAttr:$name
-  );
-  
-  let results = (outs);
-  
-  // Assembly format showing both the value and name
-  let assemblyFormat = "$value `,` $name attr-dict `:` type($value)";
-}
-
-
-
-def LoadOp : Engine_Op<"load"> {
-  let summary = "loads a tensor from the cache";
-  let description = [{
-    The "load" operation loads a tensor from the cache.
-  }];
-
-  let arguments = (ins StrAttr:$name);
-  let results = (outs AnyTypeOf<[F64Tensor, F64MemRef]>:$result);
-
-  // Corrected assembly format
-  let assemblyFormat = "$name attr-dict `:` type($result)";
 }
 
 def SettingsOp: Engine_Op<"settings"> {

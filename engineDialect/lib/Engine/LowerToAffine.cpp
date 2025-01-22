@@ -92,9 +92,8 @@ mlir::LogicalResult matchAndRewrite(engine::ConstantOp op,
 
   mlir::SmallVector<mlir::Value, 2> indices;
 
-  // Handle different element types
-  if (memRefType.getElementType().isa<mlir::FloatType>()) {
-    // Handle float case
+  if (memRefType.getElementType().isa<mlir::FloatType>()) { // REFACTOR THIS MESS LATER
+
     auto valueIt = constantValue.getValues<mlir::FloatAttr>().begin();
     std::function<void(uint64_t)> storeElements = [&](uint64_t dimension) {
       if (dimension == valueShape.size()) {
@@ -443,9 +442,11 @@ public:
         auto loc = op.getLoc();
         auto value = op.getValue();
         auto inputType = value.getType().dyn_cast<mlir::MemRefType>();
+        
         if (!inputType) {
             return rewriter.notifyMatchFailure(op, "expected memref type for input");
         }
+        auto isFloat = inputType.getElementType().isa<mlir::FloatType>();
 
         // Get input shape
         auto shape = inputType.getShape();
@@ -480,12 +481,14 @@ public:
             loc, value, loop.getInductionVar());
 
         // Compare with max val
-        auto cmp = rewriter.create<mlir::arith::CmpFOp>( // CHECK IF INPUT IS EITHER FLOAT OR INT HERE AND CHANGE CMPFOP TO CMPIOP
-            loc,
-            mlir::arith::CmpFPredicate::OGT,
-            currentValue,
-            loop.getRegionIterArgs()[0]  // First argument is maxValue
-        );
+        mlir::Value cmp;
+        if (isFloat){
+          cmp = rewriter.create<mlir::arith::CmpFOp>(loc,mlir::arith::CmpFPredicate::OGT,currentValue,loop.getRegionIterArgs()[0]);
+        }
+        else{ // if integer
+          cmp = rewriter.create<mlir::arith::CmpIOp>(loc,mlir::arith::CmpIPredicate::sgt,currentValue,loop.getRegionIterArgs()[0]); // not sure about the predicate
+        }
+        
 
         // Select the larger value and corresponding index
         auto newMax = rewriter.create<mlir::arith::SelectOp>(
@@ -502,28 +505,22 @@ public:
         // Reset insertion point
         rewriter.setInsertionPointAfter(loop);
 
-        // Convert index to i64
+        // Convert index to i32
         auto maxIndexInt = rewriter.create<mlir::arith::IndexCastOp>(
             loc,
-            rewriter.getI64Type(),
+            rewriter.getI32Type(),
             loop.getResult(1)
         );
 
-        // Convert i64 to float
-        auto maxIndexFloat = rewriter.create<mlir::arith::SIToFPOp>(
-            loc,
-            inputType.getElementType(),  // Convert to same float type as input
-            maxIndexInt
-        );
 
         // Create output memref for float
-        auto resultType = mlir::MemRefType::get({}, inputType.getElementType());
+        auto resultType = mlir::MemRefType::get({},rewriter.getI32Type());
         auto result = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
 
         // Store the float value
         rewriter.create<mlir::memref::StoreOp>(
             loc,
-            maxIndexFloat,
+            maxIndexInt,
             result.getResult(),
             mlir::ValueRange{}
         );
