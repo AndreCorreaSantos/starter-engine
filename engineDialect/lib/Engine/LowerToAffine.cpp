@@ -328,6 +328,7 @@ public:
     if (!inputType) {
       return rewriter.notifyMatchFailure(op, "expected memref type for input");
     }
+    auto isFloat = inputType.getElementType().isa<mlir::FloatType>();
 
     auto resultType = op.getResult().getType().dyn_cast<mlir::MemRefType>();
     if (!resultType) {
@@ -344,12 +345,8 @@ public:
     for (auto i : llvm::seq<int64_t>(0, *std::max_element(valueShape.begin(), valueShape.end()))) {
       constantIndices.push_back(rewriter.create<mlir::arith::ConstantIndexOp>(loc, i));
     }
-    // creates:
-    // %c0 = arith.constant 0 : index
-    // %c1 = arith.constant 1 : index
-    // %c2 = arith.constant 2 : index ...
 
-    // Create constant 1.0 for addition
+
     auto zeroAttr = rewriter.getZeroAttr(inputType.getElementType());
     auto zeroValue = rewriter.create<mlir::arith::ConstantOp>(loc, zeroAttr);
 
@@ -359,13 +356,21 @@ public:
       if (dimension == valueShape.size()) {
         // Load input value
         auto loadedValue = rewriter.create<mlir::affine::AffineLoadOp>(loc, input, llvm::ArrayRef(indices));
-      
-        auto cmp = rewriter.create<mlir::arith::CmpFOp>( // CHECK IF INPUT IS EITHER FLOAT OR INT HERE AND CHANGE CMPFOP TO CMPIOP
-            loc,
-            mlir::arith::CmpFPredicate::OGT,
-            loadedValue,    // x
-            zeroValue       // 0.0
-        );
+
+        mlir::Value cmp;
+        if(isFloat){
+          cmp = rewriter.create<mlir::arith::CmpFOp>(loc,mlir::arith::CmpFPredicate::OGT,
+                loadedValue,    // x
+                zeroValue       // 0.0
+            );
+        }
+        else{
+          cmp = rewriter.create<mlir::arith::CmpIOp>(loc,mlir::arith::CmpIPredicate::sgt,
+              loadedValue,    // x
+              zeroValue       // 0.0
+          );
+        }
+ 
 
         // relu(x) = select (x>0), x, 0
         auto reluValue = rewriter.create<mlir::arith::SelectOp>(loc, cmp, loadedValue, zeroValue);
