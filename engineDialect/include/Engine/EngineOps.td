@@ -4,7 +4,7 @@
 include "EngineDialect.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 
-def ConstantOp : Engine_Op<"constant"> {
+def ConstantOp : Engine_Op<"constant"> { // NEED TO FIND OUT HOW TO CREATE ONE OF THESE FOR INTEGERS.
   let summary = "constant";
   let description = [{
     Constant operation turns a literal into an SSA value. The data is attached

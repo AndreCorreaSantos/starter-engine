@@ -187,63 +187,6 @@ static void lowerOpToLoops(mlir::Operation *op, mlir::ValueRange operands,
   rewriter.replaceOp(op, alloc);
 }
 
-// namespace {
-// template <typename BinaryOp, typename LoweredBinaryOp>
-// struct BinaryOpLowering : public mlir::ConversionPattern {
-//   BinaryOpLowering(mlir::MLIRContext *ctx)
-//       : mlir::ConversionPattern(BinaryOp::getOperationName(), 1, ctx) {}
-
-//   mlir::LogicalResult
-//   matchAndRewrite(mlir::Operation *op, llvm::ArrayRef<mlir::Value> operands,
-//                  mlir::ConversionPatternRewriter &rewriter) const final {
-//     // Get location for error reporting
-//     mlir::Location loc = op->getLoc();
-
-//     // Get the input types
-//     auto lhsType = op->getOperand(0).getType();
-//     auto rhsType = op->getOperand(1).getType();
-
-//     // Check if inputs are MemRef types
-//     auto lhsMemRef = lhsType.dyn_cast<mlir::MemRefType>();
-//     auto rhsMemRef = rhsType.dyn_cast<mlir::MemRefType>();
-    
-//     if (!lhsMemRef || !rhsMemRef) {
-//       return rewriter.notifyMatchFailure(op, "expected memref operands");
-//     }
-
-//     // Verify shapes are compatible
-//     if (lhsMemRef.getShape() != rhsMemRef.getShape()) {
-//       return rewriter.notifyMatchFailure(op, "operand shapes must match");
-//     }
-
-//     // Create the lowering function
-//     auto elementType = lhsMemRef.getElementType();
-//     lowerOpToLoops(op, operands, rewriter,
-//       [loc, elementType](mlir::OpBuilder &builder, mlir::ValueRange memRefOperands,
-//                         mlir::ValueRange loopIvs) {
-//         // Adapt the operands
-//         typename BinaryOp::Adaptor binaryAdaptor(memRefOperands);
-        
-//         // Load values from memrefs
-//         mlir::Value loadedLhs = builder.create<mlir::memref::LoadOp>(
-//             loc, binaryAdaptor.getLhs(), loopIvs);
-//         mlir::Value loadedRhs = builder.create<mlir::memref::LoadOp>(
-//             loc, binaryAdaptor.getRhs(), loopIvs);
-
-//         // Perform the binary operation
-//         return builder.create<LoweredBinaryOp>(loc, loadedLhs, loadedRhs);
-//     });
-
-//     return mlir::success();
-//   }
-// };
-
-// // Define the specific binary operations
-// using AddOpLowering = BinaryOpLowering<engine::AddOp, mlir::arith::AddFOp>;
-// // using MulOpLowering = BinaryOpLowering<engine::MulOp, mlir::arith::MulFOp>;
-
-// }
-
 class DotOpLowering : public mlir::OpRewritePattern<engine::DotOp> {
 public:
   using OpRewritePattern<engine::DotOp>::OpRewritePattern;
@@ -421,7 +364,7 @@ public:
         // Load input value
         auto loadedValue = rewriter.create<mlir::affine::AffineLoadOp>(loc, input, llvm::ArrayRef(indices));
       
-        auto cmp = rewriter.create<mlir::arith::CmpFOp>(
+        auto cmp = rewriter.create<mlir::arith::CmpFOp>( // CHECK IF INPUT IS EITHER FLOAT OR INT HERE AND CHANGE CMPFOP TO CMPIOP
             loc,
             mlir::arith::CmpFPredicate::OGT,
             loadedValue,    // x
@@ -540,7 +483,7 @@ public:
             loc, value, loop.getInductionVar());
 
         // Compare with max val
-        auto cmp = rewriter.create<mlir::arith::CmpFOp>(
+        auto cmp = rewriter.create<mlir::arith::CmpFOp>( // CHECK IF INPUT IS EITHER FLOAT OR INT HERE AND CHANGE CMPFOP TO CMPIOP
             loc,
             mlir::arith::CmpFPredicate::OGT,
             currentValue,

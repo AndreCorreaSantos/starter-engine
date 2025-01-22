@@ -66,7 +66,7 @@ public:
     // Get a symbol reference to the printf function, inserting it if necessary.
     auto printfRef = getOrInsertPrintf(rewriter, parentModule);
     mlir::Value formatSpecifierCst = getOrCreateGlobalString(
-        loc, rewriter, "frmt_spec", mlir::StringRef("%f \0", 4), parentModule);
+        loc, rewriter, "frmt_spec", mlir::StringRef("%f \0", 4), parentModule); // CHECK IF INPUT IS FLOAT OR INT HERE AND CHANGE FORMAT
     mlir::Value newLineCst = getOrCreateGlobalString(
         loc, rewriter, "nl", mlir::StringRef("\n\0", 2), parentModule);
 
@@ -191,7 +191,7 @@ public:
         
         // Create format string with null terminator
         mlir::Value formatSpecifierCst = getOrCreateGlobalString(
-            loc, rewriter, "scanf_fmt", mlir::StringRef("%lf\0", 4), parentModule);
+            loc, rewriter, "scanf_fmt", mlir::StringRef("%lf\0", 4), parentModule); // CHECK IF RESULT TYPE IS FLOAT OR INT AND CHANGE FORMAT HERE 
         
         // Create loop for reading values
         auto lowerBound = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0);
