@@ -14,10 +14,15 @@ public:
   mlir::LogicalResult
   matchAndRewrite(engine::SettingsOp op,
                  mlir::PatternRewriter &rewriter) const final {
-    auto attr = op.getValueAttr();
-    if (!attr)
-      return mlir::failure();
-    settings.lowerSettings = attr.getInt();  // Now this will work because we have the reference
+
+    auto sett = op.getValueAttr();
+    if (sett)
+      settings.lowerSettings = sett.getInt();
+
+    auto type = op.getTypeAttr();
+    if (type)
+      settings.type = type.getInt();
+    
     rewriter.eraseOp(op);
     return mlir::success();
   }

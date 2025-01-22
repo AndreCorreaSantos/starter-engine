@@ -15062,16 +15062,15 @@ define void @main() {
 
 10112:                                            ; preds = %10099
   %10113 = sitofp i64 %10102 to double
-  %10114 = fadd double %10113, 1.000000e+00
-  %10115 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (double, ptr null, i64 1) to i64))
-  %10116 = insertvalue { ptr, ptr, i64 } undef, ptr %10115, 0
-  %10117 = insertvalue { ptr, ptr, i64 } %10116, ptr %10115, 1
-  %10118 = insertvalue { ptr, ptr, i64 } %10117, i64 0, 2
-  %10119 = extractvalue { ptr, ptr, i64 } %10118, 1
-  store double %10114, ptr %10119, align 8
-  %10120 = extractvalue { ptr, ptr, i64 } %10118, 1
-  %10121 = load double, ptr %10120, align 8
-  %10122 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %10121)
+  %10114 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (double, ptr null, i64 1) to i64))
+  %10115 = insertvalue { ptr, ptr, i64 } undef, ptr %10114, 0
+  %10116 = insertvalue { ptr, ptr, i64 } %10115, ptr %10114, 1
+  %10117 = insertvalue { ptr, ptr, i64 } %10116, i64 0, 2
+  %10118 = extractvalue { ptr, ptr, i64 } %10117, 1
+  store double %10113, ptr %10118, align 8
+  %10119 = extractvalue { ptr, ptr, i64 } %10117, 1
+  %10120 = load double, ptr %10119, align 8
+  %10121 = call i32 (ptr, ...) @printf(ptr @frmt_spec, double %10120)
   ret void
 }
 

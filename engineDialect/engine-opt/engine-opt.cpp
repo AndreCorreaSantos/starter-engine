@@ -232,7 +232,8 @@ int main(int argc, char **argv) {
 
   // Load and process MLIR file.
   engine::settingsInfo settings;
-  settings.lowerSettings = 0; // if no lowerSettings has been set they default to llvm compilation
+  settings.lowerSettings = 0; // defaulting to llvm compilation
+  settings.type = 0; // defaulting to floats.
   mlir::OwningOpRef<mlir::ModuleOp> module;
   if (int error = loadAndProcessMLIR(context, module, settings)) {
     return error;

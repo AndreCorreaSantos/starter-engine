@@ -13,7 +13,8 @@ echo "$enginePass" >> log.mlir
 echo "$enginePass" | circt-opt --mlir-print-ir-after-all \
  --pass-pipeline="builtin.module(
     func.func(convert-affine-to-loopschedule),
-    lower-scf-to-calyx
+    lower-scf-to-calyx,
+    calyx-native
   )" > output.mlir 2>> log.mlir
 
 
