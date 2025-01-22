@@ -180,6 +180,8 @@ public:
         // Get the memref type
         auto memRefType = mlir::cast<mlir::MemRefType>(readOp.getType());
         auto memRefShape = memRefType.getShape();
+
+        auto isFloat = memRefType.getElementType().isa<mlir::FloatType>();
         
         // Get module
         mlir::ModuleOp parentModule = op->getParentOfType<mlir::ModuleOp>();
@@ -190,9 +192,11 @@ public:
         // Get scanf reference
         auto scanfRef = getOrInsertScanf(rewriter, parentModule);
         
+        auto strRef = isFloat ? mlir::StringRef("%lf\0", 4) : mlir::StringRef("%d \0",4);
+
         // Create format string with null terminator
         mlir::Value formatSpecifierCst = getOrCreateGlobalString(
-            loc, rewriter, "scanf_fmt", mlir::StringRef("%lf\0", 4), parentModule); // CHECK IF RESULT TYPE IS FLOAT OR INT AND CHANGE FORMAT HERE 
+            loc, rewriter, "scanf_fmt", strRef, parentModule); // CHECK IF RESULT TYPE IS FLOAT OR INT AND CHANGE FORMAT HERE 
         
         // Create loop for reading values
         auto lowerBound = rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0);
@@ -212,8 +216,15 @@ public:
         rewriter.setInsertionPointToStart(loop.getBody());
         
         // Create buffer for scanf
-        auto doubleType = mlir::MemRefType::get({}, rewriter.getF64Type());
-        auto tempLoc = rewriter.create<mlir::memref::AllocaOp>(loc, doubleType);
+        mlir::Value tempLoc;
+        if (isFloat){
+        auto doubleType = mlir::MemRefType::get({}, rewriter.getF64Type()); // might need to change
+        tempLoc = rewriter.create<mlir::memref::AllocaOp>(loc, doubleType);
+        } else{
+        auto intType = mlir::MemRefType::get({}, rewriter.getI32Type()); // might need to change
+        tempLoc = rewriter.create<mlir::memref::AllocaOp>(loc, intType);
+        }
+
         
         // Get the raw pointer to the buffer
         auto basePtr = rewriter.create<mlir::memref::ExtractAlignedPointerAsIndexOp>(
