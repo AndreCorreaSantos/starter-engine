@@ -81,6 +81,12 @@ class Node():
         cache[self.output] = cache[m1]
         sh = print_shape(cache[m1])
         return f"%{self.output} = \"engine.add\"(%{m1},%{m2}) : (memref<{sh}>,memref<{sh}>) -> memref<{sh}> \n"
+    
+    def ArgMax(self, m, cache):
+        cache[self.output] = ()
+        sh1 = print_shape(cache[m])
+        sh2 = print_shape(())
+        return f"%{self.output} = \"engine.argmax\"(%{m}) : (memref<{sh1}>) -> memref<{sh2}> \n"
 
     def execute(self, cache):
         if self.op_type == "Flatten":
@@ -91,6 +97,8 @@ class Node():
             return self.Relu(self.inputs[0],cache)
         elif self.op_type == "Add":
             return self.Add(self.inputs[0], self.inputs[1], cache)
+        elif self.op_type == "ArgMax":
+            return self.ArgMax(self.inputs[0], cache)
         else:
             raise Exception(f"Activation Function not recognized: {self.op_type}")
 

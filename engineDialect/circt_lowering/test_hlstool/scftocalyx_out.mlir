@@ -152,4 +152,3 @@ module attributes {calyx.entrypoint = "main"} {
     }
   } {toplevel}
 }
-

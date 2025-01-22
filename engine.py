@@ -34,8 +34,6 @@ class Node():
         self.op_type = op_type
 
     def Gemm(self, m, w, b):
-        print("SHAPES ON DOT")
-        print(f"m: {m.shape}, w: {w.shape}")
         return np.dot(m, w.T) + b
 
     def Relu(self, m):
@@ -46,6 +44,9 @@ class Node():
 
     def Add(self, m1, m2):
         return m1 + m2
+    
+    def ArgMax(self, m):
+        return np.argmax(m)
 
     def execute(self):
         if self.op_type == "Flatten":
@@ -56,6 +57,8 @@ class Node():
             return self.Relu(self.inputs[0])
         elif self.op_type == "Add":
             return self.Add(self.inputs[0], self.inputs[1])
+        elif self.op_type == "ArgMax":
+            return self.ArgMax(self.inputs[0])
         else:
             raise Exception(f"Activation Function not recognized: {self.op_type}")
 

@@ -42,6 +42,14 @@ def PrintOp : Engine_Op<"print"> {
     let assemblyFormat = "$input attr-dict `:` type($input)";
 }
 
+def ReadOp : Engine_Op<"read"> {
+  let summary = "read operation";
+  let description = [{
+    The "read" operation reads a tensor from stdin.
+  }];
+  let results = (outs F64MemRef:$output);
+}
+
 def WorldOp : Engine_Op<"world", [Pure]> {
     let summary = "print Hello, World";
     let description = [{
@@ -101,6 +109,15 @@ def FlattenOp : Engine_Op<"flatten">{
   let summary = "Flattens a tensor";
   let description = [{
     The Flatten operation flattens a tensor.
+  }];
+  let arguments = (ins F64MemRef:$value);
+  let results = (outs F64MemRef);
+}
+
+def ArgMaxOp : Engine_Op<"argmax">{
+  let summary = "Returns the index of the maximum value in a tensor";
+  let description = [{
+    The ArgMax operation returns the index of the maximum value in a tensor.
   }];
   let arguments = (ins F64MemRef:$value);
   let results = (outs F64MemRef);

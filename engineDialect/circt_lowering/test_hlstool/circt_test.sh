@@ -1,0 +1,1 @@
+circt-translate --export-calyx hlsinput.mlir
