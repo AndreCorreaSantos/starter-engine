@@ -14,11 +14,10 @@ def print_shape(array,type):
     result += type
     return result
 
-def print_data(array,dtype,factor=1000):
-
+def print_data(array,dtype,factor=255):
     if dtype == FLOAT:
         return np.array2string(array, separator=', ', formatter={'float_kind': lambda x: f'{x:.1f}'}, max_line_width=np.inf,threshold=array.size).replace("\n","")
-    return np.array2string(array, separator=', ', formatter={'float_kind': lambda x: str(int(x * factor))}, max_line_width=np.inf, threshold=array.size).replace("\n", "")
+    return np.array2string((array*factor).astype(np.int32), separator=', ', formatter={'int_kind': lambda x: str(x)}, max_line_width=np.inf, threshold=array.size).replace("\n", "")
 
 
 def get_matmul_shape(shape1, shape2):

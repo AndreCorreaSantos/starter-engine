@@ -68,7 +68,8 @@ class Model():
         o_model = onnx.load(path)
         for init in o_model.graph.initializer:
             data = convert_raw_data(init)
-            self.cache[init.name] = data
+            self.cache[init.name] = (255*data).astype(np.int32)  # SCALING WEIGHTS AND BIASES
+            print(self.cache[init.name])
         self.nodes = o_model.graph.node
 
     def infer(self, input):
@@ -82,6 +83,3 @@ class Model():
         return self.cache[out]
     
 
-
-    # PASSAR AST PARA MINHA LINGUAGEM 
-    #
