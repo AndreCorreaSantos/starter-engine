@@ -14,8 +14,12 @@ def print_shape(array,type):
     result += type
     return result
 
-def print_data(array,useInt):
-    return np.array2string(array, separator=', ', formatter={'float_kind': lambda x: f'{x:.1f}'}, max_line_width=np.inf,threshold=array.size).replace("\n","")
+def print_data(array,dtype,factor=1000):
+
+    if dtype == FLOAT:
+        return np.array2string(array, separator=', ', formatter={'float_kind': lambda x: f'{x:.1f}'}, max_line_width=np.inf,threshold=array.size).replace("\n","")
+    return np.array2string(array, separator=', ', formatter={'float_kind': lambda x: str(int(x * factor))}, max_line_width=np.inf, threshold=array.size).replace("\n", "")
+
 
 def get_matmul_shape(shape1, shape2):
     t1 = np.zeros(shape1)
