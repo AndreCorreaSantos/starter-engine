@@ -1,6 +1,7 @@
 import onnx
 import numpy as np
 
+
 def convert_raw_data(initializer):
     data_type = initializer.data_type
     if data_type == onnx.TensorProto.FLOAT:
@@ -63,13 +64,15 @@ class Node():
             raise Exception(f"Activation Function not recognized: {self.op_type}")
 
 class Model():
-    def __init__(self, path):
+    def __init__(self, path, useInt=False):
         self.cache = {}
         o_model = onnx.load(path)
         for init in o_model.graph.initializer:
             data = convert_raw_data(init)
-            self.cache[init.name] = (255*data).astype(np.int32)  # SCALING WEIGHTS AND BIASES
-            print(self.cache[init.name])
+            if useInt:
+                self.cache[init.name] = (255*data).astype(np.int32)
+            else:
+                self.cache[init.name] = data 
         self.nodes = o_model.graph.node
 
     def infer(self, input):
