@@ -10,19 +10,19 @@ func.func @main() {
 %_model.fc3.bias = "engine.constant"() {value=dense<[-10, 3, -5, 6, -1, 15, -11, 15, -10, -3]>:tensor<10xi32>} : () -> memref<10xi32>
 %_onnx.Flatten_0 = "engine.constant"() {value=dense<[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 11, 9, 9, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 15, 15, 15, 15, 15, 12, 12, 12, 12, 12, 12, 12, 12, 10, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 7, 4, 7, 10, 14, 15, 14, 15, 15, 15, 15, 14, 15, 15, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 0, 4, 4, 4, 3, 1, 14, 15, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 15, 13, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 14, 16, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 15, 14, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 15, 15, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 15, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 15, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 15, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 15, 15, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 13, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 15, 13, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 15, 15, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 14, 15, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 15, 15, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 15, 15, 15, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 15, 15, 13, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 15, 12, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]>:tensor<784xi32>} : () -> memref<784xi32>
 %_.model.Flatten_output_0 = "engine.flatten"(%_onnx.Flatten_0) : (memref<784xi32>) -> memref<784xi32> 
-%_.model.fc1.Gemm_output_0_int = "engine.matmul"(%_model.fc1.weight,%_.model.Flatten_output_0) : (memref<5x784xi32>,memref<784xi32>) -> memref<5xi32>
-%_.model.fc1.Gemm_output_0 = "engine.add"(%_.model.fc1.Gemm_output_0_int,%_model.fc1.bias) : (memref<5xi32>,memref<5xi32>) -> memref<5xi32>
-%_.model.Relu_output_0 = "engine.relu"(%_.model.fc1.Gemm_output_0) : (memref<5xi32>) -> memref<5xi32> 
-%_.model.fc2_left2.Gemm_output_0_int = "engine.matmul"(%_model.fc2_left2.weight,%_.model.Relu_output_0) : (memref<5x5xi32>,memref<5xi32>) -> memref<5xi32>
-%_.model.fc2_left2.Gemm_output_0 = "engine.add"(%_.model.fc2_left2.Gemm_output_0_int,%_model.fc2_left2.bias) : (memref<5xi32>,memref<5xi32>) -> memref<5xi32>
-%_.model.Relu_1_output_0 = "engine.relu"(%_.model.fc2_left2.Gemm_output_0) : (memref<5xi32>) -> memref<5xi32> 
-%_.model.fc2_right.Gemm_output_0_int = "engine.matmul"(%_model.fc2_right.weight,%_.model.Relu_output_0) : (memref<5x5xi32>,memref<5xi32>) -> memref<5xi32>
-%_.model.fc2_right.Gemm_output_0 = "engine.add"(%_.model.fc2_right.Gemm_output_0_int,%_model.fc2_right.bias) : (memref<5xi32>,memref<5xi32>) -> memref<5xi32>
-%_.model.Relu_2_output_0 = "engine.relu"(%_.model.fc2_right.Gemm_output_0) : (memref<5xi32>) -> memref<5xi32> 
-%_.model.Add_output_0 = "engine.add"(%_.model.Relu_1_output_0,%_.model.Relu_2_output_0) : (memref<5xi32>,memref<5xi32>) -> memref<5xi32> 
-%_.model.fc3.Gemm_output_0_int = "engine.matmul"(%_model.fc3.weight,%_.model.Add_output_0) : (memref<10x5xi32>,memref<5xi32>) -> memref<10xi32>
-%_.model.fc3.Gemm_output_0 = "engine.add"(%_.model.fc3.Gemm_output_0_int,%_model.fc3.bias) : (memref<10xi32>,memref<10xi32>) -> memref<10xi32>
-"engine.print"(%_.model.fc3.Gemm_output_0) : (memref<10xi32>) -> ()
+"engine.print"(%_.model.Flatten_output_0) : (memref<784xi32>) -> ()
+// %_.model.fc1.Gemm_output_0_int = "engine.matmul"(%_model.fc1.weight,%_.model.Flatten_output_0) : (memref<5x784xi32>,memref<784xi32>) -> memref<5xi32>
+// %_.model.fc1.Gemm_output_0 = "engine.add"(%_.model.fc1.Gemm_output_0_int,%_model.fc1.bias) : (memref<5xi32>,memref<5xi32>) -> memref<5xi32>
+// %_.model.Relu_output_0 = "engine.relu"(%_.model.fc1.Gemm_output_0) : (memref<5xi32>) -> memref<5xi32> 
+// %_.model.fc2_left2.Gemm_output_0_int = "engine.matmul"(%_model.fc2_left2.weight,%_.model.Relu_output_0) : (memref<5x5xi32>,memref<5xi32>) -> memref<5xi32>
+// %_.model.fc2_left2.Gemm_output_0 = "engine.add"(%_.model.fc2_left2.Gemm_output_0_int,%_model.fc2_left2.bias) : (memref<5xi32>,memref<5xi32>) -> memref<5xi32>
+// %_.model.Relu_1_output_0 = "engine.relu"(%_.model.fc2_left2.Gemm_output_0) : (memref<5xi32>) -> memref<5xi32> 
+// %_.model.fc2_right.Gemm_output_0_int = "engine.matmul"(%_model.fc2_right.weight,%_.model.Relu_output_0) : (memref<5x5xi32>,memref<5xi32>) -> memref<5xi32>
+// %_.model.fc2_right.Gemm_output_0 = "engine.add"(%_.model.fc2_right.Gemm_output_0_int,%_model.fc2_right.bias) : (memref<5xi32>,memref<5xi32>) -> memref<5xi32>
+// %_.model.Relu_2_output_0 = "engine.relu"(%_.model.fc2_right.Gemm_output_0) : (memref<5xi32>) -> memref<5xi32> 
+// %_.model.Add_output_0 = "engine.add"(%_.model.Relu_1_output_0,%_.model.Relu_2_output_0) : (memref<5xi32>,memref<5xi32>) -> memref<5xi32> 
+// %_.model.fc3.Gemm_output_0_int = "engine.matmul"(%_model.fc3.weight,%_.model.Add_output_0) : (memref<10x5xi32>,memref<5xi32>) -> memref<10xi32>
+// %_.model.fc3.Gemm_output_0 = "engine.add"(%_.model.fc3.Gemm_output_0_int,%_model.fc3.bias) : (memref<10xi32>,memref<10xi32>) -> memref<10xi32>
 // %_18 = "engine.argmax"(%_.model.fc3.Gemm_output_0) : (memref<10xi32>) -> memref<i32> 
 // "engine.print"(%_18) : (memref<i32>) -> ()
 return
