@@ -64,13 +64,15 @@ class Node():
             raise Exception(f"Activation Function not recognized: {self.op_type}")
 
 class StarterModel():
-    def __init__(self, path, useInt=False):
+    def __init__(self, path, useInt=False,scaleFactor=255):
         self.cache = {}
+        self.useInt = useInt
+        self.scaleFactor = scaleFactor
         o_model = onnx.load(path)
         for init in o_model.graph.initializer:
             data = convert_raw_data(init)
-            if useInt:
-                self.cache[init.name] = (255*data).astype(np.int32)
+            if self.useInt:
+                self.cache[init.name] = (self.scaleFactor*data).astype(np.int32) # scaling constants
             else:
                 self.cache[init.name] = data 
         self.nodes = o_model.graph.node
@@ -81,7 +83,10 @@ class StarterModel():
                 self.cache[nd.input[0]] = input
             inputs = [self.cache[inp] for inp in nd.input]
             n_obj = Node(nd.op_type, inputs)
-            self.cache[nd.output[0]] = n_obj.execute()
+            if self.useInt:
+                self.cache[nd.output[0]] = (n_obj.execute()).astype(np.int32)
+            else:
+                self.cache[nd.output[0]] = n_obj.execute()
             out = nd.output[0]
         return self.cache[out]
     
