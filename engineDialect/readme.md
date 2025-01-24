@@ -156,4 +156,4 @@ tasks:
 ##### 7)
 
 Current Problem:
-  - Integer version of mlir net giving different results for same input and same code.
+  - Integer version of mlir net giving different results for same input and same code. --> found the problem: matmul is overflowing.

@@ -14576,22 +14576,68 @@ define void @main() {
   %9733 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %9732, i64 0, 2
   %9734 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %9733, i64 784, 3, 0
   %9735 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %9734, i64 1, 4, 0
-  br label %9736
+  %9736 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (i32, ptr null, i64 5) to i64))
+  %9737 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } undef, ptr %9736, 0
+  %9738 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %9737, ptr %9736, 1
+  %9739 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %9738, i64 0, 2
+  %9740 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %9739, i64 5, 3, 0
+  %9741 = insertvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %9740, i64 1, 4, 0
+  br label %9742
 
-9736:                                             ; preds = %9739, %0
-  %9737 = phi i64 [ 0, %0 ], [ %9744, %9739 ]
-  %9738 = icmp slt i64 %9737, 784
-  br i1 %9738, label %9739, label %9745
+9742:                                             ; preds = %9766, %0
+  %9743 = phi i64 [ 0, %0 ], [ %9767, %9766 ]
+  %9744 = icmp slt i64 %9743, 5
+  br i1 %9744, label %9745, label %9768
 
-9739:                                             ; preds = %9736
-  %9740 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %9735, 1
-  %9741 = getelementptr i32, ptr %9740, i64 %9737
-  %9742 = load i32, ptr %9741, align 4
-  %9743 = call i32 (ptr, ...) @printf(ptr @frmt_spec, i32 %9742)
-  %9744 = add i64 %9737, 1
-  br label %9736
+9745:                                             ; preds = %9742
+  br label %9746
 
-9745:                                             ; preds = %9736
+9746:                                             ; preds = %9749, %9745
+  %9747 = phi i64 [ 0, %9745 ], [ %9765, %9749 ]
+  %9748 = icmp slt i64 %9747, 784
+  br i1 %9748, label %9749, label %9766
+
+9749:                                             ; preds = %9746
+  %9750 = extractvalue { ptr, ptr, i64, [2 x i64], [2 x i64] } %8, 1
+  %9751 = mul i64 %9743, 784
+  %9752 = add i64 %9751, %9747
+  %9753 = getelementptr i32, ptr %9750, i64 %9752
+  %9754 = load i32, ptr %9753, align 4
+  %9755 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %9735, 1
+  %9756 = getelementptr i32, ptr %9755, i64 %9747
+  %9757 = load i32, ptr %9756, align 4
+  %9758 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %9741, 1
+  %9759 = getelementptr i32, ptr %9758, i64 %9743
+  %9760 = load i32, ptr %9759, align 4
+  %9761 = mul i32 %9754, %9757
+  %9762 = add i32 %9760, %9761
+  %9763 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %9741, 1
+  %9764 = getelementptr i32, ptr %9763, i64 %9743
+  store i32 %9762, ptr %9764, align 4
+  %9765 = add i64 %9747, 1
+  br label %9746
+
+9766:                                             ; preds = %9746
+  %9767 = add i64 %9743, 1
+  br label %9742
+
+9768:                                             ; preds = %9742
+  br label %9769
+
+9769:                                             ; preds = %9772, %9768
+  %9770 = phi i64 [ 0, %9768 ], [ %9777, %9772 ]
+  %9771 = icmp slt i64 %9770, 5
+  br i1 %9771, label %9772, label %9778
+
+9772:                                             ; preds = %9769
+  %9773 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %9741, 1
+  %9774 = getelementptr i32, ptr %9773, i64 %9770
+  %9775 = load i32, ptr %9774, align 4
+  %9776 = call i32 (ptr, ...) @printf(ptr @frmt_spec, i32 %9775)
+  %9777 = add i64 %9770, 1
+  br label %9769
+
+9778:                                             ; preds = %9769
   ret void
 }
 
