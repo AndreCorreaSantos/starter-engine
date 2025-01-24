@@ -64,7 +64,7 @@ class Node():
             raise Exception(f"Activation Function not recognized: {self.op_type}")
 
 class StarterModel():
-    def __init__(self, path, useInt=False,scaleFactor=255):
+    def __init__(self, path, useInt=False,scaleFactor=16):
         self.cache = {}
         self.useInt = useInt
         self.scaleFactor = scaleFactor
@@ -89,5 +89,16 @@ class StarterModel():
                 self.cache[nd.output[0]] = n_obj.execute()
             out = nd.output[0]
         return self.cache[out]
+    
+    def debug(self,path):
+        #write to path
+        with open(path,"w+") as file:
+            for key,value in self.cache.items():
+                file.write(key)
+                file.write("\n")
+                txt = np.array2string(value, separator=', ', formatter={'int_kind': lambda x: str(x)}, max_line_width=np.inf, threshold=value.size).replace("\n", "")
+                file.write(txt)
+            # file.write(str(self.cache))
+
     
 

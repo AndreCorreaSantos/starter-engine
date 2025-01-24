@@ -14,10 +14,10 @@ def print_shape(array,type):
     result += type
     return result
 
-def print_data(array,dtype,factor=255):
+def print_data(array,dtype,scaleFactor=16):
     if dtype == FLOAT:
         return np.array2string(array, separator=', ', formatter={'float_kind': lambda x: f'{x:.1f}'}, max_line_width=np.inf,threshold=array.size).replace("\n","")
-    return np.array2string((array*factor).astype(np.int32), separator=', ', formatter={'int_kind': lambda x: str(x)}, max_line_width=np.inf, threshold=array.size).replace("\n", "")
+    return np.array2string((array*scaleFactor).astype(np.int32), separator=', ', formatter={'int_kind': lambda x: str(x)}, max_line_width=np.inf, threshold=array.size).replace("\n", "")
 
 
 def get_matmul_shape(shape1, shape2):
@@ -119,23 +119,24 @@ class Info():
         self.shape = shape
         self.type = type
 
-class Model():
-    def __init__(self, path, dtype):
+class TranslateModel():
+    def __init__(self, path, dtype,scaleFactor=16):
         self.cache = {} # cache to store tensor {name: cache_obj}
         o_model = onnx.load(path)
         self.initializers = o_model.graph.initializer # weights and biases
         self.nodes = o_model.graph.node # layers
         self.result = "" # final mlir code
         self.dtype = dtype
+        self.scaleFactor = scaleFactor
 
     def init_model(self):
         for init in self.initializers:
             data = convert_raw_data(init)
-            self.result += self.load_constant(data, "_"+init.name) # doing this for same reason as in Node class
+            self.result += self.load_constant(data, "_"+init.name,self.scaleFactor) # doing +"_" for same reason as in Node class
             
-    def load_constant(self, input, name):
+    def load_constant(self, input, name, scaleFactor=16):
         shape = print_shape(input.shape,self.dtype)
-        data = print_data(input,self.dtype)
+        data = print_data(input,self.dtype,scaleFactor)
         self.cache[name] = Info(input.shape, self.dtype)
         mlir = f"%{name} = \"engine.constant\"() {{value=dense<{data}>:tensor<{shape}>}} : () -> memref<{shape}>\n"
         return mlir
@@ -143,7 +144,7 @@ class Model():
     def translate(self, input):
         for i, nd in enumerate(self.nodes):
             if i == 0:
-                self.result += self.load_constant(input, "_"+nd.input[0]) # "_" same reason as in Node class
+                self.result += self.load_constant(input, "_"+nd.input[0],self.scaleFactor) # "_" same reason as in Node class
             n_obj = Node(nd.op_type, nd.input, nd.output[0])
             self.result += n_obj.execute(self.cache,self.dtype)
 
@@ -157,6 +158,15 @@ class Model():
         print_result = f"\"engine.print\"(%_{result_name}) : (memref<{result_shape}>) -> ()\n"
 
         return header + remove_illegals(self.result)+print_result+ footer
+    
+    def debug(self):
+        for key,value in self.cache.items():
+            print(key)
+            print(value.shape)
+            print(value)
 
 
 
+# I HAVE TO SCALE: INPUT, WEIGHTS AND BIASES
+# INPUT IS SCALED IN LOAD CONSTANT
+# WEIGHTS AND BIASES ARE ALSO SCALED IN LOAD CONSTANT -> WHICH CALLS PRINT DATA
