@@ -63,7 +63,7 @@ class Node():
         else:
             raise Exception(f"Activation Function not recognized: {self.op_type}")
 
-class Model():
+class StarterModel():
     def __init__(self, path, useInt=False):
         self.cache = {}
         o_model = onnx.load(path)
