@@ -15038,39 +15038,22 @@ define void @main() {
   br label %10081
 
 10095:                                            ; preds = %10081
-  %10096 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %10080, 1
-  %10097 = getelementptr i32, ptr %10096, i64 0
-  %10098 = load i32, ptr %10097, align 4
-  br label %10099
+  br label %10096
 
-10099:                                            ; preds = %10104, %10095
-  %10100 = phi i64 [ 0, %10095 ], [ %10111, %10104 ]
-  %10101 = phi i32 [ %10098, %10095 ], [ %10109, %10104 ]
-  %10102 = phi i64 [ 0, %10095 ], [ %10110, %10104 ]
-  %10103 = icmp slt i64 %10100, 10
-  br i1 %10103, label %10104, label %10112
+10096:                                            ; preds = %10099, %10095
+  %10097 = phi i64 [ 0, %10095 ], [ %10104, %10099 ]
+  %10098 = icmp slt i64 %10097, 10
+  br i1 %10098, label %10099, label %10105
 
-10104:                                            ; preds = %10099
-  %10105 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %10080, 1
-  %10106 = getelementptr i32, ptr %10105, i64 %10100
-  %10107 = load i32, ptr %10106, align 4
-  %10108 = icmp sgt i32 %10107, %10101
-  %10109 = select i1 %10108, i32 %10107, i32 %10101
-  %10110 = select i1 %10108, i64 %10100, i64 %10102
-  %10111 = add i64 %10100, 1
-  br label %10099
+10099:                                            ; preds = %10096
+  %10100 = extractvalue { ptr, ptr, i64, [1 x i64], [1 x i64] } %10080, 1
+  %10101 = getelementptr i32, ptr %10100, i64 %10097
+  %10102 = load i32, ptr %10101, align 4
+  %10103 = call i32 (ptr, ...) @printf(ptr @frmt_spec, i32 %10102)
+  %10104 = add i64 %10097, 1
+  br label %10096
 
-10112:                                            ; preds = %10099
-  %10113 = trunc i64 %10102 to i32
-  %10114 = call ptr @malloc(i64 ptrtoint (ptr getelementptr (i32, ptr null, i64 1) to i64))
-  %10115 = insertvalue { ptr, ptr, i64 } undef, ptr %10114, 0
-  %10116 = insertvalue { ptr, ptr, i64 } %10115, ptr %10114, 1
-  %10117 = insertvalue { ptr, ptr, i64 } %10116, i64 0, 2
-  %10118 = extractvalue { ptr, ptr, i64 } %10117, 1
-  store i32 %10113, ptr %10118, align 4
-  %10119 = extractvalue { ptr, ptr, i64 } %10117, 1
-  %10120 = load i32, ptr %10119, align 4
-  %10121 = call i32 (ptr, ...) @printf(ptr @frmt_spec, i32 %10120)
+10105:                                            ; preds = %10096
   ret void
 }
 

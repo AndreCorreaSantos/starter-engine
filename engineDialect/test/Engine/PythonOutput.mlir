@@ -22,8 +22,9 @@ func.func @main() {
 %_.model.Add_output_0 = "engine.add"(%_.model.Relu_1_output_0,%_.model.Relu_2_output_0) : (memref<5xi32>,memref<5xi32>) -> memref<5xi32> 
 %_.model.fc3.Gemm_output_0_int = "engine.matmul"(%_model.fc3.weight,%_.model.Add_output_0) : (memref<10x5xi32>,memref<5xi32>) -> memref<10xi32>
 %_.model.fc3.Gemm_output_0 = "engine.add"(%_.model.fc3.Gemm_output_0_int,%_model.fc3.bias) : (memref<10xi32>,memref<10xi32>) -> memref<10xi32>
-%_18 = "engine.argmax"(%_.model.fc3.Gemm_output_0) : (memref<10xi32>) -> memref<i32> 
-"engine.print"(%_18) : (memref<i32>) -> ()
+"engine.print"(%_.model.fc3.Gemm_output_0) : (memref<10xi32>) -> ()
+// %_18 = "engine.argmax"(%_.model.fc3.Gemm_output_0) : (memref<10xi32>) -> memref<i32> 
+// "engine.print"(%_18) : (memref<i32>) -> ()
 return
 }
 }

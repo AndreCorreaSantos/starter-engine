@@ -22,8 +22,9 @@ func.func @main() {
 %_.model.Add_output_0 = "engine.add"(%_.model.Relu_1_output_0,%_.model.Relu_2_output_0) : (memref<5xi32>,memref<5xi32>) -> memref<5xi32> 
 %_.model.fc3.Gemm_output_0_int = "engine.matmul"(%_model.fc3.weight,%_.model.Add_output_0) : (memref<10x5xi32>,memref<5xi32>) -> memref<10xi32>
 %_.model.fc3.Gemm_output_0 = "engine.add"(%_.model.fc3.Gemm_output_0_int,%_model.fc3.bias) : (memref<10xi32>,memref<10xi32>) -> memref<10xi32>
-%_18 = "engine.argmax"(%_.model.fc3.Gemm_output_0) : (memref<10xi32>) -> memref<i32> 
-"engine.print"(%_18) : (memref<i32>) -> ()
+"engine.print"(%_.model.fc3.Gemm_output_0) : (memref<10xi32>) -> ()
+// %_18 = "engine.argmax"(%_.model.fc3.Gemm_output_0) : (memref<10xi32>) -> memref<i32> 
+// "engine.print"(%_18) : (memref<i32>) -> ()
 return
 }
 }// -----// IR Dump After {anonymous}::LowerSettingsPass () //----- //
@@ -51,8 +52,7 @@ module {
     %19 = "engine.add"(%15, %18) : (memref<5xi32>, memref<5xi32>) -> memref<5xi32>
     %20 = "engine.matmul"(%6, %19) : (memref<10x5xi32>, memref<5xi32>) -> memref<10xi32>
     %21 = "engine.add"(%20, %7) : (memref<10xi32>, memref<10xi32>) -> memref<10xi32>
-    %22 = "engine.argmax"(%21) : (memref<10xi32>) -> memref<i32>
-    engine.print %22 : memref<i32>
+    engine.print %21 : memref<10xi32>
     return
   }
 }
@@ -11446,21 +11446,7 @@ module {
     linalg.matvec ins(%alloc_3990, %alloc_5656 : memref<10x5xi32>, memref<5xi32>) outs(%alloc_5657 : memref<10xi32>)
     %alloc_5658 = memref.alloc() : memref<10xi32>
     linalg.add ins(%alloc_5657, %alloc_4039 : memref<10xi32>, memref<10xi32>) outs(%alloc_5658 : memref<10xi32>)
-    %c0_5659 = arith.constant 0 : index
-    %45 = memref.load %alloc_5658[%c0_5659] : memref<10xi32>
-    %c1_5660 = arith.constant 1 : index
-    %c10_5661 = arith.constant 10 : index
-    %46:2 = scf.for %arg0 = %c0_5659 to %c10_5661 step %c1_5660 iter_args(%arg1 = %45, %arg2 = %c0_5659) -> (i32, index) {
-      %48 = memref.load %alloc_5658[%arg0] : memref<10xi32>
-      %49 = arith.cmpi sgt, %48, %arg1 : i32
-      %50 = arith.select %49, %48, %arg1 : i32
-      %51 = arith.select %49, %arg0, %arg2 : index
-      scf.yield %50, %51 : i32, index
-    }
-    %47 = arith.index_cast %46#1 : index to i32
-    %alloc_5662 = memref.alloc() : memref<i32>
-    memref.store %47, %alloc_5662[] : memref<i32>
-    engine.print %alloc_5662 : memref<i32>
+    engine.print %alloc_5658 : memref<10xi32>
     return
   }
 }
@@ -17137,20 +17123,20 @@ module {
     %alloc_9 = memref.alloc() : memref<5xi32>
     scf.for %arg0 = %c0 to %c5 step %c1 {
       scf.for %arg1 = %c0 to %c784 step %c1 {
-        %48 = memref.load %alloc[%arg0, %arg1] : memref<5x784xi32>
-        %49 = memref.load %reshape[%arg1] : memref<784xi32>
-        %50 = memref.load %alloc_9[%arg0] : memref<5xi32>
-        %51 = arith.muli %48, %49 : i32
-        %52 = arith.addi %50, %51 : i32
-        memref.store %52, %alloc_9[%arg0] : memref<5xi32>
+        %45 = memref.load %alloc[%arg0, %arg1] : memref<5x784xi32>
+        %46 = memref.load %reshape[%arg1] : memref<784xi32>
+        %47 = memref.load %alloc_9[%arg0] : memref<5xi32>
+        %48 = arith.muli %45, %46 : i32
+        %49 = arith.addi %47, %48 : i32
+        memref.store %49, %alloc_9[%arg0] : memref<5xi32>
       }
     }
     %alloc_10 = memref.alloc() : memref<5xi32>
     scf.for %arg0 = %c0 to %c5 step %c1 {
-      %48 = memref.load %alloc_9[%arg0] : memref<5xi32>
-      %49 = memref.load %alloc_0[%arg0] : memref<5xi32>
-      %50 = arith.addi %48, %49 : i32
-      memref.store %50, %alloc_10[%arg0] : memref<5xi32>
+      %45 = memref.load %alloc_9[%arg0] : memref<5xi32>
+      %46 = memref.load %alloc_0[%arg0] : memref<5xi32>
+      %47 = arith.addi %45, %46 : i32
+      memref.store %47, %alloc_10[%arg0] : memref<5xi32>
     }
     %alloc_11 = memref.alloc() : memref<5xi32>
     %0 = affine.load %alloc_10[%c0] : memref<5xi32>
@@ -17176,20 +17162,20 @@ module {
     %alloc_12 = memref.alloc() : memref<5xi32>
     scf.for %arg0 = %c0 to %c5 step %c1 {
       scf.for %arg1 = %c0 to %c5 step %c1 {
-        %48 = memref.load %alloc_1[%arg0, %arg1] : memref<5x5xi32>
-        %49 = memref.load %alloc_11[%arg1] : memref<5xi32>
-        %50 = memref.load %alloc_12[%arg0] : memref<5xi32>
-        %51 = arith.muli %48, %49 : i32
-        %52 = arith.addi %50, %51 : i32
-        memref.store %52, %alloc_12[%arg0] : memref<5xi32>
+        %45 = memref.load %alloc_1[%arg0, %arg1] : memref<5x5xi32>
+        %46 = memref.load %alloc_11[%arg1] : memref<5xi32>
+        %47 = memref.load %alloc_12[%arg0] : memref<5xi32>
+        %48 = arith.muli %45, %46 : i32
+        %49 = arith.addi %47, %48 : i32
+        memref.store %49, %alloc_12[%arg0] : memref<5xi32>
       }
     }
     %alloc_13 = memref.alloc() : memref<5xi32>
     scf.for %arg0 = %c0 to %c5 step %c1 {
-      %48 = memref.load %alloc_12[%arg0] : memref<5xi32>
-      %49 = memref.load %alloc_2[%arg0] : memref<5xi32>
-      %50 = arith.addi %48, %49 : i32
-      memref.store %50, %alloc_13[%arg0] : memref<5xi32>
+      %45 = memref.load %alloc_12[%arg0] : memref<5xi32>
+      %46 = memref.load %alloc_2[%arg0] : memref<5xi32>
+      %47 = arith.addi %45, %46 : i32
+      memref.store %47, %alloc_13[%arg0] : memref<5xi32>
     }
     %alloc_14 = memref.alloc() : memref<5xi32>
     %15 = affine.load %alloc_13[%c0] : memref<5xi32>
@@ -17215,20 +17201,20 @@ module {
     %alloc_15 = memref.alloc() : memref<5xi32>
     scf.for %arg0 = %c0 to %c5 step %c1 {
       scf.for %arg1 = %c0 to %c5 step %c1 {
-        %48 = memref.load %alloc_3[%arg0, %arg1] : memref<5x5xi32>
-        %49 = memref.load %alloc_11[%arg1] : memref<5xi32>
-        %50 = memref.load %alloc_15[%arg0] : memref<5xi32>
-        %51 = arith.muli %48, %49 : i32
-        %52 = arith.addi %50, %51 : i32
-        memref.store %52, %alloc_15[%arg0] : memref<5xi32>
+        %45 = memref.load %alloc_3[%arg0, %arg1] : memref<5x5xi32>
+        %46 = memref.load %alloc_11[%arg1] : memref<5xi32>
+        %47 = memref.load %alloc_15[%arg0] : memref<5xi32>
+        %48 = arith.muli %45, %46 : i32
+        %49 = arith.addi %47, %48 : i32
+        memref.store %49, %alloc_15[%arg0] : memref<5xi32>
       }
     }
     %alloc_16 = memref.alloc() : memref<5xi32>
     scf.for %arg0 = %c0 to %c5 step %c1 {
-      %48 = memref.load %alloc_15[%arg0] : memref<5xi32>
-      %49 = memref.load %alloc_4[%arg0] : memref<5xi32>
-      %50 = arith.addi %48, %49 : i32
-      memref.store %50, %alloc_16[%arg0] : memref<5xi32>
+      %45 = memref.load %alloc_15[%arg0] : memref<5xi32>
+      %46 = memref.load %alloc_4[%arg0] : memref<5xi32>
+      %47 = arith.addi %45, %46 : i32
+      memref.store %47, %alloc_16[%arg0] : memref<5xi32>
     }
     %alloc_17 = memref.alloc() : memref<5xi32>
     %30 = affine.load %alloc_16[%c0] : memref<5xi32>
@@ -17253,41 +17239,30 @@ module {
     affine.store %44, %alloc_17[%c4] : memref<5xi32>
     %alloc_18 = memref.alloc() : memref<5xi32>
     scf.for %arg0 = %c0 to %c5 step %c1 {
-      %48 = memref.load %alloc_14[%arg0] : memref<5xi32>
-      %49 = memref.load %alloc_17[%arg0] : memref<5xi32>
-      %50 = arith.addi %48, %49 : i32
-      memref.store %50, %alloc_18[%arg0] : memref<5xi32>
+      %45 = memref.load %alloc_14[%arg0] : memref<5xi32>
+      %46 = memref.load %alloc_17[%arg0] : memref<5xi32>
+      %47 = arith.addi %45, %46 : i32
+      memref.store %47, %alloc_18[%arg0] : memref<5xi32>
     }
     %alloc_19 = memref.alloc() : memref<10xi32>
     scf.for %arg0 = %c0 to %c10 step %c1 {
       scf.for %arg1 = %c0 to %c5 step %c1 {
-        %48 = memref.load %alloc_5[%arg0, %arg1] : memref<10x5xi32>
-        %49 = memref.load %alloc_18[%arg1] : memref<5xi32>
-        %50 = memref.load %alloc_19[%arg0] : memref<10xi32>
-        %51 = arith.muli %48, %49 : i32
-        %52 = arith.addi %50, %51 : i32
-        memref.store %52, %alloc_19[%arg0] : memref<10xi32>
+        %45 = memref.load %alloc_5[%arg0, %arg1] : memref<10x5xi32>
+        %46 = memref.load %alloc_18[%arg1] : memref<5xi32>
+        %47 = memref.load %alloc_19[%arg0] : memref<10xi32>
+        %48 = arith.muli %45, %46 : i32
+        %49 = arith.addi %47, %48 : i32
+        memref.store %49, %alloc_19[%arg0] : memref<10xi32>
       }
     }
     %alloc_20 = memref.alloc() : memref<10xi32>
     scf.for %arg0 = %c0 to %c10 step %c1 {
-      %48 = memref.load %alloc_19[%arg0] : memref<10xi32>
-      %49 = memref.load %alloc_6[%arg0] : memref<10xi32>
-      %50 = arith.addi %48, %49 : i32
-      memref.store %50, %alloc_20[%arg0] : memref<10xi32>
+      %45 = memref.load %alloc_19[%arg0] : memref<10xi32>
+      %46 = memref.load %alloc_6[%arg0] : memref<10xi32>
+      %47 = arith.addi %45, %46 : i32
+      memref.store %47, %alloc_20[%arg0] : memref<10xi32>
     }
-    %45 = memref.load %alloc_20[%c0] : memref<10xi32>
-    %46:2 = scf.for %arg0 = %c0 to %c10 step %c1 iter_args(%arg1 = %45, %arg2 = %c0) -> (i32, index) {
-      %48 = memref.load %alloc_20[%arg0] : memref<10xi32>
-      %49 = arith.cmpi sgt, %48, %arg1 : i32
-      %50 = arith.select %49, %48, %arg1 : i32
-      %51 = arith.select %49, %arg0, %arg2 : index
-      scf.yield %50, %51 : i32, index
-    }
-    %47 = arith.index_cast %46#1 : index to i32
-    %alloc_21 = memref.alloc() : memref<i32>
-    memref.store %47, %alloc_21[] : memref<i32>
-    engine.print %alloc_21 : memref<i32>
+    engine.print %alloc_20 : memref<10xi32>
     return
   }
 }
@@ -45330,48 +45305,30 @@ module {
     %23110 = llvm.add %23099, %822 : i64
     llvm.br ^bb37(%23110 : i64)
   ^bb39:  // pred: ^bb37
-    %23111 = llvm.extractvalue %23098[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %23112 = llvm.getelementptr %23111[%823] : (!llvm.ptr, i64) -> !llvm.ptr, i32
-    %23113 = llvm.load %23112 : !llvm.ptr -> i32
-    llvm.br ^bb40(%823, %23113, %823 : i64, i32, i64)
-  ^bb40(%23114: i64, %23115: i32, %23116: i64):  // 2 preds: ^bb39, ^bb41
-    %23117 = llvm.icmp "slt" %23114, %813 : i64
-    llvm.cond_br %23117, ^bb41, ^bb42
+    %23111 = llvm.mlir.addressof @frmt_spec : !llvm.ptr
+    %23112 = llvm.mlir.constant(0 : index) : i64
+    %23113 = llvm.getelementptr %23111[%23112, %23112] : (!llvm.ptr, i64, i64) -> !llvm.ptr, !llvm.array<4 x i8>
+    %23114 = llvm.mlir.addressof @nl : !llvm.ptr
+    %23115 = llvm.mlir.constant(0 : index) : i64
+    %23116 = llvm.getelementptr %23114[%23115, %23115] : (!llvm.ptr, i64, i64) -> !llvm.ptr, !llvm.array<2 x i8>
+    %23117 = llvm.mlir.constant(0 : index) : i64
+    %23118 = llvm.mlir.constant(10 : index) : i64
+    %23119 = llvm.mlir.constant(1 : index) : i64
+    llvm.br ^bb40(%23117 : i64)
+  ^bb40(%23120: i64):  // 2 preds: ^bb39, ^bb41
+    %23121 = llvm.icmp "slt" %23120, %23118 : i64
+    llvm.cond_br %23121, ^bb41, ^bb42
   ^bb41:  // pred: ^bb40
-    %23118 = llvm.extractvalue %23098[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
-    %23119 = llvm.getelementptr %23118[%23114] : (!llvm.ptr, i64) -> !llvm.ptr, i32
-    %23120 = llvm.load %23119 : !llvm.ptr -> i32
-    %23121 = llvm.icmp "sgt" %23120, %23115 : i32
-    %23122 = llvm.select %23121, %23120, %23115 : i1, i32
-    %23123 = llvm.select %23121, %23114, %23116 : i1, i64
-    %23124 = llvm.add %23114, %822 : i64
-    llvm.br ^bb40(%23124, %23122, %23123 : i64, i32, i64)
+    %23122 = llvm.extractvalue %23098[1] : !llvm.struct<(ptr, ptr, i64, array<1 x i64>, array<1 x i64>)> 
+    %23123 = llvm.getelementptr %23122[%23120] : (!llvm.ptr, i64) -> !llvm.ptr, i32
+    %23124 = llvm.load %23123 : !llvm.ptr -> i32
+    %23125 = llvm.call @printf(%23113, %23124) vararg(!llvm.func<i32 (ptr, ...)>) : (!llvm.ptr, i32) -> i32
+    %23126 = llvm.add %23120, %23119 : i64
+    llvm.br ^bb40(%23126 : i64)
   ^bb42:  // pred: ^bb40
-    %23125 = llvm.trunc %23116 : i64 to i32
-    %23126 = llvm.mlir.constant(1 : index) : i64
-    %23127 = llvm.mlir.zero : !llvm.ptr
-    %23128 = llvm.getelementptr %23127[%23126] : (!llvm.ptr, i64) -> !llvm.ptr, i32
-    %23129 = llvm.ptrtoint %23128 : !llvm.ptr to i64
-    %23130 = llvm.call @malloc(%23129) : (i64) -> !llvm.ptr
-    %23131 = llvm.mlir.undef : !llvm.struct<(ptr, ptr, i64)>
-    %23132 = llvm.insertvalue %23130, %23131[0] : !llvm.struct<(ptr, ptr, i64)> 
-    %23133 = llvm.insertvalue %23130, %23132[1] : !llvm.struct<(ptr, ptr, i64)> 
-    %23134 = llvm.mlir.constant(0 : index) : i64
-    %23135 = llvm.insertvalue %23134, %23133[2] : !llvm.struct<(ptr, ptr, i64)> 
-    %23136 = llvm.extractvalue %23135[1] : !llvm.struct<(ptr, ptr, i64)> 
-    llvm.store %23125, %23136 : i32, !llvm.ptr
-    %23137 = llvm.mlir.addressof @frmt_spec : !llvm.ptr
-    %23138 = llvm.mlir.constant(0 : index) : i64
-    %23139 = llvm.getelementptr %23137[%23138, %23138] : (!llvm.ptr, i64, i64) -> !llvm.ptr, !llvm.array<4 x i8>
-    %23140 = llvm.mlir.addressof @nl : !llvm.ptr
-    %23141 = llvm.mlir.constant(0 : index) : i64
-    %23142 = llvm.getelementptr %23140[%23141, %23141] : (!llvm.ptr, i64, i64) -> !llvm.ptr, !llvm.array<2 x i8>
-    %23143 = llvm.extractvalue %23135[1] : !llvm.struct<(ptr, ptr, i64)> 
-    %23144 = llvm.load %23143 : !llvm.ptr -> i32
-    %23145 = llvm.call @printf(%23139, %23144) vararg(!llvm.func<i32 (ptr, ...)>) : (!llvm.ptr, i32) -> i32
     llvm.return
   }
 }
 
 
-9 
+865357259 -738595971 -461459776 1240525655 911241242 -1919880297 -1402790486 -1419615150 -316713122 1967912637 
