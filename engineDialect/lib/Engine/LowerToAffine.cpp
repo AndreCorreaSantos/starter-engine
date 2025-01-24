@@ -226,7 +226,7 @@ public:
   }
 };
 
-class MatmulOpLowering : public mlir::OpRewritePattern<engine::MatmulOp> {
+class MatmulOpLowering : public mlir::OpRewritePattern<engine::MatmulOp> { // MAYBE NEED TO INITIALIZE OUTPUT BUFFER TO 0 - test this
 public:
   using OpRewritePattern<engine::MatmulOp>::OpRewritePattern;
 
@@ -252,10 +252,35 @@ public:
       return rewriter.notifyMatchFailure(op, "expected memref result type");
     } 
 
+    auto isFloat = resultType.getElementType().isa<mlir::FloatType>();
+
     // // Allocate output memref
     // auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
     // Allocate output memref
     auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
+
+    // // Zero-initialize the output buffer
+    mlir::Value zero = isFloat ? 
+      rewriter.create<mlir::arith::ConstantFloatOp>(
+          loc, 
+          llvm::APFloat(0.0),
+          rewriter.getF64Type()
+      ).getResult() :  // For floats
+      rewriter.create<mlir::arith::ConstantIntOp>(
+          loc, 
+          0, 
+          32
+      ).getResult();   // For integers
+
+    mlir::Value allocMemref = alloc.getResult(); // Get the memref value
+    
+    for (int64_t i = 0; i < resultType.getShape()[0]; ++i) {
+      // Create index value (not operation)
+      mlir::Value idx = rewriter.create<mlir::arith::ConstantIndexOp>(loc, i).getResult();
+      
+      // Store using VALUES, not operations
+      rewriter.create<mlir::memref::StoreOp>(loc, zero, allocMemref, idx);
+    }
 
     // Create the linalg.Matmul operation
     rewriter.create<mlir::linalg::MatvecOp>(
@@ -300,7 +325,6 @@ public:
     // Allocate output memref
     auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
 
-    // Create the linalg.Matmul operation
     rewriter.create<mlir::linalg::AddOp>(
         loc,
         mlir::ValueRange{lhs, rhs},
