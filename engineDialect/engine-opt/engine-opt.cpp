@@ -153,6 +153,7 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
     return 4;
   passManager.addPass(engine::createLowerToAffinePass(settings));
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
+  passManager.addPass(mlir::createCanonicalizerPass());
   // passManager.addPass(mlir::createConvertSCFToCFPass());
 
   if (settings.lowerSettings == 0) {

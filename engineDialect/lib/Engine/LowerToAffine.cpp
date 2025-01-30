@@ -399,7 +399,7 @@ public:
         // relu(x) = select (x>0), x, 0
         auto reluValue = rewriter.create<mlir::arith::SelectOp>(loc, cmp, loadedValue, zeroValue);
 
-        // Then store reluValue
+        // Then store reluValue CHECK THIS OUT LATER.
         rewriter.create<mlir::affine::AffineStoreOp>(loc, reluValue, alloc, indices);
         return;
       }
