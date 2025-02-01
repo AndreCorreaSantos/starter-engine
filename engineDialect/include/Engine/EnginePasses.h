@@ -32,6 +32,7 @@ struct settingsInfo {
 std::unique_ptr<mlir::Pass> createLowerSettingsPass(settingsInfo &settings);
 std::unique_ptr<mlir::Pass> createLowerToAffinePass(settingsInfo &settings);
 std::unique_ptr<mlir::Pass> createLowerToLLVMPass();
+std::unique_ptr<mlir::Pass> createLowerToSPIRPass();
 } // namespace engine
 
 #endif // MLIR_ENGINE_PASSES_H

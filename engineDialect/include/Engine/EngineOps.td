@@ -165,7 +165,8 @@ def SettingsOp: Engine_Op<"settings"> {
   let description = [{
     The "set" operation sets engine lowering settings.
     Binary, 0 = lowers to llvm,
-    1 = lowers to fpga.
+    1 = lowers to fpga,
+    2 = lowers to spir-v.
   }];
   let arguments = (ins I32Attr:$value);
 }

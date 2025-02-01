@@ -158,6 +158,9 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (settings.lowerSettings == 0) {
     passManager.addPass(engine::createLowerToLLVMPass());
   }
+  if (settings.lowerSettings == 2) {
+    passManager.addPass(engine::createLowerToSPIRPass());
+  }
   if (mlir::failed(passManager.run(*module))) {
     return 4;
   }
