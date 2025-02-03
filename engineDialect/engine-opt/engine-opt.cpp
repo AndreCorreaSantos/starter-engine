@@ -144,7 +144,7 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (mlir::failed(settingsPassManager.run(*module))) {
     return 4;
   }
-  llvm::errs() << "lowerSettings: " << settings.lowerSettings << "\n";
+  // llvm::errs() << "lowerSettings: " << settings.lowerSettings << "\n";
 
 
   // run main pass manager

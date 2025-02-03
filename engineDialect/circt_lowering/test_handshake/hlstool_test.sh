@@ -1,3 +1,5 @@
+#!/bin/bash
+
 out="../../build/bin/engine-opt stress.mlir"
 
 $out &> log.mlir
