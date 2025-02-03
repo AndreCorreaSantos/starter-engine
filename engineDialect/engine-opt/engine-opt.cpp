@@ -144,7 +144,7 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (mlir::failed(settingsPassManager.run(*module))) {
     return 4;
   }
-  llvm::errs() << "lowerSettings: " << settings.lowerSettings << "\n";
+  // llvm::errs() << "lowerSettings: " << settings.lowerSettings << "\n";
 
 
   // run main pass manager
@@ -153,6 +153,7 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
     return 4;
   passManager.addPass(engine::createLowerToAffinePass(settings));
   passManager.addPass(mlir::createConvertLinalgToLoopsPass());
+  passManager.addPass(mlir::createCanonicalizerPass());
   // passManager.addPass(mlir::createConvertSCFToCFPass());
 
   if (settings.lowerSettings == 0) {
@@ -232,7 +233,8 @@ int main(int argc, char **argv) {
 
   // Load and process MLIR file.
   engine::settingsInfo settings;
-  settings.lowerSettings = 0; // if no lowerSettings has been set they default to llvm compilation
+  settings.lowerSettings = 0; // defaulting to llvm compilation
+  settings.type = 0; // defaulting to floats.
   mlir::OwningOpRef<mlir::ModuleOp> module;
   if (int error = loadAndProcessMLIR(context, module, settings)) {
     return error;

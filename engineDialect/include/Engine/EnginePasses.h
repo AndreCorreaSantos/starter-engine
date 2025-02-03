@@ -26,7 +26,8 @@
 
 namespace engine {
 struct settingsInfo {
-  int64_t lowerSettings;
+  int64_t lowerSettings; // Lowering type: 0 means llvm, 1 verilog
+  int64_t type; // data Types: 0 means floats, 1 means integers.
 };
 
 std::unique_ptr<mlir::Pass> createLowerSettingsPass(settingsInfo &settings);

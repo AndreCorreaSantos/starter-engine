@@ -61,85 +61,81 @@ static mlir::Value insertAllocAndDealloc(mlir::MemRefType type,
 }
 
 class ConstantOpLowering : public mlir::OpRewritePattern<engine::ConstantOp> {
-  using OpRewritePattern<engine::ConstantOp>::OpRewritePattern;
+using OpRewritePattern<engine::ConstantOp>::OpRewritePattern;
 
-  mlir::LogicalResult
-  matchAndRewrite(engine::ConstantOp op,
-                  mlir::PatternRewriter &rewriter) const final {
-    mlir::DenseElementsAttr constantValue = op.getValue();
-    mlir::Location loc = op.getLoc();
+mlir::LogicalResult matchAndRewrite(engine::ConstantOp op,
+                                  mlir::PatternRewriter &rewriter) const final {
+  mlir::ElementsAttr constantValue = op.getValue();
+  mlir::Location loc = op.getLoc();
 
-    // When lowering the constant operation, we allocate and assign the constant
-    // values to a corresponding memref allocation.
-    auto memRefType = op.getType().dyn_cast<mlir::MemRefType>();
-    if (!memRefType) {
-      return rewriter.notifyMatchFailure(op, "expected memref result");
-    }
-    // auto alloc = insertAllocAndDealloc(memRefType, loc, rewriter);
-    auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, memRefType);
+  // When lowering the constant operation, we allocate and assign the constant
+  // values to a corresponding memref allocation.
+  auto memRefType = op.getType().dyn_cast<mlir::MemRefType>();
+  if (!memRefType) {
+    return rewriter.notifyMatchFailure(op, "expected memref result");
+  }
 
-    // We will be generating constant indices up-to the largest dimension.
-    // Create these constants up-front to avoid large amounts of redundant
-    // operations.
-    auto valueShape = memRefType.getShape();
-    mlir::SmallVector<mlir::Value, 8> constantIndices;
+  auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, memRefType);
 
-    if (!valueShape.empty()) {
-      for (auto i : llvm::seq<int64_t>(
-               0, *std::max_element(valueShape.begin(), valueShape.end())))
-        constantIndices.push_back(
-            rewriter.create<mlir::arith::ConstantIndexOp>(loc, i));
-    } else {
-      // This is the case of a tensor of rank 0.
+  // We will be generating constant indices up-to the largest dimension.
+  auto valueShape = memRefType.getShape();
+  mlir::SmallVector<mlir::Value, 8> constantIndices;
+  if (!valueShape.empty()) {
+    for (auto i : llvm::seq<int64_t>(
+         0, *std::max_element(valueShape.begin(), valueShape.end())))
       constantIndices.push_back(
-          rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0));
-    }
-    // The constant operation represents a multi-dimensional constant, so we
-    // will need to generate a store for each of the elements. The following
-    // functor recursively walks the dimensions of the constant shape,
-    // generating a store when the recursion hits the base case.
+          rewriter.create<mlir::arith::ConstantIndexOp>(loc, i));
+  } else {
+    constantIndices.push_back(
+        rewriter.create<mlir::arith::ConstantIndexOp>(loc, 0));
+  }
 
-    // [4, 3] (1, 2, 3, 4, 5, 6, 7, 8)
-    // storeElements(0)
-    //   indices = [0]
-    //   storeElements(1)
-    //     indices = [0, 0]
-    //     storeElements(2)
-    //       store (const 1) [0, 0]
-    //     indices = [0]
-    //     indices = [0, 1]
-    //     storeElements(2)
-    //       store (const 2) [0, 1]
-    //  ...
-    //
-    mlir::SmallVector<mlir::Value, 2> indices;
+  mlir::SmallVector<mlir::Value, 2> indices;
+
+  if (memRefType.getElementType().isa<mlir::FloatType>()) { // REFACTOR THIS MESS LATER
+
     auto valueIt = constantValue.getValues<mlir::FloatAttr>().begin();
     std::function<void(uint64_t)> storeElements = [&](uint64_t dimension) {
-      // The last dimension is the base case of the recursion, at this point
-      // we store the element at the given index.
       if (dimension == valueShape.size()) {
         rewriter.create<mlir::affine::AffineStoreOp>(
             loc, rewriter.create<mlir::arith::ConstantOp>(loc, *valueIt++),
             alloc, llvm::ArrayRef(indices));
         return;
       }
-
-      // Otherwise, iterate over the current dimension and add the indices to
-      // the list.
       for (uint64_t i = 0, e = valueShape[dimension]; i != e; ++i) {
         indices.push_back(constantIndices[i]);
         storeElements(dimension + 1);
         indices.pop_back();
       }
     };
-
-    // Start the element storing recursion from the first dimension.
-    storeElements(/*dimension=*/0);
-
-    // Replace this operation with the generated alloc.
-    rewriter.replaceOp(op, alloc);
-    return mlir::success();
+    storeElements(0);
+  } 
+  else if (memRefType.getElementType().isa<mlir::IntegerType>()) {
+    // Handle integer case
+    auto valueIt = constantValue.getValues<mlir::IntegerAttr>().begin();
+    std::function<void(uint64_t)> storeElements = [&](uint64_t dimension) {
+      if (dimension == valueShape.size()) {
+        rewriter.create<mlir::affine::AffineStoreOp>(
+            loc, rewriter.create<mlir::arith::ConstantOp>(loc, *valueIt++),
+            alloc, llvm::ArrayRef(indices));
+        return;
+      }
+      for (uint64_t i = 0, e = valueShape[dimension]; i != e; ++i) {
+        indices.push_back(constantIndices[i]);
+        storeElements(dimension + 1);
+        indices.pop_back();
+      }
+    };
+    storeElements(0);
   }
+  else {
+    return rewriter.notifyMatchFailure(op, "unsupported element type");
+  }
+
+  // Replace this operation with the generated alloc.
+  rewriter.replaceOp(op, alloc);
+  return mlir::success();
+}
 };
 
 class PrintOpLowering : public mlir::OpConversionPattern<engine::PrintOp> {
@@ -187,63 +183,6 @@ static void lowerOpToLoops(mlir::Operation *op, mlir::ValueRange operands,
   rewriter.replaceOp(op, alloc);
 }
 
-// namespace {
-// template <typename BinaryOp, typename LoweredBinaryOp>
-// struct BinaryOpLowering : public mlir::ConversionPattern {
-//   BinaryOpLowering(mlir::MLIRContext *ctx)
-//       : mlir::ConversionPattern(BinaryOp::getOperationName(), 1, ctx) {}
-
-//   mlir::LogicalResult
-//   matchAndRewrite(mlir::Operation *op, llvm::ArrayRef<mlir::Value> operands,
-//                  mlir::ConversionPatternRewriter &rewriter) const final {
-//     // Get location for error reporting
-//     mlir::Location loc = op->getLoc();
-
-//     // Get the input types
-//     auto lhsType = op->getOperand(0).getType();
-//     auto rhsType = op->getOperand(1).getType();
-
-//     // Check if inputs are MemRef types
-//     auto lhsMemRef = lhsType.dyn_cast<mlir::MemRefType>();
-//     auto rhsMemRef = rhsType.dyn_cast<mlir::MemRefType>();
-    
-//     if (!lhsMemRef || !rhsMemRef) {
-//       return rewriter.notifyMatchFailure(op, "expected memref operands");
-//     }
-
-//     // Verify shapes are compatible
-//     if (lhsMemRef.getShape() != rhsMemRef.getShape()) {
-//       return rewriter.notifyMatchFailure(op, "operand shapes must match");
-//     }
-
-//     // Create the lowering function
-//     auto elementType = lhsMemRef.getElementType();
-//     lowerOpToLoops(op, operands, rewriter,
-//       [loc, elementType](mlir::OpBuilder &builder, mlir::ValueRange memRefOperands,
-//                         mlir::ValueRange loopIvs) {
-//         // Adapt the operands
-//         typename BinaryOp::Adaptor binaryAdaptor(memRefOperands);
-        
-//         // Load values from memrefs
-//         mlir::Value loadedLhs = builder.create<mlir::memref::LoadOp>(
-//             loc, binaryAdaptor.getLhs(), loopIvs);
-//         mlir::Value loadedRhs = builder.create<mlir::memref::LoadOp>(
-//             loc, binaryAdaptor.getRhs(), loopIvs);
-
-//         // Perform the binary operation
-//         return builder.create<LoweredBinaryOp>(loc, loadedLhs, loadedRhs);
-//     });
-
-//     return mlir::success();
-//   }
-// };
-
-// // Define the specific binary operations
-// using AddOpLowering = BinaryOpLowering<engine::AddOp, mlir::arith::AddFOp>;
-// // using MulOpLowering = BinaryOpLowering<engine::MulOp, mlir::arith::MulFOp>;
-
-// }
-
 class DotOpLowering : public mlir::OpRewritePattern<engine::DotOp> {
 public:
   using OpRewritePattern<engine::DotOp>::OpRewritePattern;
@@ -287,7 +226,7 @@ public:
   }
 };
 
-class MatmulOpLowering : public mlir::OpRewritePattern<engine::MatmulOp> {
+class MatmulOpLowering : public mlir::OpRewritePattern<engine::MatmulOp> { // MAYBE NEED TO INITIALIZE OUTPUT BUFFER TO 0 - test this
 public:
   using OpRewritePattern<engine::MatmulOp>::OpRewritePattern;
 
@@ -313,10 +252,35 @@ public:
       return rewriter.notifyMatchFailure(op, "expected memref result type");
     } 
 
+    auto isFloat = resultType.getElementType().isa<mlir::FloatType>();
+
     // // Allocate output memref
     // auto alloc = insertAllocAndDealloc(resultType, loc, rewriter);
     // Allocate output memref
     auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
+
+    // // Zero-initialize the output buffer
+    mlir::Value zero = isFloat ? 
+      rewriter.create<mlir::arith::ConstantFloatOp>(
+          loc, 
+          llvm::APFloat(0.0),
+          rewriter.getF64Type()
+      ).getResult() :  // For floats
+      rewriter.create<mlir::arith::ConstantIntOp>(
+          loc, 
+          0, 
+          32
+      ).getResult();   // For integers
+
+    mlir::Value allocMemref = alloc.getResult(); // Get the memref value
+    
+    for (int64_t i = 0; i < resultType.getShape()[0]; ++i) {
+      // Create index value (not operation)
+      mlir::Value idx = rewriter.create<mlir::arith::ConstantIndexOp>(loc, i).getResult();
+      
+      // Store using VALUES, not operations
+      rewriter.create<mlir::memref::StoreOp>(loc, zero, allocMemref, idx);
+    }
 
     // Create the linalg.Matmul operation
     rewriter.create<mlir::linalg::MatvecOp>(
@@ -361,7 +325,6 @@ public:
     // Allocate output memref
     auto alloc = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
 
-    // Create the linalg.Matmul operation
     rewriter.create<mlir::linalg::AddOp>(
         loc,
         mlir::ValueRange{lhs, rhs},
@@ -389,6 +352,7 @@ public:
     if (!inputType) {
       return rewriter.notifyMatchFailure(op, "expected memref type for input");
     }
+    auto isFloat = inputType.getElementType().isa<mlir::FloatType>();
 
     auto resultType = op.getResult().getType().dyn_cast<mlir::MemRefType>();
     if (!resultType) {
@@ -405,12 +369,8 @@ public:
     for (auto i : llvm::seq<int64_t>(0, *std::max_element(valueShape.begin(), valueShape.end()))) {
       constantIndices.push_back(rewriter.create<mlir::arith::ConstantIndexOp>(loc, i));
     }
-    // creates:
-    // %c0 = arith.constant 0 : index
-    // %c1 = arith.constant 1 : index
-    // %c2 = arith.constant 2 : index ...
 
-    // Create constant 1.0 for addition
+
     auto zeroAttr = rewriter.getZeroAttr(inputType.getElementType());
     auto zeroValue = rewriter.create<mlir::arith::ConstantOp>(loc, zeroAttr);
 
@@ -420,18 +380,26 @@ public:
       if (dimension == valueShape.size()) {
         // Load input value
         auto loadedValue = rewriter.create<mlir::affine::AffineLoadOp>(loc, input, llvm::ArrayRef(indices));
-      
-        auto cmp = rewriter.create<mlir::arith::CmpFOp>(
-            loc,
-            mlir::arith::CmpFPredicate::OGT,
-            loadedValue,    // x
-            zeroValue       // 0.0
-        );
+
+        mlir::Value cmp;
+        if(isFloat){
+          cmp = rewriter.create<mlir::arith::CmpFOp>(loc,mlir::arith::CmpFPredicate::OGT,
+                loadedValue,    // x
+                zeroValue       // 0.0
+            );
+        }
+        else{
+          cmp = rewriter.create<mlir::arith::CmpIOp>(loc,mlir::arith::CmpIPredicate::sgt,
+              loadedValue,    // x
+              zeroValue       // 0.0
+          );
+        }
+ 
 
         // relu(x) = select (x>0), x, 0
         auto reluValue = rewriter.create<mlir::arith::SelectOp>(loc, cmp, loadedValue, zeroValue);
 
-        // Then store reluValue
+        // Then store reluValue CHECK THIS OUT LATER.
         rewriter.create<mlir::affine::AffineStoreOp>(loc, reluValue, alloc, indices);
         return;
       }
@@ -503,9 +471,11 @@ public:
         auto loc = op.getLoc();
         auto value = op.getValue();
         auto inputType = value.getType().dyn_cast<mlir::MemRefType>();
+        
         if (!inputType) {
             return rewriter.notifyMatchFailure(op, "expected memref type for input");
         }
+        auto isFloat = inputType.getElementType().isa<mlir::FloatType>();
 
         // Get input shape
         auto shape = inputType.getShape();
@@ -540,12 +510,14 @@ public:
             loc, value, loop.getInductionVar());
 
         // Compare with max val
-        auto cmp = rewriter.create<mlir::arith::CmpFOp>(
-            loc,
-            mlir::arith::CmpFPredicate::OGT,
-            currentValue,
-            loop.getRegionIterArgs()[0]  // First argument is maxValue
-        );
+        mlir::Value cmp;
+        if (isFloat){
+          cmp = rewriter.create<mlir::arith::CmpFOp>(loc,mlir::arith::CmpFPredicate::OGT,currentValue,loop.getRegionIterArgs()[0]);
+        }
+        else{ // if integer
+          cmp = rewriter.create<mlir::arith::CmpIOp>(loc,mlir::arith::CmpIPredicate::sgt,currentValue,loop.getRegionIterArgs()[0]); // not sure about the predicate
+        }
+        
 
         // Select the larger value and corresponding index
         auto newMax = rewriter.create<mlir::arith::SelectOp>(
@@ -562,28 +534,22 @@ public:
         // Reset insertion point
         rewriter.setInsertionPointAfter(loop);
 
-        // Convert index to i64
+        // Convert index to i32
         auto maxIndexInt = rewriter.create<mlir::arith::IndexCastOp>(
             loc,
-            rewriter.getI64Type(),
+            rewriter.getI32Type(),
             loop.getResult(1)
         );
 
-        // Convert i64 to float
-        auto maxIndexFloat = rewriter.create<mlir::arith::SIToFPOp>(
-            loc,
-            inputType.getElementType(),  // Convert to same float type as input
-            maxIndexInt
-        );
 
         // Create output memref for float
-        auto resultType = mlir::MemRefType::get({}, inputType.getElementType());
+        auto resultType = mlir::MemRefType::get({},rewriter.getI32Type());
         auto result = rewriter.create<mlir::memref::AllocOp>(loc, resultType);
 
         // Store the float value
         rewriter.create<mlir::memref::StoreOp>(
             loc,
-            maxIndexFloat,
+            maxIndexInt,
             result.getResult(),
             mlir::ValueRange{}
         );

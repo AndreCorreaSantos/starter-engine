@@ -1,6 +1,7 @@
 import onnx
 import numpy as np
 
+
 def convert_raw_data(initializer):
     data_type = initializer.data_type
     if data_type == onnx.TensorProto.FLOAT:
@@ -62,13 +63,18 @@ class Node():
         else:
             raise Exception(f"Activation Function not recognized: {self.op_type}")
 
-class Model():
-    def __init__(self, path):
+class StarterModel():
+    def __init__(self, path, useInt=False,scaleFactor=16):
         self.cache = {}
+        self.useInt = useInt
+        self.scaleFactor = scaleFactor
         o_model = onnx.load(path)
         for init in o_model.graph.initializer:
             data = convert_raw_data(init)
-            self.cache[init.name] = data
+            if self.useInt:
+                self.cache[init.name] = (self.scaleFactor*data).astype(np.int32) # scaling constants
+            else:
+                self.cache[init.name] = data 
         self.nodes = o_model.graph.node
 
     def infer(self, input):
@@ -77,11 +83,22 @@ class Model():
                 self.cache[nd.input[0]] = input
             inputs = [self.cache[inp] for inp in nd.input]
             n_obj = Node(nd.op_type, inputs)
-            self.cache[nd.output[0]] = n_obj.execute()
+            if self.useInt:
+                self.cache[nd.output[0]] = (n_obj.execute()).astype(np.int32)
+            else:
+                self.cache[nd.output[0]] = n_obj.execute()
             out = nd.output[0]
         return self.cache[out]
     
+    def debug(self,path):
+        #write to path
+        with open(path,"w+") as file:
+            for key,value in self.cache.items():
+                file.write(key)
+                file.write("\n")
+                txt = np.array2string(value, separator=', ', formatter={'int_kind': lambda x: str(x)}, max_line_width=np.inf, threshold=value.size).replace("\n", "")
+                file.write(txt)
+            # file.write(str(self.cache))
 
+    
 
-    # PASSAR AST PARA MINHA LINGUAGEM 
-    #

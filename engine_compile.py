@@ -1,18 +1,24 @@
 import onnx
 import numpy as np
 
+FLOAT = "f64"
+INT = "i32"
+
 def remove_illegals(result):
     return result.replace("/",".").replace("::",".")
 
-def print_shape(array):
+def print_shape(array,type):
     result =""
     for dim in array:
         result += str(dim) + "x"
-    result += "f64"
+    result += type
     return result
 
-def print_data(array):
-    return np.array2string(array, separator=', ', formatter={'float_kind': lambda x: f'{x:.1f}'}, max_line_width=np.inf,threshold=array.size).replace("\n","")
+def print_data(array,dtype,scaleFactor=16):
+    if dtype == FLOAT:
+        return np.array2string(array, separator=', ', formatter={'float_kind': lambda x: f'{x:.1f}'}, max_line_width=np.inf,threshold=array.size).replace("\n","")
+    return np.array2string((array*scaleFactor).astype(np.int32), separator=', ', formatter={'int_kind': lambda x: str(x)}, max_line_width=np.inf, threshold=array.size).replace("\n", "")
+
 
 def get_matmul_shape(shape1, shape2):
     t1 = np.zeros(shape1)
@@ -53,91 +59,114 @@ class Node():
         self.inputs = ["_"+i for i in inputs] # last two layers give SSA errors without _ prefix dont know why.
         self.output = "_"+output
         self.op_type = op_type
-    def Gemm(self, m, w, b, cache): # m, w and b will be their respective names
-        shape1 = print_shape(cache[m])
-        shape2 = print_shape(cache[w])
-        r_shape = get_matmul_shape(cache[m], cache[w])
-        cache[self.output] = r_shape
-        result_shape = print_shape(r_shape)
+
+    def Gemm(self, m, w, b, cache,dtype): # m, w and b will be their respective names
+
+        shape1 = print_shape(cache[m].shape, cache[m].type)
+        shape2 = print_shape(cache[w].shape, cache[w].type)
+        r_shape = get_matmul_shape(cache[m].shape, cache[w].shape)
+        cache[self.output] = Info(r_shape, dtype)
+        result_shape = print_shape(r_shape, dtype)
         mlir = f"%{self.output}_int = \"engine.matmul\"(%{w},%{m}) : (memref<{shape2}>,memref<{shape1}>) -> memref<{result_shape}>\n" # matmul with weights
         mlir += f"%{self.output} = \"engine.add\"(%{self.output}_int,%{b}) : (memref<{result_shape}>,memref<{result_shape}>) -> memref<{result_shape}>\n" # add bias | Addition preserves input shapes.
         return mlir
 
-    def Relu(self, m, cache):
+    def Relu(self, m, cache, dtype):
+        r_obj = Info(cache[m].shape, cache[m].type)
         cache[self.output] = cache[m]
-        sh = print_shape(cache[m])
+        sh = print_shape(cache[m].shape,dtype)
         return f"%{self.output} = \"engine.relu\"(%{m}) : (memref<{sh}>) -> memref<{sh}> \n"
 
-    def Flatten(self, m, cache):
+    def Flatten(self,m,cache,dtype):
         # flatten shape
         shape = 1
-        for i in cache[m]:
+        for i in cache[m].shape:
             shape *= i
-        cache[self.output] = (784,)
-        sh = print_shape((shape,))
+        r_obj = Info((784,),dtype)
+        cache[self.output] = r_obj # HARDCODED FOR NOW, CHANGE THIS LATER
+        sh = print_shape(r_obj.shape,dtype)
         return f"%{self.output} = \"engine.flatten\"(%{m}) : (memref<{sh}>) -> memref<{sh}> \n"
 
-    def Add(self, m1, m2, cache):
-        cache[self.output] = cache[m1]
-        sh = print_shape(cache[m1])
+    def Add(self, m1, m2, cache,dtype):
+        r_obj = Info(cache[m1].shape, dtype)
+        cache[self.output] = r_obj
+        sh = print_shape(cache[m1].shape,dtype)
         return f"%{self.output} = \"engine.add\"(%{m1},%{m2}) : (memref<{sh}>,memref<{sh}>) -> memref<{sh}> \n"
     
-    def ArgMax(self, m, cache):
-        cache[self.output] = ()
-        sh1 = print_shape(cache[m])
-        sh2 = print_shape(())
+    def ArgMax(self, m,cache,dtype):
+        r_obj = Info((), INT)
+        cache[self.output] = r_obj
+        sh1 = print_shape(cache[m].shape,dtype)
+        sh2 = print_shape((), INT)
         return f"%{self.output} = \"engine.argmax\"(%{m}) : (memref<{sh1}>) -> memref<{sh2}> \n"
 
-    def execute(self, cache):
+    def execute(self, cache, dtype):
         if self.op_type == "Flatten":
-            return self.Flatten(self.inputs[0],cache)
+            return self.Flatten(self.inputs[0],cache,dtype)
         elif self.op_type == "Gemm":
-            return self.Gemm(self.inputs[0], self.inputs[1], self.inputs[2],cache)
+            return self.Gemm(self.inputs[0], self.inputs[1], self.inputs[2],cache,dtype)
         elif self.op_type == "Relu":
-            return self.Relu(self.inputs[0],cache)
+            return self.Relu(self.inputs[0],cache,dtype)
         elif self.op_type == "Add":
-            return self.Add(self.inputs[0], self.inputs[1], cache)
+            return self.Add(self.inputs[0], self.inputs[1], cache,dtype)
         elif self.op_type == "ArgMax":
-            return self.ArgMax(self.inputs[0], cache)
+            return self.ArgMax(self.inputs[0], cache,dtype)
         else:
             raise Exception(f"Activation Function not recognized: {self.op_type}")
+        
+class Info():
+    def __init__(self, shape, type):
+        self.shape = shape
+        self.type = type
 
-class Model():
-    def __init__(self, path):
-        self.cache = {} # cache to store tensor {name: shape}
+class TranslateModel():
+    def __init__(self, path, dtype,scaleFactor=16):
+        self.cache = {} # cache to store tensor {name: cache_obj}
         o_model = onnx.load(path)
         self.initializers = o_model.graph.initializer # weights and biases
         self.nodes = o_model.graph.node # layers
         self.result = "" # final mlir code
+        self.dtype = dtype
+        self.scaleFactor = scaleFactor
 
     def init_model(self):
         for init in self.initializers:
             data = convert_raw_data(init)
-            self.result += self.load_constant(data, "_"+init.name) # doing this for same reason as in Node class
+            self.result += self.load_constant(data, "_"+init.name,self.scaleFactor) # doing +"_" for same reason as in Node class
             
-    def load_constant(self, input, name):
-        shape = print_shape(input.shape)
-        data = print_data(input)
-        self.cache[name] = input.shape
+    def load_constant(self, input, name, scaleFactor=16):
+        shape = print_shape(input.shape,self.dtype)
+        data = print_data(input,self.dtype,scaleFactor)
+        self.cache[name] = Info(input.shape, self.dtype)
         mlir = f"%{name} = \"engine.constant\"() {{value=dense<{data}>:tensor<{shape}>}} : () -> memref<{shape}>\n"
         return mlir
  
     def translate(self, input):
         for i, nd in enumerate(self.nodes):
             if i == 0:
-                self.result += self.load_constant(input, "_"+nd.input[0]) # "_" same reason as in Node class
+                self.result += self.load_constant(input, "_"+nd.input[0],self.scaleFactor) # "_" same reason as in Node class
             n_obj = Node(nd.op_type, nd.input, nd.output[0])
-            self.result += n_obj.execute(self.cache)
+            self.result += n_obj.execute(self.cache,self.dtype)
 
         
 
         header = "module {\nfunc.func @main() {\n"
         footer = "return\n}\n}"
         result_name = nd.output[0]
-        result_shape = print_shape(self.cache["_"+result_name])
+        r_obj= self.cache["_"+result_name]
+        result_shape = print_shape(r_obj.shape,r_obj.type)
         print_result = f"\"engine.print\"(%_{result_name}) : (memref<{result_shape}>) -> ()\n"
 
         return header + remove_illegals(self.result)+print_result+ footer
+    
+    def debug(self):
+        for key,value in self.cache.items():
+            print(key)
+            print(value.shape)
+            print(value)
 
 
 
+# I HAVE TO SCALE: INPUT, WEIGHTS AND BIASES
+# INPUT IS SCALED IN LOAD CONSTANT
+# WEIGHTS AND BIASES ARE ALSO SCALED IN LOAD CONSTANT -> WHICH CALLS PRINT DATA

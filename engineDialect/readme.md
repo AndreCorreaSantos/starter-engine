@@ -155,7 +155,5 @@ tasks:
 
 ##### 7)
 
-CURRENT PROBLEM WITH CIRCT: 
-  - CANNOT DEAL WITH FUNCTIONS.
-  - MLIR CANNOT LOWER FUNCTIONS TO ANYTHING ELSE BUT LLVM.
-  
+Current Problem:
+  - Integer version of mlir net giving different results for same input and same code. --> found the problem: matmul is overflowing.
