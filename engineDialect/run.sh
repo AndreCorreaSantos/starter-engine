@@ -29,7 +29,7 @@ fi
 cat "$mlir_file" > "$log_file"
 
 # Append the output of engine-opt to the log file
-./build/bin/engine-opt --mlir-print-ir-after-all "$mlir_file" > "$output_file" 2>> "$log_file"
+./build/bin/engine-opt --mlir-print-ir-after-all -debug-only=dialect-conversion "$mlir_file" > "$output_file" 2>> "$log_file"
 
 # If a second argument (input file) is provided, pipe that into lli.
 if [ -n "$second_arg" ]; then

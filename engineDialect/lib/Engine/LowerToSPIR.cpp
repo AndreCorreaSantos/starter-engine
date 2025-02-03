@@ -1,17 +1,13 @@
 #include "Engine/EngineDialect.h"
 #include "Engine/EngineOps.h"
 #include "Engine/EnginePasses.h"
-
 #include "mlir/Pass/Pass.h"
 #include "mlir/Transforms/DialectConversion.h"
-
 #include "mlir/Conversion/ArithToSPIRV/ArithToSPIRV.h"
 #include "mlir/Conversion/SCFToSPIRV/SCFToSPIRV.h"
 #include "mlir/Conversion/FuncToSPIRV/FuncToSPIRV.h"
 #include "mlir/Conversion/MemRefToSPIRV/MemRefToSPIRV.h"
-
 #include "mlir/Conversion/AffineToStandard/AffineToStandard.h"
-
 #include "mlir/Dialect/SPIRV/IR/SPIRVDialect.h"
 #include "mlir/Dialect/SCF/IR/SCF.h"
 #include "mlir/Dialect/ControlFlow/IR/ControlFlow.h"
@@ -21,79 +17,91 @@
 #include "mlir/Dialect/SPIRV/IR/SPIRVTypes.h"
 #include "mlir/Dialect/SPIRV/Transforms/SPIRVConversion.h"
 
-
-
-
 namespace {
 class LowerToSPIRPass
-    : public mlir::PassWrapper<LowerToSPIRPass,
-                               mlir::OperationPass<mlir::ModuleOp>> {
+    : public mlir::PassWrapper<LowerToSPIRPass, mlir::OperationPass<mlir::ModuleOp>> {
 public:
   MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(LowerToSPIRPass)
+
   void getDependentDialects(mlir::DialectRegistry &registry) const override {
     registry.insert<mlir::spirv::SPIRVDialect, mlir::scf::SCFDialect,
-                    mlir::cf::ControlFlowDialect>();
+                   mlir::cf::ControlFlowDialect, mlir::memref::MemRefDialect,
+                   mlir::func::FuncDialect>();
   }
-  
+
   void runOnOperation() final;
 };
-
 } // namespace
 
 void LowerToSPIRPass::runOnOperation() {
-    mlir::MLIRContext* context = &getContext();
-    mlir::ConversionTarget target(*context);
+  mlir::MLIRContext* context = &getContext();
+  mlir::ModuleOp module = getOperation();
 
-    mlir::spirv::Version version = mlir::spirv::Version::V_1_3; // COME BACK HERE LATER, NEED TO FIND OUT HOW TO WRITE THIS TO RUN ON IREE.
-    llvm::SmallVector<mlir::spirv::Capability> caps = {
-        mlir::spirv::Capability::Shader,
-        mlir::spirv::Capability::Float64,
-        mlir::spirv::Capability::Int64,
-        mlir::spirv::Capability::Addresses
-    };
-    llvm::SmallVector<mlir::spirv::Extension> exts;
-    
-    auto verCapExt = mlir::spirv::VerCapExtAttr::get(
-        version, caps, exts, context
-    );
-    auto resourceLimits = mlir::spirv::getDefaultResourceLimits(context);
+  // Configure SPIR-V conversion target
+  mlir::ConversionTarget target(*context);
+  mlir::spirv::Version version = mlir::spirv::Version::V_1_3;
+  
+  // Add required capabilities for memory operations
+  llvm::SmallVector<mlir::spirv::Capability, 6> caps{
+    mlir::spirv::Capability::Shader,
+    mlir::spirv::Capability::Float64,
+    mlir::spirv::Capability::Int64,
+    mlir::spirv::Capability::Addresses,
+    mlir::spirv::Capability::PhysicalStorageBufferAddresses,
+    mlir::spirv::Capability::VariablePointers
+  };
 
-    auto spirvTarget = mlir::spirv::TargetEnvAttr::get(
-            verCapExt,                      
-            resourceLimits,                
-            mlir::spirv::ClientAPI::Vulkan, // HARDCODED FOR NOW, SHOULD BE DETECTED OR SET LATER 
-            mlir::spirv::Vendor::NVIDIA,    
-            mlir::spirv::DeviceType::DiscreteGPU, 
-            0x10DE                          
-        );
+  llvm::SmallVector<mlir::spirv::Extension> exts;
+  auto verCapExt = mlir::spirv::VerCapExtAttr::get(version, caps, exts, context);
+  auto resourceLimits = mlir::spirv::getDefaultResourceLimits(context);
+  
+  auto spirvTarget = mlir::spirv::TargetEnvAttr::get(
+    verCapExt,
+    resourceLimits,
+    mlir::spirv::ClientAPI::Vulkan,
+    mlir::spirv::Vendor::NVIDIA,
+    mlir::spirv::DeviceType::DiscreteGPU,
+    0x10DE
+  );
 
-    mlir::SPIRVConversionOptions options;
-    options.use64bitIndex = sizeof(size_t) == 8;
-    mlir::SPIRVTypeConverter typeConverter(spirvTarget, options);
-    target.addLegalOp<mlir::ModuleOp>();
-    target.addLegalDialect<mlir::spirv::SPIRVDialect>();
+  // Configure conversion options
+  mlir::SPIRVConversionOptions options;
+  options.use64bitIndex = true;
+  options.emulateLT32BitScalarTypes = true;
+  
+  // Set up type converter
+  mlir::SPIRVTypeConverter typeConverter(spirvTarget, options);
 
-    target.addIllegalDialect<mlir::arith::ArithDialect>();
-    target.addIllegalDialect<mlir::memref::MemRefDialect>();
-    target.addIllegalDialect<mlir::scf::SCFDialect>();
+  // Set up conversion target
+  target.addLegalOp<mlir::ModuleOp>();
+  target.addLegalDialect<mlir::spirv::SPIRVDialect>();
+  
+  // Mark all other dialects as illegal to ensure full conversion
+  target.addIllegalDialect<mlir::arith::ArithDialect,
+                          mlir::memref::MemRefDialect,
+                          mlir::scf::SCFDialect,
+                          mlir::func::FuncDialect>();
 
-    mlir::RewritePatternSet patterns(context);
-    
-    mlir::populateAffineToStdConversionPatterns(patterns);
-    mlir::populateFuncToSPIRVPatterns(typeConverter, patterns);
-    mlir::arith::populateArithToSPIRVPatterns(typeConverter, patterns);
-    mlir::populateMemRefToSPIRVPatterns(typeConverter, patterns);
-    
-    mlir::ScfToSPIRVContext scfContext;
-    mlir::populateSCFToSPIRVPatterns(typeConverter, scfContext, patterns);
+  // Set up conversion patterns
+  mlir::RewritePatternSet patterns(context);
 
-    if (mlir::failed(mlir::applyFullConversion(getOperation(), target, std::move(patterns)))) {
-        signalPassFailure();
-    }
+  // Add all necessary conversion patterns
+  mlir::populateAffineToStdConversionPatterns(patterns);
+  mlir::populateMemRefToSPIRVPatterns(typeConverter, patterns);
+  mlir::arith::populateArithToSPIRVPatterns(typeConverter, patterns);
+  mlir::populateFuncToSPIRVPatterns(typeConverter, patterns);
+  
+  mlir::ScfToSPIRVContext scfContext;
+  mlir::populateSCFToSPIRVPatterns(typeConverter, scfContext, patterns);
+
+  // Apply the conversion
+  if (mlir::failed(mlir::applyFullConversion(getOperation(), target, std::move(patterns)))) {
+    signalPassFailure();
+  }
 }
 
 namespace engine {
-std::unique_ptr<mlir::Pass> createLowerToSPIRPass () {
+std::unique_ptr<mlir::Pass> createLowerToSPIRPass() {
   return std::make_unique<LowerToSPIRPass>();
 }
 }
